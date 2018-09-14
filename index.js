@@ -18,6 +18,28 @@ app.post('/categories', (req, res) => {
     res.status(202).send(json);
 });
 
+app.get('/categories', (req, res) => {
+    const categories = [
+        {
+            id: 5,
+            name: 'Databases',
+            color: 'Red',
+            icon: 'Icon.png',
+        },
+        {
+            id: 6,
+            name: 'Software Engineering',
+            color: 'Blue',
+            icon: 'IconSE.png',
+        },
+    ];
+    const json = {
+        response: 'Ok',
+        data: categories,
+    };
+    res.status(200).send(json);
+});
+
 app.listen(3000, () => {
     console.log('Example app listening on port 3000!');
 });
