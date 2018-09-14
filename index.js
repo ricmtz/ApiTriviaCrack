@@ -76,6 +76,14 @@ app.delete('/categories/:categoryId', (req, res) => {
     res.status(204).send(json);
 });
 
+app.delete('/categories', (req, res) => {
+    const json = {
+        response: 'No content',
+        data: {},
+    };
+    res.status(204).send(json);
+});
+
 app.listen(3000, () => {
     console.log('Example app listening on port 3000!');
 });
