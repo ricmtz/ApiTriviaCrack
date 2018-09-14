@@ -1,6 +1,10 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
     res.send('Hello World!');
@@ -12,10 +16,10 @@ app.post('/categories', (req, res) => {
         response: 'Created',
         data: {
             id: generatedId,
-            url: `https://domain/categories/${generatedId}`,
+            url: `https://domain/categories/${req.body.name}`,
         },
     };
-    res.status(202).send(json);
+    res.status(201).send(json);
 });
 
 app.get('/categories', (req, res) => {
