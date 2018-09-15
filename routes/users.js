@@ -41,7 +41,7 @@ router.get('/users/:userId', (req, res) => {
 });
 
 // Create users.
-router.post('/users', (req, res) => {    
+router.post('/users', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
