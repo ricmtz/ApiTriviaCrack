@@ -6,14 +6,20 @@ const router = express.Router();
 router.get('/questions_users', (req, res) => {
     const questionsUsers = [
         {
+            id: 123,
             nickname: 'juan',
             question: 'Que significa POO?',
+            options: ['Poder Oro y Osio', 'Puerta Ordenadas Operable', 'Programación Orienta a Objetos'],
+            corret: 'Programación Orienta a Objetos',
             createDate: '09/15/2018',
             approvedDate: '10/15/2018',
         },
         {
+            id: 234,
             nickname: 'pepe',
             question: 'Quien creo git?',
+            options: ['Stallman', 'Linus', 'Bill'],
+            corret: 'Bill',
             createDate: '09/15/2018',
             approvedDate: '10/15/2018',
         },
@@ -32,13 +38,12 @@ router.get('/questions_users/:idQuestionsUsers', (req, res) => {
         response: 'Ok',
         data: {
             id: req.params.idQuestionsUsers,
-            questios: {
-                nickname: 'juan',
-                question: 'Quien creo git?',
-                createDate: '09/15/2018',
-                approvedDate: '10/15/2018',
-            },
-            total: 1,
+            nickname: 'juan',
+            question: 'Quien creo git?',
+            options: ['Stallman', 'Linus', 'Bill'],
+            corret: 'Bill',
+            createDate: '09/15/2018',
+            approvedDate: '10/15/2018',
         },
     };
     res.status(200).send(json);
@@ -63,7 +68,7 @@ router.delete('/questions_users/:idQuestionsUsers', (req, res) => {
 });
 
 // Update question user.
-router.delete('/questions_users/:idQuestionsUsers', (req, res) => {
+router.patch('/questions_users/:idQuestionsUsers', (req, res) => {
     res.status(204).send('Data is updated');
 });
 
