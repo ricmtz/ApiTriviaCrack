@@ -40,5 +40,19 @@ router.get('/games', (req, res) => {
     res.status(200).send(json);
 });
 
+// Get game by Id
+router.get('/games/:gameId', (req, res) => {
+    const json = {
+        response: 'Ok',
+        data: {
+            id: `${req.params.gameId}`,
+            player_1: 48,
+            player_2: 24,
+            answers_player_1: 0,
+            answers_player_2: 2,
+        },
+    };
+    res.status(200).send(json);
+});
 
 module.exports = router;
