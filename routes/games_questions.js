@@ -1,7 +1,8 @@
 const { Router } = require('express');
+
 const gamesQuestions = Router();
 
-gamesQuestions.get('/', (req, res) => {
+gamesQuestions.get('/gamesquestions', (req, res) => {
     const answers = [
         {
             game: 1,
@@ -9,7 +10,7 @@ gamesQuestions.get('/', (req, res) => {
             selected_option_player_1: 'Puerta Ordenadas Operable',
             option_player_1: false,
             selected_option_player_2: 'Programación Orientada a Objetos',
-            option_player_3: true,
+            option_player_2: true,
         },
         {
             game: 1,
@@ -17,7 +18,7 @@ gamesQuestions.get('/', (req, res) => {
             selected_option_player_1: 'Linus',
             option_player_1: false,
             selected_option_player_2: 'BIll',
-            option_player_3: true,
+            option_player_2: true,
         },
     ];
     const json = {
@@ -28,7 +29,7 @@ gamesQuestions.get('/', (req, res) => {
     res.status(200).send(json);
 });
 
-gamesQuestions.get('/:game/:question', (req, res) => {
+gamesQuestions.get('/gamesquestions/:game/:question', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -37,13 +38,13 @@ gamesQuestions.get('/:game/:question', (req, res) => {
             selected_option_player_1: 'Linus',
             option_player_1: false,
             selected_option_player_2: 'Bill',
-            option_player_3: true,
+            option_player_2: true,
         },
     };
     res.status(200).send(json);
 });
 
-gamesQuestions.post('/', (req, res) => {
+gamesQuestions.post('/gamesquestions', (req, res) => {
     const json = {
         response: 'OK',
         data: {
@@ -54,7 +55,7 @@ gamesQuestions.post('/', (req, res) => {
     res.status(200).send(json);
 });
 
-gamesQuestions.delete('/:game/:question', (req, res) => {
+gamesQuestions.delete('/gamesquestions/:game/:question', (req, res) => {
     const json = {
         response: 'OK',
         game: req.params.game,
@@ -63,7 +64,7 @@ gamesQuestions.delete('/:game/:question', (req, res) => {
     res.status(200).send(json);
 });
 
-gamesQuestions.patch('/:game/:question', (req, res) => {
+gamesQuestions.patch('/gamesquestions/:game/:question', (req, res) => {
     res.status(204).send('Data is updated');
 });
 
