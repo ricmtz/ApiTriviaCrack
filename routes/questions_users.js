@@ -10,7 +10,7 @@ router.get('/questions_users', (req, res) => {
             nickname: 'juan',
             question: 'Que significa POO?',
             options: ['Poder Oro y Osio', 'Puerta Ordenadas Operable', 'Programación Orienta a Objetos'],
-            corret: 'Programación Orienta a Objetos',
+            correct: 'Programación Orienta a Objetos',
             createDate: '09/15/2018',
             approvedDate: '10/15/2018',
         },
@@ -19,7 +19,7 @@ router.get('/questions_users', (req, res) => {
             nickname: 'pepe',
             question: 'Quien creo git?',
             options: ['Stallman', 'Linus', 'Bill'],
-            corret: 'Bill',
+            correct: 'Bill',
             createDate: '09/15/2018',
             approvedDate: '10/15/2018',
         },
@@ -41,7 +41,7 @@ router.get('/questions_users/:idQuestionsUsers', (req, res) => {
             nickname: 'juan',
             question: 'Quien creo git?',
             options: ['Stallman', 'Linus', 'Bill'],
-            corret: 'Bill',
+            correct: 'Bill',
             createDate: '09/15/2018',
             approvedDate: '10/15/2018',
         },
@@ -69,7 +69,7 @@ router.delete('/questions_users/:idQuestionsUsers', (req, res) => {
 
 // Update question user.
 router.patch('/questions_users/:idQuestionsUsers', (req, res) => {
-    res.status(204).send('Data is updated');
+    res.status(204).send('Data successfully updated');
 });
 
 module.exports = router;

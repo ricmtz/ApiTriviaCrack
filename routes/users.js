@@ -63,7 +63,7 @@ router.delete('/users/:userId', (req, res) => {
 
 // Update users.
 router.patch('/users/:userId', (req, res) => {
-    res.status(204).send('Data is updated.');
+    res.status(204).send('Data successfully updated');
 });
 
 
