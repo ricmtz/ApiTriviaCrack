@@ -5,6 +5,10 @@ const categoriesRouter = require('./routes/categories');
 
 const app = express();
 
+const routers = require('./routers');
+
+app.use('/', routers);
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
