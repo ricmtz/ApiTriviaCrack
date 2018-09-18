@@ -55,4 +55,15 @@ router.get('/games/:gameId', (req, res) => {
     res.status(200).send(json);
 });
 
+// Put game
+router.put('/games/:gameId', (req, res) => {
+    const json = {
+        response: 'Ok',
+        data: {
+            id: req.params.gameId,
+        },
+    };
+    res.status(200).send(json);
+});
+
 module.exports = router;
