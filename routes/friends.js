@@ -2,7 +2,7 @@ const { Router } = require('express');
 
 const friends = Router();
 
-friends.get('/friends', (req, res) => {
+friends.get('/', (req, res) => {
     const fri = [
         {
             user_1: 1,
@@ -23,7 +23,7 @@ friends.get('/friends', (req, res) => {
     res.status(200).send(json);
 });
 
-friends.get('/friends/:user_1/:user_2', (req, res) => {
+friends.get('/:user_1/:user_2', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -35,7 +35,7 @@ friends.get('/friends/:user_1/:user_2', (req, res) => {
     res.status(200).send(json);
 });
 
-friends.post('/friends', (req, res) => {
+friends.post('/', (req, res) => {
     const json = {
         response: 'OK',
         data: {
@@ -46,7 +46,7 @@ friends.post('/friends', (req, res) => {
     res.status(200).send(json);
 });
 
-friends.delete('/friends/:user_1/:user_2', (req, res) => {
+friends.delete('/:user_1/:user_2', (req, res) => {
     const json = {
         response: 'OK',
         user_1: req.params.user_1,
@@ -55,7 +55,7 @@ friends.delete('/friends/:user_1/:user_2', (req, res) => {
     res.status(200).send(json);
 });
 
-friends.patch('/friends/:user_1/:user_2', (req, res) => {
+friends.patch('/:user_1/:user_2', (req, res) => {
     res.status(204).send('Data is updated');
 });
 

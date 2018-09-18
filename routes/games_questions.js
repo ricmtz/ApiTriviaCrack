@@ -2,7 +2,7 @@ const { Router } = require('express');
 
 const gamesQuestions = Router();
 
-gamesQuestions.get('/gamesquestions', (req, res) => {
+gamesQuestions.get('/', (req, res) => {
     const answers = [
         {
             game: 1,
@@ -29,7 +29,7 @@ gamesQuestions.get('/gamesquestions', (req, res) => {
     res.status(200).send(json);
 });
 
-gamesQuestions.get('/gamesquestions/:game/:question', (req, res) => {
+gamesQuestions.get('/:game/:question', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -44,7 +44,7 @@ gamesQuestions.get('/gamesquestions/:game/:question', (req, res) => {
     res.status(200).send(json);
 });
 
-gamesQuestions.post('/gamesquestions', (req, res) => {
+gamesQuestions.post('/', (req, res) => {
     const json = {
         response: 'OK',
         data: {
@@ -55,7 +55,7 @@ gamesQuestions.post('/gamesquestions', (req, res) => {
     res.status(200).send(json);
 });
 
-gamesQuestions.delete('/gamesquestions/:game/:question', (req, res) => {
+gamesQuestions.delete('/:game/:question', (req, res) => {
     const json = {
         response: 'OK',
         game: req.params.game,
@@ -64,7 +64,7 @@ gamesQuestions.delete('/gamesquestions/:game/:question', (req, res) => {
     res.status(200).send(json);
 });
 
-gamesQuestions.patch('/gamesquestions/:game/:question', (req, res) => {
+gamesQuestions.patch('/:game/:question', (req, res) => {
     res.status(204).send('Data is updated');
 });
 

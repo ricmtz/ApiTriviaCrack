@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Post category
-router.post('/categories', (req, res) => {
+router.post('/', (req, res) => {
     const generatedId = 5;
     const json = {
         response: 'Created',
@@ -16,7 +16,7 @@ router.post('/categories', (req, res) => {
 });
 
 // Get all categories
-router.get('/categories', (req, res) => {
+router.get('/', (req, res) => {
     const categories = [
         {
             id: 5,
@@ -39,7 +39,7 @@ router.get('/categories', (req, res) => {
 });
 
 // Get category by Id
-router.get('/categories/:categoryId', (req, res) => {
+router.get('/:categoryId', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -53,7 +53,7 @@ router.get('/categories/:categoryId', (req, res) => {
 });
 
 // Put category
-router.put('/categories/:categoryId', (req, res) => {
+router.put('/:categoryId', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -65,7 +65,7 @@ router.put('/categories/:categoryId', (req, res) => {
 });
 
 // Delete category
-router.delete('/categories/:categoryId', (req, res) => {
+router.delete('/:categoryId', (req, res) => {
     const json = {
         response: 'No content',
         data: {},
@@ -74,7 +74,7 @@ router.delete('/categories/:categoryId', (req, res) => {
 });
 
 // Delete all categories
-router.delete('/categories', (req, res) => {
+router.delete('/', (req, res) => {
     const json = {
         response: 'No content',
         data: {},
