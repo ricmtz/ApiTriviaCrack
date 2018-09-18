@@ -66,4 +66,13 @@ router.put('/games/:gameId', (req, res) => {
     res.status(200).send(json);
 });
 
+// Delete game
+router.delete('/games/:gameId', (req, res) => {
+    const json = {
+        response: 'No content',
+        data: {},
+    };
+    res.status(204).send(json);
+});
+
 module.exports = router;
