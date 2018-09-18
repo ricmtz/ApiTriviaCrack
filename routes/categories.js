@@ -38,7 +38,7 @@ router.get('/categories', (req, res) => {
     res.status(200).send(json);
 });
 
-// Get categoty by Id
+// Get category by Id
 router.get('/categories/:categoryId', (req, res) => {
     const json = {
         response: 'Ok',
