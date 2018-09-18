@@ -6,6 +6,7 @@ const questionsUser = require('./routes/questions_users');
 const gamesQuestionsRouter = require('./routes/games_questions');
 const questionsRouter = require('./routes/questions');
 const games = require('./routes/games');
+const friendsRouter = require('./routes/friends');
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(questionsUser);
 app.use(gamesQuestionsRouter);
 app.use(questionsRouter);
 app.use(games);
+app.use(friendsRouter);
 
 app.listen(3000, () => {
     console.log('Example app listening on port 3000!');
