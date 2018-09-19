@@ -1,85 +1,24 @@
-const express = require('express');
+const { Router } = require('express');
+const { categoriesCtrl } = require('../controllers');
 
-const router = express.Router();
+const router = Router();
 
 // Post category
-router.post('/', (req, res) => {
-    const generatedId = 5;
-    const json = {
-        response: 'Created',
-        data: {
-            id: generatedId,
-            url: `https://domain/categories/${req.body.name}`,
-        },
-    };
-    res.status(201).send(json);
-});
+router.post('/', categoriesCtrl.create);
 
 // Get all categories
-router.get('/', (req, res) => {
-    const categories = [
-        {
-            id: 5,
-            name: 'Databases',
-            color: 'Red',
-            icon: 'Icon.png',
-        },
-        {
-            id: 6,
-            name: 'Software Engineering',
-            color: 'Blue',
-            icon: 'IconSE.png',
-        },
-    ];
-    const json = {
-        response: 'Ok',
-        data: categories,
-    };
-    res.status(200).send(json);
-});
+router.get('/', categoriesCtrl.getAll);
 
 // Get category by Id
-router.get('/:categoryId', (req, res) => {
-    const json = {
-        response: 'Ok',
-        data: {
-            id: req.params.categoryId,
-            name: `Category ${req.params.categoryId}`,
-            color: 'White',
-            icon: `Icon${req.params.categoryId}.png`,
-        },
-    };
-    res.status(200).send(json);
-});
+router.get('/:categoryId', categoriesCtrl.get);
 
 // Put category
-router.put('/:categoryId', (req, res) => {
-    const json = {
-        response: 'Ok',
-        data: {
-            id: req.params.categoryId,
-            name: req.body.name,
-        },
-    };
-    res.status(200).send(json);
-});
+router.put('/:categoryId', categoriesCtrl.update);
 
 // Delete category
-router.delete('/:categoryId', (req, res) => {
-    const json = {
-        response: 'No content',
-        data: {},
-    };
-    res.status(204).send(json);
-});
+router.delete('/:categoryId', categoriesCtrl.delete);
 
 // Delete all categories
-router.delete('/', (req, res) => {
-    const json = {
-        response: 'No content',
-        data: {},
-    };
-    res.status(204).send(json);
-});
+router.delete('/', categoriesCtrl.deleteAll);
 
 module.exports = router;
