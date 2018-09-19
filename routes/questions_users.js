@@ -1,75 +1,21 @@
-const express = require('express');
+const { Router } = require('express');
+const { questionsUsersCtrl } = require('../controllers');
 
-const router = express.Router();
+const router = Router();
 
 // List all questions users.
-router.get('/', (req, res) => {
-    const questionsUsers = [
-        {
-            id: 123,
-            nickname: 'juan',
-            question: 'Que significa POO?',
-            options: ['Poder Oro y Osio', 'Puerta Ordenadas Operable', 'Programación Orienta a Objetos'],
-            correct: 'Programación Orienta a Objetos',
-            createDate: '09/15/2018',
-            approvedDate: '10/15/2018',
-        },
-        {
-            id: 234,
-            nickname: 'pepe',
-            question: 'Quien creo git?',
-            options: ['Stallman', 'Linus', 'Bill'],
-            correct: 'Bill',
-            createDate: '09/15/2018',
-            approvedDate: '10/15/2018',
-        },
-    ];
-    const json = {
-        response: 'Ok',
-        data: questionsUsers,
-        total: 2,
-    };
-    res.status(200).send(json);
-});
+router.get('/', questionsUsersCtrl.getAll);
 
 // Find question user.
-router.get('/:idQuestionsUsers', (req, res) => {
-    const json = {
-        response: 'Ok',
-        data: {
-            id: req.params.idQuestionsUsers,
-            nickname: 'juan',
-            question: 'Quien creo git?',
-            options: ['Stallman', 'Linus', 'Bill'],
-            correct: 'Bill',
-            createDate: '09/15/2018',
-            approvedDate: '10/15/2018',
-        },
-    };
-    res.status(200).send(json);
-});
+router.get('/:question/:user', questionsUsersCtrl.get);
 
 // Create question user
-router.post('/', (req, res) => {
-    const json = {
-        response: 'Ok',
-        id: 1012,
-    };
-    res.status(200).send(json);
-});
+router.post('/', questionsUsersCtrl.create);
 
 // Delete question user
-router.delete('/:idQuestionsUsers', (req, res) => {
-    const json = {
-        response: 'Ok',
-        id: req.params.idQuestionsUsers,
-    };
-    res.status(200).send(json);
-});
+router.delete('/:question/:user', questionsUsersCtrl.delete);
 
 // Update question user.
-router.patch('/:idQuestionsUsers', (req, res) => {
-    res.status(204).send('Data successfully updated');
-});
+router.patch('/:question/:user', questionsUsersCtrl.update);
 
 module.exports = router;
