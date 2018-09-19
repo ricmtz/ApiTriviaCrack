@@ -1,71 +1,16 @@
 const { Router } = require('express');
+const { gamesQuestionsCtrl } = require('../controllers');
 
-const gamesQuestions = Router();
+const router = Router();
 
-gamesQuestions.get('/', (req, res) => {
-    const answers = [
-        {
-            game: 1,
-            question: 1,
-            selected_option_player_1: 'Puerta Ordenadas Operable',
-            option_player_1: false,
-            selected_option_player_2: 'Programación Orientada a Objetos',
-            option_player_2: true,
-        },
-        {
-            game: 1,
-            question: 2,
-            selected_option_player_1: 'Linus',
-            option_player_1: false,
-            selected_option_player_2: 'BIll',
-            option_player_2: true,
-        },
-    ];
-    const json = {
-        response: 'Ok',
-        data: answers,
-        total: 2,
-    };
-    res.status(200).send(json);
-});
+router.get('/', gamesQuestionsCtrl.getAll);
 
-gamesQuestions.get('/:game/:question', (req, res) => {
-    const json = {
-        response: 'Ok',
-        data: {
-            game: req.params.game,
-            question: req.params.question,
-            selected_option_player_1: 'Linus',
-            option_player_1: false,
-            selected_option_player_2: 'Bill',
-            option_player_2: true,
-        },
-    };
-    res.status(200).send(json);
-});
+router.get('/:game/:question', gamesQuestionsCtrl.get);
 
-gamesQuestions.post('/', (req, res) => {
-    const json = {
-        response: 'OK',
-        data: {
-            game: req.body.game,
-            question: req.body.question,
-        },
-    };
-    res.status(200).send(json);
-});
+router.post('/', gamesQuestionsCtrl.create);
 
-gamesQuestions.delete('/:game/:question', (req, res) => {
-    const json = {
-        response: 'OK',
-        game: req.params.game,
-        question: req.params.question,
-    };
-    res.status(200).send(json);
-});
+router.delete('/:game/:question', gamesQuestionsCtrl.delete);
 
-gamesQuestions.patch('/:game/:question', (req, res) => {
-    res.status(204).send('Data is updated');
-});
+router.patch('/:game/:question', gamesQuestionsCtrl.update);
 
-module.exports = gamesQuestions;
+module.exports = router;
