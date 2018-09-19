@@ -1,1 +1,1 @@
-exports.emailsCtrl = require('./email');
+exports.emailsCtrl = require('./emails');
