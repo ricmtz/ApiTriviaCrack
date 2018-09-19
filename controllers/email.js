@@ -11,7 +11,7 @@ exports.getAll = (req, res) => {
         {
             idUser: 1,
             email: 'pepechuy@gmail.com',
-        }
+        },
     ];
     const json = {
         response: 'Ok',
