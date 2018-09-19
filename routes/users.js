@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // List all users.
-router.get('/users', (req, res) => {
+router.get('/', (req, res) => {
     const users = [
         {
             id: 1,
@@ -27,7 +27,7 @@ router.get('/users', (req, res) => {
 });
 
 // Find users.
-router.get('/users/:userId', (req, res) => {
+router.get('/:userId', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -41,7 +41,7 @@ router.get('/users/:userId', (req, res) => {
 });
 
 // Create users.
-router.post('/users', (req, res) => {
+router.post('/', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -53,7 +53,7 @@ router.post('/users', (req, res) => {
 });
 
 // Delete users.
-router.delete('/users/:userId', (req, res) => {
+router.delete('/:userId', (req, res) => {
     const json = {
         response: 'Ok',
         id: req.params.userId,
@@ -62,7 +62,7 @@ router.delete('/users/:userId', (req, res) => {
 });
 
 // Update users.
-router.patch('/users/:userId', (req, res) => {
+router.patch('/:userId', (req, res) => {
     res.status(204).send('Data successfully updated');
 });
 

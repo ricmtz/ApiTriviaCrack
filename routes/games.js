@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // Post game
-router.post('/games', (req, res) => {
+router.post('/', (req, res) => {
     const generatedId = 15;
     const json = {
         response: 'Created',
@@ -16,7 +16,7 @@ router.post('/games', (req, res) => {
 });
 
 // Get all games
-router.get('/games', (req, res) => {
+router.get('/', (req, res) => {
     const games = [
         {
             id: 9,
@@ -41,7 +41,7 @@ router.get('/games', (req, res) => {
 });
 
 // Get game by Id
-router.get('/games/:gameId', (req, res) => {
+router.get('/:gameId', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -56,7 +56,7 @@ router.get('/games/:gameId', (req, res) => {
 });
 
 // Put game
-router.put('/games/:gameId', (req, res) => {
+router.put('/:gameId', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -67,7 +67,7 @@ router.put('/games/:gameId', (req, res) => {
 });
 
 // Delete game
-router.delete('/games/:gameId', (req, res) => {
+router.delete('/:gameId', (req, res) => {
     const json = {
         response: 'No content',
         data: {},
@@ -76,7 +76,7 @@ router.delete('/games/:gameId', (req, res) => {
 });
 
 // Delete all games
-router.delete('/games', (req, res) => {
+router.delete('/', (req, res) => {
     const json = {
         response: 'No content',
         data: {},

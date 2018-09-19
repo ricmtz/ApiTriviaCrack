@@ -2,7 +2,7 @@ const { Router } = require('express');
 
 const questions = Router();
 
-questions.get('/questions', (req, res) => {
+questions.get('/', (req, res) => {
     const ques = [
         {
             id: 10,
@@ -29,7 +29,7 @@ questions.get('/questions', (req, res) => {
     res.status(200).send(json);
 });
 
-questions.get('/questions/:questionID', (req, res) => {
+questions.get('/:questionID', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -44,7 +44,7 @@ questions.get('/questions/:questionID', (req, res) => {
     res.status(200).send(json);
 });
 
-questions.post('/questions', (req, res) => {
+questions.post('/', (req, res) => {
     const json = {
         response: 'OK',
         data: {
@@ -54,7 +54,7 @@ questions.post('/questions', (req, res) => {
     res.status(200).send(json);
 });
 
-questions.delete('/questions/:questionID', (req, res) => {
+questions.delete('/:questionID', (req, res) => {
     const json = {
         response: 'OK',
         questionID: req.params.questionID,
@@ -62,7 +62,7 @@ questions.delete('/questions/:questionID', (req, res) => {
     res.status(200).send(json);
 });
 
-questions.patch('/questions/:questionID', (req, res) => {
+questions.patch('/:questionID', (req, res) => {
     res.status(204).send('Data is updated');
 });
 

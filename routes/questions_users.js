@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 // List all questions users.
-router.get('/questions_users', (req, res) => {
+router.get('/', (req, res) => {
     const questionsUsers = [
         {
             id: 123,
@@ -33,7 +33,7 @@ router.get('/questions_users', (req, res) => {
 });
 
 // Find question user.
-router.get('/questions_users/:idQuestionsUsers', (req, res) => {
+router.get('/:idQuestionsUsers', (req, res) => {
     const json = {
         response: 'Ok',
         data: {
@@ -50,7 +50,7 @@ router.get('/questions_users/:idQuestionsUsers', (req, res) => {
 });
 
 // Create question user
-router.post('/questions_users', (req, res) => {
+router.post('/', (req, res) => {
     const json = {
         response: 'Ok',
         id: 1012,
@@ -59,7 +59,7 @@ router.post('/questions_users', (req, res) => {
 });
 
 // Delete question user
-router.delete('/questions_users/:idQuestionsUsers', (req, res) => {
+router.delete('/:idQuestionsUsers', (req, res) => {
     const json = {
         response: 'Ok',
         id: req.params.idQuestionsUsers,
@@ -68,7 +68,7 @@ router.delete('/questions_users/:idQuestionsUsers', (req, res) => {
 });
 
 // Update question user.
-router.patch('/questions_users/:idQuestionsUsers', (req, res) => {
+router.patch('/:idQuestionsUsers', (req, res) => {
     res.status(204).send('Data successfully updated');
 });
 
