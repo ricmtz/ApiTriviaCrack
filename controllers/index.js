@@ -5,3 +5,4 @@ exports.gamesCtrl = require('./games');
 exports.gamesQuestionsCtrl = require('./games_questions');
 exports.questionsUsersCtrl = require('./questions_users');
 exports.questionsCtrl = require('./questions');
+exports.emailsCtrl = require('./emails');
