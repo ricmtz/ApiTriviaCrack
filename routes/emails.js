@@ -13,9 +13,9 @@ router.get('/:userId', emailsCtrl.get);
 router.post('/', emailsCtrl.create);
 
 // Delete email.
-router.delete('/:userId', emailsCtrl.delete);
+router.delete('/:userEmail', emailsCtrl.delete);
 
 // Update email.
-router.patch('/:userId', emailsCtrl.update);
+router.patch('/:userEmail', emailsCtrl.update);
 
 module.exports = router;

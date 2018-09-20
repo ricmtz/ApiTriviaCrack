@@ -49,7 +49,7 @@ exports.update = (req, res) => {
 exports.delete = (req, res) => {
     const json = {
         response: 'Ok',
-        idUser: req.params.userId,
+        email: req.params.userEmail,
     };
     res.status(200).send(json);
 };
