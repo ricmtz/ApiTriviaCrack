@@ -3,19 +3,19 @@ const { emailsCtrl } = require('../controllers');
 
 const router = express.Router();
 
-// List all users.
+// List all emails.
 router.get('/', emailsCtrl.getAll);
 
-// Find users.
+// Find emails user.
 router.get('/:userId', emailsCtrl.get);
 
-// Create users.
+// Create email.
 router.post('/', emailsCtrl.create);
 
-// Delete users.
-router.delete('/:userId', emailsCtrl.delete);
+// Delete email.
+router.delete('/:userEmail', emailsCtrl.delete);
 
-// Update users.
-router.patch('/:userId', emailsCtrl.update);
+// Update email.
+router.patch('/:userEmail', emailsCtrl.update);
 
 module.exports = router;
