@@ -1,15 +1,6 @@
-
-class GamesQuestions {
+class GamesQuestionsCtrl {
     constructor() {
-        this.getAll = this.getAll.bind(this);
-        this.get = this.get.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
-    }
-
-    getAll(req, res) {
-        const answers = [
+        this.gamesQuestions = [
             {
                 game: 1,
                 question: 1,
@@ -27,9 +18,18 @@ class GamesQuestions {
                 option_player_2: true,
             },
         ];
+
+        this.getAll = this.getAll.bind(this);
+        this.get = this.get.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
+    }
+
+    getAll(req, res) {
         const json = {
             response: 'Ok',
-            data: answers,
+            data: this.gamesQuestions,
             total: 2,
         };
         res.status(200).send(json);
@@ -38,14 +38,7 @@ class GamesQuestions {
     get(req, res) {
         const json = {
             response: 'Ok',
-            data: {
-                game: req.params.game,
-                question: req.params.question,
-                selected_option_player_1: 'Linus',
-                option_player_1: false,
-                selected_option_player_2: 'Bill',
-                option_player_2: true,
-            },
+            data: this.gamesQuestions.find(el => el.id === Number(req.params.question))
         };
         res.status(200).send(json);
     }
@@ -62,7 +55,7 @@ class GamesQuestions {
     }
 
     update(req, res) {
-        res.status(204).send('Data is updated');
+        res.status(204).send('Data successfully updated');
     }
 
     delete(req, res) {
@@ -75,4 +68,4 @@ class GamesQuestions {
     }
 }
 
-module.exports = new GamesQuestions();
+module.exports = new GamesQuestionsCtrl();
