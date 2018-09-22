@@ -38,7 +38,8 @@ class GamesQuestionsCtrl {
     get(req, res) {
         const json = {
             response: 'Ok',
-            data: this.gamesQuestions.find(el => el.id === Number(req.params.question))
+            data: this.gamesQuestions.find(el => el.game === Number(req.params.game)
+          && el.question === Number(req.params.question)),
         };
         res.status(200).send(json);
     }

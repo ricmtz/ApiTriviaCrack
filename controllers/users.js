@@ -14,6 +14,12 @@ class UsersCtrl {
                 current_points: 767,
             },
         ];
+
+        this.getAll = this.getAll.bind(this);
+        this.get = this.get.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
     }
 
     getAll(req, res) {

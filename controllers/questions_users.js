@@ -22,6 +22,12 @@ class QuestionsUsersCtrl {
                 approvedDate: '10/15/2018',
             },
         ];
+
+        this.getAll = this.getAll.bind(this);
+        this.get = this.get.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
     }
 
     getAll(req, res) {
@@ -33,7 +39,7 @@ class QuestionsUsersCtrl {
         res.status(200).send(json);
     }
 
-    static get(req, res) {
+    get(req, res) {
         const json = {
             response: 'Ok',
             data: this.questionsUsers.find(el => el.question === Number(req.params.question)
