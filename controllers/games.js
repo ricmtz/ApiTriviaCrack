@@ -42,12 +42,12 @@ class GamesCtrl {
     }
 
     create(req, res) {
-        const generatedId = 15;
+        const generatedId = this.games[this.games.length - 1].id + 1;
         const json = {
             response: 'Created',
             data: {
                 id: generatedId,
-                url: `https://domain/games/${req.body.player_1}&${req.body.player_2}`,
+                url: `https://domain/games/${req.body.player_1}/${req.body.player_2}`,
             },
         };
         res.status(201).send(json);
