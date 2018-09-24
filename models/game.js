@@ -12,6 +12,23 @@ class Game {
     save() {
         db.insert(this);
     }
+
+    get id() {
+        return this.id;
+    }
+
+    get players() {
+        return [this.player1, this.player2];
+    }
+
+    get winner() {
+        return this.countAnswersPlayer1 > this.countAnswersPlayer2 ? this.player1 : this.player2;
+    }
+
+    get loser() {
+        return this.countAnswersPlayer1 > this.countAnswersPlayer2 ? this.player2 : this.player1;
+    }
+
 }
 
 module.exports = Game;

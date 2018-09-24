@@ -22,15 +22,19 @@ class User {
         db.insert(this);
     }
 
-    getNickname() {
+    get id() {
+        return this.id;
+    }
+
+    get nickname() {
         return this.nickname;
     }
 
-    getEmail() {
+    get email() {
         return this.email;
     }
 
-    getCurrentPoints() {
+    get currentPoints() {
         return this.currentPoints;
     }
 }
