@@ -19,7 +19,7 @@ class User {
     }
 
     save() {
-        db.create(this);
+        db.insert(this);
     }
 
     getNickname() {
