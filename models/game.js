@@ -1,4 +1,4 @@
-const db = require('../db');
+const db = require('../DB');
 
 class Game {
     constructor(id, player1, player2, countAnswersPlayer1, countAnswersPlayer2) {
