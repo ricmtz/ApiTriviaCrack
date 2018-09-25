@@ -29,6 +29,21 @@ class Game {
         return this.countAnswersPlayer1 > this.countAnswersPlayer2 ? this.player2 : this.player1;
     }
 
+    set player1(player) {
+        this.player1 = player;
+    }
+
+    set player2(player) {
+        this.player2 = player;
+    }
+
+    set countAnswersPlayer1(count) {
+        this.countAnswersPlayer1 = count;
+    }
+
+    set countAnswersPlayer2(count) {
+        this.countAnswersPlayer2 = count;
+    }
 }
 
 module.exports = Game;
