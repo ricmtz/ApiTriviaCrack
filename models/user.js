@@ -5,21 +5,21 @@ class User {
      * @param {Number} id
      * @param {String} nickname
      * @param {String} password
-     * @param {String} email
+     * @param {String} principalEmail
      * @param {String} uType
-     * @param {number} cPoints
+     * @param {number} score
      */
-    constructor(id, nickname, password, email, uType, cPoints) {
+    constructor(id, nickname, password, principalEmail, uType, score) {
         this.id = id;
         this.nickname = nickname;
         this.password = password;
-        this.email = email;
+        this.principalEmail = principalEmail;
         this.userType = uType;
-        this.currentPoints = cPoints;
+        this.score = score;
     }
 
     save() {
-        db.insert(this);
+        db.insert('Users', this);
     }
 
     get id() {
@@ -30,12 +30,40 @@ class User {
         return this.nickname;
     }
 
-    get email() {
-        return this.email;
+    get password() {
+        return this.password;
+    }
+
+    get principalEmail() {
+        return this.principalEmail;
+    }
+
+    get userType() {
+        return this.userType;
     }
 
     get currentPoints() {
-        return this.currentPoints;
+        return this.score;
+    }
+
+    set nickname(nickname) {
+        this.nickname = nickname;
+    }
+
+    set password(password) {
+        this.password = password;
+    }
+
+    set principalEmail(email) {
+        this.principalEmail = email;
+    }
+
+    set userType(type) {
+        this.userType = type;
+    }
+
+    set escore(score) {
+        this.score = score;
     }
 }
 
