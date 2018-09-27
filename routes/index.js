@@ -6,7 +6,6 @@ const bodyParser = require('body-parser');
 const usersRouter = require('./users');
 const categoriesRouter = require('./categories');
 const questionsUser = require('./questions_users');
-const gamesQuestionsRouter = require('./games_questions');
 const questionsRouter = require('./questions');
 const gamesRouter = require('./games');
 
@@ -20,7 +19,6 @@ router.get('/', (req, res) => {
 router.use('/users', usersRouter);
 router.use('/categories', categoriesRouter);
 router.use('/questions_users', questionsUser);
-router.use('/games_questions', gamesQuestionsRouter);
 router.use('/questions', questionsRouter);
 router.use('/games', gamesRouter);
 

@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { gamesCtrl } = require('../controllers');
+const gamesQuestionsRouter = require('./games_questions');
 
 const router = Router();
 
@@ -20,5 +21,7 @@ router.delete('/:gameId', gamesCtrl.delete);
 
 // Delete all games
 router.delete('/', gamesCtrl.deleteAll);
+
+router.use('/', gamesQuestionsRouter);
 
 module.exports = router;
