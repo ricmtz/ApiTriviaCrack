@@ -4,10 +4,10 @@ const { usersCtrl } = require('../controllers');
 const router = Router();
 
 // Get all friends.
-router.get('/:nickname/friends', usersCtrl.getFriends);
+router.get('/:nickname/friends', usersCtrl.getAllFriends);
 
 // Add friend
-router.post('/:nickname/friends', usersCtrl.addFriend);
+router.post('/:nickname/friends', usersCtrl.createFriend);
 
 // Remove friend
 router.delete('/:nickname/friends', usersCtrl.removeFriend);

@@ -16,16 +16,21 @@ class UsersCtrl {
         ];
 
         this.getAll = this.getAll.bind(this);
-        this.getEmails = this.getEmails.bind(this);
-        this.getFriends = this.getFriends.bind(this);
+        this.getAllEmails = this.getAllEmails.bind(this);
+        this.getAllFriends = this.getAllFriends.bind(this);
         this.get = this.get.bind(this);
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.addEmail = this.addEmail.bind(this);
-        this.addFriend = this.addFriend.bind(this);
+        this.createEmail = this.createEmail.bind(this);
+        this.createFriend = this.createFriend.bind(this);
         this.removeEmail = this.removeEmail.bind(this);
         this.removeFriend = this.removeFriend.bind(this);
+        this.getAllQuestions = this.getAllQuestions.bind(this);
+        this.getQuestion = this.getQuestion.bind(this);
+        this.createdQuestion = this.createdQuestion.bind(this);
+        this.createdQuestion = this.createdQuestion.bind(this);
+        this.updateQuestion = this.updateQuestion.bind(this);
     }
 
     getAll(req, res) {
@@ -45,7 +50,7 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    getEmails(req, res) {
+    getAllEmails(req, res) {
         const json = {
             response: 'Ok',
             data: `emails of ${req.params.nickname}`,
@@ -53,7 +58,7 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    getFriends(req, res) {
+    getAllFriends(req, res) {
         const json = {
             response: 'Ok',
             data: `friends of ${req.params.nickname}`,
@@ -62,7 +67,7 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    addEmail(req, res) {
+    createEmail(req, res) {
         const json = {
             response: 'Ok',
             data: `emails add to ${req.params.nickname}`,
@@ -70,7 +75,7 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    addFriend(req, res) {
+    createFriend(req, res) {
         const json = {
             response: 'Ok',
             data: `friend add to ${req.params.nickname}`,

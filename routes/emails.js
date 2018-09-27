@@ -4,10 +4,10 @@ const { usersCtrl } = require('../controllers');
 const router = express.Router();
 
 // Get all emails
-router.get('/:nickname/emails', usersCtrl.getEmails);
+router.get('/:nickname/emails', usersCtrl.getAllEmails);
 
 // Add email
-router.post('/:nickname/emails', usersCtrl.addEmail);
+router.post('/:nickname/emails', usersCtrl.createEmail);
 
 // Update email
 router.post('/:nickname/emails/:emailUsr', usersCtrl.updateEmail);
