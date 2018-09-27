@@ -2,6 +2,7 @@ const express = require('express');
 const { usersCtrl } = require('../controllers');
 const emailsRouter = require('./emails');
 const friendsRouter = require('./friends');
+const questionsUser = require('./questions_users');
 
 const router = express.Router();
 
@@ -24,5 +25,6 @@ router.patch('/:nickname', usersCtrl.update);
 
 router.use('/', emailsRouter);
 router.use('/', friendsRouter);
+router.use('/', questionsUser);
 
 module.exports = router;
