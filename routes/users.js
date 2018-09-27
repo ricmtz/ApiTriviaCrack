@@ -1,5 +1,7 @@
 const express = require('express');
 const { usersCtrl } = require('../controllers');
+const emailsRouter = require('./emails');
+const friendsRouter = require('./friends');
 
 const router = express.Router();
 
@@ -7,16 +9,20 @@ const router = express.Router();
 router.get('/', usersCtrl.getAll);
 
 // Find users.
-router.get('/:userId', usersCtrl.get);
+router.get('/:nickname', usersCtrl.get);
 
 // Create users.
 router.post('/', usersCtrl.create);
 
+
 // Delete users.
-router.delete('/:userId', usersCtrl.delete);
+router.delete('/:nickname', usersCtrl.delete);
+
 
 // Update users.
-router.patch('/:userId', usersCtrl.update);
+router.patch('/:nickname', usersCtrl.update);
 
+router.use('/', emailsRouter);
+router.use('/', friendsRouter);
 
 module.exports = router;

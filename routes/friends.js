@@ -1,16 +1,15 @@
 const { Router } = require('express');
-const { friendsCtrl } = require('../controllers');
+const { usersCtrl } = require('../controllers');
 
 const router = Router();
 
-router.get('/', friendsCtrl.getAll);
+// Get all friends.
+router.get('/:nickname/friends', usersCtrl.getFriends);
 
-router.get('/:user_1/:user_2', friendsCtrl.get);
+// Add friend
+router.post('/:nickname/friends', usersCtrl.addFriend);
 
-router.post('/', friendsCtrl.create);
-
-router.delete('/:user_1/:user_2', friendsCtrl.delete);
-
-router.patch('/:user_1/:user_2', friendsCtrl.update);
+// Remove friend
+router.delete('/:nickname/friends', usersCtrl.removeFriend);
 
 module.exports = router;
