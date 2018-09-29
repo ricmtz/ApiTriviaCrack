@@ -1,70 +1,57 @@
 const express = require('express');
+const { usersCtrl } = require('../controllers');
 
 const router = express.Router();
 
 // List all users.
-router.get('/users', (req, res) => {
-    const users = [
-        {
-            id: 1,
-            nickname: 'xXPedro777Xx',
-            email: 'jose@gmail.com',
-            current_points: 777,
-        },
-        {
-            id: 2,
-            nickname: 'xXRuben777Xx',
-            email: 'ruben@gmail.com',
-            current_points: 767,
-        },
-    ];
-    const json = {
-        response: 'Ok',
-        data: users,
-        total: 2,
-    };
-    res.status(200).send(json);
-});
+router.get('/', usersCtrl.getAll);
 
 // Find users.
-router.get('/users/:userId', (req, res) => {
-    const json = {
-        response: 'Ok',
-        data: {
-            id: req.params.userId,
-            nickname: 'xXRuben777Xx',
-            email: 'ruben@gmail.com',
-            current_points: 767,
-        },
-    };
-    res.status(200).send(json);
-});
+router.get('/:nickname', usersCtrl.get);
 
 // Create users.
-router.post('/users', (req, res) => {
-    const json = {
-        response: 'Ok',
-        data: {
-            id: 100,
-            nickname: req.body.nickname,
-        },
-    };
-    res.status(200).send(json);
-});
+router.post('/', usersCtrl.create);
 
 // Delete users.
-router.delete('/users/:userId', (req, res) => {
-    const json = {
-        response: 'Ok',
-        id: req.params.userId,
-    };
-    res.status(200).send(json);
-});
+router.delete('/:nickname', usersCtrl.delete);
 
 // Update users.
-router.patch('/users/:userId', (req, res) => {
-    res.status(204).send('Data successfully updated');
-});
+router.patch('/:nickname', usersCtrl.update);
 
+// Get all friends.
+router.get('/:nickname/friends', usersCtrl.getAllFriends);
+
+// Add friend
+router.post('/:nickname/friends', usersCtrl.addFriend);
+
+// Remove friend
+router.delete('/:nickname/friends', usersCtrl.removeFriend);
+
+// Get all emails
+router.get('/:nickname/emails', usersCtrl.getAllEmails);
+
+// Add email
+router.post('/:nickname/emails', usersCtrl.addEmail);
+
+// Update email
+router.patch('/:nickname/emails/', usersCtrl.updateEmail);
+
+// Remove email
+router.delete('/:nickname/emails', usersCtrl.removeEmail);
+
+// List all questions users.
+router.get('/:nickname/questions_users', usersCtrl.getAllQuestions);
+
+// Find question user.
+router.get('/:nickname/questions_users/:questionId', usersCtrl.getQuestion);
+
+// Create question user
+router.post('/:nickname/questions_users', usersCtrl.createdQuestion);
+
+// Delete question user
+router.delete('/:nickname/questions_users/:questionId', usersCtrl.removeQuestion);
+
+// Update question user.
+router.patch('/:nickname/questions_users/:questionId', usersCtrl.updateQuestion);
 
 module.exports = router;
