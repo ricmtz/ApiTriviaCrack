@@ -34,7 +34,7 @@ router.get('/:nickname/emails', usersCtrl.getAllEmails);
 router.post('/:nickname/emails', usersCtrl.addEmail);
 
 // Update email
-router.post('/:nickname/emails/:emailUsr', usersCtrl.updateEmail);
+router.patch('/:nickname/emails/', usersCtrl.updateEmail);
 
 // Remove email
 router.delete('/:nickname/emails', usersCtrl.removeEmail);
@@ -43,15 +43,15 @@ router.delete('/:nickname/emails', usersCtrl.removeEmail);
 router.get('/:nickname/questions_users', usersCtrl.getAllQuestions);
 
 // Find question user.
-router.get('/:nickname/:questionId/', usersCtrl.getQuestion);
+router.get('/:nickname/questions_users/:questionId', usersCtrl.getQuestion);
 
 // Create question user
 router.post('/:nickname/questions_users', usersCtrl.createdQuestion);
 
 // Delete question user
-router.delete('/:nickname/:questionId', usersCtrl.removeQuestion);
+router.delete('/:nickname/questions_users/:questionId', usersCtrl.removeQuestion);
 
 // Update question user.
-router.patch('/:nickname/:questionId', usersCtrl.updateQuestion);
+router.patch('/:nickname/questions_users/:questionId', usersCtrl.updateQuestion);
 
 module.exports = router;
