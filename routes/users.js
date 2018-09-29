@@ -1,8 +1,5 @@
 const express = require('express');
 const { usersCtrl } = require('../controllers');
-const emailsRouter = require('./emails');
-const friendsRouter = require('./friends');
-const questionsUser = require('./questions_users');
 
 const router = express.Router();
 
@@ -15,16 +12,46 @@ router.get('/:nickname', usersCtrl.get);
 // Create users.
 router.post('/', usersCtrl.create);
 
-
 // Delete users.
 router.delete('/:nickname', usersCtrl.delete);
-
 
 // Update users.
 router.patch('/:nickname', usersCtrl.update);
 
-router.use('/', emailsRouter);
-router.use('/', friendsRouter);
-router.use('/', questionsUser);
+// Get all friends.
+router.get('/:nickname/friends', usersCtrl.getAllFriends);
+
+// Add friend
+router.post('/:nickname/friends', usersCtrl.addFriend);
+
+// Remove friend
+router.delete('/:nickname/friends', usersCtrl.removeFriend);
+
+// Get all emails
+router.get('/:nickname/emails', usersCtrl.getAllEmails);
+
+// Add email
+router.post('/:nickname/emails', usersCtrl.addEmail);
+
+// Update email
+router.post('/:nickname/emails/:emailUsr', usersCtrl.updateEmail);
+
+// Remove email
+router.delete('/:nickname/emails', usersCtrl.removeEmail);
+
+// List all questions users.
+router.get('/:nickname/questions_users', usersCtrl.getAllQuestions);
+
+// Find question user.
+router.get('/:nickname/:questionId/', usersCtrl.getQuestion);
+
+// Create question user
+router.post('/:nickname/questions_users', usersCtrl.createdQuestion);
+
+// Delete question user
+router.delete('/:nickname/:questionId', usersCtrl.removeQuestion);
+
+// Update question user.
+router.patch('/:nickname/:questionId', usersCtrl.updateQuestion);
 
 module.exports = router;

@@ -7,7 +7,7 @@ const router = Router();
 router.get('/:nickname/friends', usersCtrl.getAllFriends);
 
 // Add friend
-router.post('/:nickname/friends', usersCtrl.createFriend);
+router.post('/:nickname/friends', usersCtrl.addFriend);
 
 // Remove friend
 router.delete('/:nickname/friends', usersCtrl.removeFriend);

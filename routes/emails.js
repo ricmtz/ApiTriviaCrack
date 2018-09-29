@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/:nickname/emails', usersCtrl.getAllEmails);
 
 // Add email
-router.post('/:nickname/emails', usersCtrl.createEmail);
+router.post('/:nickname/emails', usersCtrl.addEmail);
 
 // Update email
 router.post('/:nickname/emails/:emailUsr', usersCtrl.updateEmail);

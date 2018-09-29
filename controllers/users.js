@@ -22,8 +22,8 @@ class UsersCtrl {
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.createEmail = this.createEmail.bind(this);
-        this.createFriend = this.createFriend.bind(this);
+        this.addEmail = this.addEmail.bind(this);
+        this.addFriend = this.addFriend.bind(this);
         this.removeEmail = this.removeEmail.bind(this);
         this.removeFriend = this.removeFriend.bind(this);
         this.getAllQuestions = this.getAllQuestions.bind(this);
@@ -67,7 +67,7 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    createEmail(req, res) {
+    addEmail(req, res) {
         const json = {
             response: 'Ok',
             data: `emails add to ${req.params.nickname}`,
@@ -75,7 +75,7 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    createFriend(req, res) {
+    addFriend(req, res) {
         const json = {
             response: 'Ok',
             data: `friend add to ${req.params.nickname}`,
