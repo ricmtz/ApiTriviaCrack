@@ -1,68 +1,61 @@
-const db = require('../DB');
+const { EmailsORM, FriendsORM } = require('../orm');
 
 class User {
-    /**
-     * @param {Number} id
-     * @param {String} nickname
-     * @param {String} password
-     * @param {String} principalEmail
-     * @param {String} uType
-     * @param {number} score
-     */
-    constructor(id, nickname, password, principalEmail, uType, score) {
+    constructor({
+        id, nickname, password, principalEmail, userType, score, avatar, emails, friends,
+    }) {
         this.id = id;
         this.nickname = nickname;
         this.password = password;
         this.principalEmail = principalEmail;
-        this.userType = uType;
+        this.userType = userType;
         this.score = score;
+        this.avatar = avatar;
+        this.email = EmailsORM.get(emails);
+        this.friends = FriendsORM.get(friends);
     }
 
-    save() {
-        db.insert('Users', this);
-    }
-
-    get id() {
+    getId() {
         return this.id;
     }
 
-    get nickname() {
+    getNickname() {
         return this.nickname;
     }
 
-    get password() {
+    getPassword() {
         return this.password;
     }
 
-    get principalEmail() {
+    getPrincipalEmail() {
         return this.principalEmail;
     }
 
-    get userType() {
+    getUserType() {
         return this.userType;
     }
 
-    get currentPoints() {
+    getCurrentPoints() {
         return this.score;
     }
 
-    set nickname(nickname) {
+    setNickname(nickname) {
         this.nickname = nickname;
     }
 
-    set password(password) {
+    setPassword(password) {
         this.password = password;
     }
 
-    set principalEmail(email) {
+    setPrincipalEmail(email) {
         this.principalEmail = email;
     }
 
-    set userType(type) {
+    setUserType(type) {
         this.userType = type;
     }
 
-    set escore(score) {
+    setScore(score) {
         this.score = score;
     }
 }
