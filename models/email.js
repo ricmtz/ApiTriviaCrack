@@ -1,14 +1,9 @@
-const db = require('../DB');
 
 class Email {
-    constructor(id, idUser, email) {
+    constructor({ id, idUser, email }) {
         this.id = id;
         this.idUser = idUser;
         this.email = email;
-    }
-
-    save() {
-        db.create(this);
     }
 
     getId() {
