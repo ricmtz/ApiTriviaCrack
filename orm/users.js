@@ -1,6 +1,10 @@
 class Users {
-    static async get(user) {
-        return user;
+    static async get(idUser) {
+        return idUser;
+    }
+
+    static async getNickname(idUser) {
+        return idUser;
     }
 }
 
