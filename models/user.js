@@ -2,7 +2,8 @@ const { EmailsORM, FriendsORM } = require('../orm');
 
 class User {
     constructor({
-        id, nickname, password, principalEmail, userType, score, avatar, emails, friends,
+        id, nickname, password, principalEmail, userType,
+        score, avatar, emails, friends,
     }) {
         this.id = id;
         this.nickname = nickname;

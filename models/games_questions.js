@@ -1,14 +1,10 @@
-const db = require('../DB');
+const { QuestionsORM } = require('../orm');
 
-class Games_Questions {
-    constructor(id, game, question) {
+class GamesQuestions {
+    constructor({ id, game, question }) {
         this.id = id;
         this.game = game;
-        this.question = question;
-    }
-
-    save() {
-        db.create(this);
+        this.question = QuestionsORM.get(question);
     }
 
     getId() {
@@ -36,4 +32,4 @@ class Games_Questions {
     }
 }
 
-module.exports = Games_Questions;
+module.exports = GamesQuestions;
