@@ -67,8 +67,8 @@ class Game {
         this.finished = finished;
     }
 
-    setDeleted() {
-        this.deleted = true;
+    setDeleted(deleted) {
+        this.deleted = deleted;
     }
 }
 
