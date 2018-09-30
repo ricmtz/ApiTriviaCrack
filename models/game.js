@@ -2,7 +2,8 @@ const { UsersORM } = require('../orm');
 
 class Game {
     constructor({
-        id, player1, player2, countAnswersPlayer1, countAnswersPlayer2, createDate, finished,
+        id, player1, player2, countAnswersPlayer1, countAnswersPlayer2, createDate,
+        finished, deleted,
     }) {
         this.id = id;
         this.player1 = UsersORM.get(player1);
@@ -11,6 +12,7 @@ class Game {
         this.countAnswersPlayer2 = countAnswersPlayer2;
         this.createDate = createDate;
         this.finished = finished;
+        this.deleted = deleted;
     }
 
     getId() {
@@ -37,6 +39,10 @@ class Game {
         return this.finished;
     }
 
+    getDeleted() {
+        return this.deleted;
+    }
+
     setPlayer1(player) {
         this.player1 = player;
     }
@@ -59,6 +65,10 @@ class Game {
 
     setFinished(finished) {
         this.finished = finished;
+    }
+
+    setDeleted() {
+        this.deleted = true;
     }
 }
 

@@ -3,7 +3,7 @@ const { EmailsORM, FriendsORM } = require('../orm');
 class User {
     constructor({
         id, nickname, password, principalEmail, userType,
-        score, avatar, emails, friends,
+        score, avatar, emails, friends, deleted,
     }) {
         this.id = id;
         this.nickname = nickname;
@@ -14,6 +14,7 @@ class User {
         this.avatar = avatar;
         this.email = EmailsORM.get(emails);
         this.friends = FriendsORM.get(friends);
+        this.deleted = deleted;
     }
 
     getId() {
@@ -40,6 +41,10 @@ class User {
         return this.score;
     }
 
+    getDeleted() {
+        return this.deleted;
+    }
+
     setNickname(nickname) {
         this.nickname = nickname;
     }
@@ -58,6 +63,10 @@ class User {
 
     setScore(score) {
         this.score = score;
+    }
+
+    setDeleted(deleted) {
+        this.deleted = deleted;
     }
 }
 
