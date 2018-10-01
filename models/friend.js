@@ -1,29 +1,29 @@
-const db = require('../DB');
+const { UsersORM } = require('../orm');
 
 class Friend {
-    constructor(user1, user2, friendshipDate) {
-        this.user1 = user1;
-        this.user2 = user2;
+    constructor({ idUser1, idUser2, friendshipDate }) {
+        this.user1 = UsersORM.getNickname(idUser1);
+        this.user2 = UsersORM.getNickname(idUser2);
         this.friendshipDate = friendshipDate;
     }
 
-    save() {
-        db.insert(this);
-    }
-
-    get friendshipDate() {
+    getFriendshipDate() {
         return this.friendshipDate;
     }
 
-    set user1(user) {
+    getFriend(user) {
+        return user === this.user1 ? this.user2 : this.user1;
+    }
+
+    setUser1(user) {
         this.user1 = user;
     }
 
-    set user2(user) {
+    setUser2(user) {
         this.user2 = user;
     }
 
-    set friendshipDate(date) {
+    setFriendshipDate(date) {
         this.friendshipDate = date;
     }
 }
