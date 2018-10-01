@@ -1,21 +1,21 @@
 const { Router } = require('express');
-const { questionsUsersCtrl } = require('../controllers');
+const { usersCtrl } = require('../controllers');
 
 const router = Router();
 
 // List all questions users.
-router.get('/', questionsUsersCtrl.getAll);
+router.get('/:nickname/questions_users', usersCtrl.getAllQuestions);
 
 // Find question user.
-router.get('/:question/:user', questionsUsersCtrl.get);
+router.get('/:nickname/:questionId/', usersCtrl.getQuestion);
 
 // Create question user
-router.post('/', questionsUsersCtrl.create);
+router.post('/:nickname/questions_users', usersCtrl.createdQuestion);
 
 // Delete question user
-router.delete('/:question/:user', questionsUsersCtrl.delete);
+router.delete('/:nickname/:questionId', usersCtrl.removeQuestion);
 
 // Update question user.
-router.patch('/:question/:user', questionsUsersCtrl.update);
+router.patch('/:nickname/:questionId', usersCtrl.updateQuestion);
 
 module.exports = router;
