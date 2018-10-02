@@ -1,11 +1,25 @@
+const { db } = require('../db');
+
 class Users {
-    static async get(idUser) {
-        return idUser;
+    constructor() {
+        this.nombre = 'users';
     }
 
-    static async getNickname(idUser) {
-        return idUser;
+    async getAll() {
+        return db.select(this.nombre);
+    }
+
+    get(idUser) {
+        return db.select(this.nombre, [], { id: idUser });
+    }
+
+    getNickname(nicknameUser) {
+        return db.select(this.nombre, [], { nickname: nicknameUser });
+    }
+
+    create(data) {
+        return db.insert(this.nombre, data);
     }
 }
 
-module.exports = Users;
+module.exports = new Users();

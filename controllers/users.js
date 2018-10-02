@@ -1,3 +1,5 @@
+const { UsersORM } = require('../orm');
+
 class UsersCtrl {
     constructor() {
         this.users = [
@@ -33,19 +35,21 @@ class UsersCtrl {
         this.updateQuestion = this.updateQuestion.bind(this);
     }
 
-    getAll(req, res) {
+    async getAll(req, res) {
+        this.result = await UsersORM.getAll();
         const json = {
             response: 'Ok',
-            data: this.users,
-            total: 2,
+            data: this.result,
+            total: this.resultado.length,
         };
         res.status(200).send(json);
     }
 
-    get(req, res) {
+    async get(req, res) {
+        this.result = await UsersORM.getNickname(req.params.nickname);
         const json = {
             response: 'Ok',
-            data: this.users.find(el => el.nickname === req.params.nickname),
+            data: this.result,
         };
         res.status(200).send(json);
     }
@@ -83,7 +87,9 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    create(req, res) {
+    async create(req, res) {
+        this.result = await UsersORM.create(req.body);
+        console.log(this.result);
         const json = {
             response: 'Ok',
             data: {
