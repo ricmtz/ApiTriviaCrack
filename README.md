@@ -15,7 +15,7 @@
 - [Description](#description)
 - [Modules](#modules)
 - [Installation](#installation)
-- [Demo URL](#demo)
+- [Demo URL](#demo-url)
 - [Collaborators](#collaborators)
 
 ## Description
