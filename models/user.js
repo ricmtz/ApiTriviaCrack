@@ -2,19 +2,23 @@ const { EmailsORM, FriendsORM } = require('../orm');
 
 class User {
     constructor({
-        id, nickname, password, principalEmail, userType,
-        score, avatar, emails, friends, deleted,
+        id, nickname, password, email, admin,
+        score, avatar, emails = [], friends = [],
+        deleted, lastlogin,
     }) {
-        this.id = id;
+        this.setId(id);
         this.nickname = nickname;
         this.password = password;
-        this.principalEmail = principalEmail;
-        this.userType = userType;
-        this.score = score;
-        this.avatar = avatar;
-        this.email = EmailsORM.get(emails);
-        this.friends = FriendsORM.get(friends);
-        this.deleted = deleted;
+        this.email = email;
+        this.setAdmin(admin);
+        this.setScore(score);
+        this.setAvatar(avatar);
+        this.setEmails(emails);
+        this.setFriends(friends);
+        this.setEmails(emails);
+        this.setFriends(friends);
+        this.setDeleted(deleted);
+        this.setLastlogin(lastlogin);
     }
 
     getId() {
@@ -29,20 +33,32 @@ class User {
         return this.password;
     }
 
-    getPrincipalEmail() {
+    getEmail() {
         return this.principalEmail;
     }
 
-    getUserType() {
+    getAmdin() {
         return this.userType;
     }
 
-    getCurrentPoints() {
+    getScore() {
         return this.score;
+    }
+
+    getAvatar() {
+        return this.avatar;
     }
 
     getDeleted() {
         return this.deleted;
+    }
+
+    getLastlogin() {
+        return this.lastlogin;
+    }
+
+    setId(id) {
+        if (id !== undefined) this.id = id;
     }
 
     setNickname(nickname) {
@@ -53,20 +69,38 @@ class User {
         this.password = password;
     }
 
-    setPrincipalEmail(email) {
-        this.principalEmail = email;
+    setEmail(email) {
+        this.email = email;
     }
 
-    setUserType(type) {
-        this.userType = type;
+    setAdmin(admin) {
+        if (admin !== undefined) this.admin = admin;
     }
 
     setScore(score) {
-        this.score = score;
+        if (score !== undefined) this.score = score;
+    }
+
+    setAvatar(avatar) {
+        if (avatar !== undefined) this.avatar = avatar;
     }
 
     setDeleted(deleted) {
-        this.deleted = deleted;
+        if (deleted !== undefined) this.deleted = deleted;
+    }
+
+    setLastlogin(lastlogin) {
+        if (lastlogin !== undefined) this.lastlogin = lastlogin;
+    }
+
+    setEmails(emails) {
+        if (this.id !== undefined) {
+            this.emails = EmailsORM.get(emails);
+        }
+    }
+
+    setFriends(friends) {
+        if (this.id !== undefined) this.friends = FriendsORM.get(friends);
     }
 }
 

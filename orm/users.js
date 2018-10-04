@@ -1,4 +1,5 @@
 const { db } = require('../db');
+const { User } = require('../models');
 
 class Users {
     constructor() {
@@ -6,19 +7,33 @@ class Users {
     }
 
     async getAll() {
-        return db.select(this.nombre);
+        const result = await db.select(this.nombre);
+        if (result.length === 0) return result;
+        const response = [];
+        result.forEach((row) => {
+            response.push(new User(row));
+        });
+        return response;
     }
 
-    get(idUser) {
-        return db.select(this.nombre, [], { id: idUser });
+    async get(idUser) {
+        const result = db.select(this.nombre, [], { id: idUser });
+        return result.length !== 0 ? new User(result[0]) : result;
     }
 
-    getNickname(nicknameUser) {
-        return db.select(this.nombre, [], { nickname: nicknameUser });
+    async getNickname(nicknameUser) {
+        const result = await db.select(this.nombre, [], { nickname: nicknameUser });
+        return result.length !== 0 ? new User(result[0]) : result;
     }
 
-    create(data) {
-        return db.insert(this.nombre, data);
+    async create(data) {
+        const user = new User(data);
+        let result = await db.insert(this.nombre, user);
+        result = await db.select(this.nombre, [], user);
+        if (result.length !== 0) {
+            return user.setId(result[0]);
+        }
+        return result;
     }
 }
 
