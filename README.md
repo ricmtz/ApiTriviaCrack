@@ -16,6 +16,7 @@
 - [Modules](#modules)
 - [Installation](#installation)
 - [Demo URL](#demo-url)
+- [App URL](#app-url)
 - [Collaborators](#collaborators)
 
 ## Description
@@ -66,6 +67,14 @@ $ node index.js
 ```
 
 ## Demo URL
+<div align="center">
+  <a href="https://www.getpostman.com/collections/e4e893d5230a0a4cac35">
+    <img src="https://www.getpostman.com/img/v2/logo-glyph.png" height="75" width="75">
+  </a>
+</div>
+
+
+## App URL
 <div align="center">
   <a href="https://api-trivia-crack.herokuapp.com/" target="_blank">
     <img src="https://png.icons8.com/color/1600/heroku.png" height="75" width="75">
