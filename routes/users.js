@@ -1,5 +1,6 @@
 const express = require('express');
 const { usersCtrl } = require('../controllers');
+const middlewares = require('../middlewares');
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router.get('/', usersCtrl.getAll);
 router.get('/:nickname', usersCtrl.get);
 
 // Create users.
-router.post('/', usersCtrl.create);
+router.post('/', [middlewares.validator.isValidEmail, middlewares.validator.isValidUserType], usersCtrl.create);
 
 // Delete users.
 router.delete('/:nickname', usersCtrl.delete);
