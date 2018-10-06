@@ -1,0 +1,1 @@
+exports.Middlewares = require('./validator');
