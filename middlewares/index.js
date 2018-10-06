@@ -1,1 +1,2 @@
-exports.Middlewares = require('./validator');
+exports.validator = require('./validator');
+exports.errorHandler = require('./errorHandler');
