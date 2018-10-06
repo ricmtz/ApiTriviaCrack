@@ -18,9 +18,4 @@ const isValidUserType = (req, res, next) => {
     }
 };
 
-const addDate = (req, res, next) => {
-    req.body.date = new Date().toISOString();
-    next();
-};
-
-module.exports = { isValidEmail, isValidUserType, addDate };
+module.exports = { isValidEmail, isValidUserType };
