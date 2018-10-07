@@ -1,4 +1,5 @@
 const express = require('express');
+const emailsRouter = require('./emails');
 const friendsRouter = require('./friends');
 const { usersCtrl } = require('../controllers');
 
@@ -19,18 +20,6 @@ router.delete('/:nickname', usersCtrl.delete);
 // Update users.
 router.patch('/:nickname', usersCtrl.update);
 
-// Get all emails
-router.get('/:nickname/emails', usersCtrl.getAllEmails);
-
-// Add email
-router.post('/:nickname/emails', usersCtrl.addEmail);
-
-// Update email
-router.patch('/:nickname/emails/', usersCtrl.updateEmail);
-
-// Remove email
-router.delete('/:nickname/emails', usersCtrl.removeEmail);
-
 // List all questions users.
 router.get('/:nickname/questions_users', usersCtrl.getAllQuestions);
 
@@ -46,6 +35,7 @@ router.delete('/:nickname/questions_users/:questionId', usersCtrl.removeQuestion
 // Update question user.
 router.patch('/:nickname/questions_users/:questionId', usersCtrl.updateQuestion);
 
+router.use('/:nickname/emails', emailsRouter);
 router.use('/:nickname/friends', friendsRouter);
 
 module.exports = router;
