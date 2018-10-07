@@ -23,11 +23,6 @@ class GamesCtrl {
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
         this.deleteAll = this.deleteAll.bind(this);
-        this.getAllGamesQuestions = this.getAllGamesQuestions.bind(this);
-        this.getGameQuestion = this.getGameQuestion.bind(this);
-        this.createQuestions = this.createQuestions.bind(this);
-        this.updateQuestion = this.updateQuestion.bind(this);
-        this.removeQuestion = this.removeQuestion.bind(this);
     }
 
     getAll(req, res) {
@@ -38,26 +33,10 @@ class GamesCtrl {
         res.status(200).send(json);
     }
 
-    getAllGamesQuestions(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `All questions from ${req.params.gameId}`,
-        };
-        res.status(200).send(json);
-    }
-
     get(req, res) {
         const json = {
             response: 'Ok',
             data: this.games.find(el => el.id === Number(req.params.gameId)),
-        };
-        res.status(200).send(json);
-    }
-
-    getGameQuestion(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `Question ${req.params.questionId} from ${req.params.gameId}`,
         };
         res.status(200).send(json);
     }
@@ -74,14 +53,6 @@ class GamesCtrl {
         res.status(201).send(json);
     }
 
-    createQuestions(req, res){
-        const json = {
-            response: 'Ok',
-            data: `Creation questions to ${req.params.gameId}`,
-        };
-        res.status(200).send(json);
-    }
-
     update(req, res) {
         const json = {
             response: 'Ok',
@@ -92,28 +63,12 @@ class GamesCtrl {
         res.status(200).send(json);
     }
 
-    updateQuestion(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `Question ${req.params.questionId} updated from ${req.params.gameId}`,
-        };
-        res.status(200).send(json);
-    }
-
     delete(req, res) {
         const json = {
             response: 'No content',
             data: {},
         };
         res.status(204).send(json);
-    }
-
-    removeQuestion(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `Question ${req.params.questionId} removed from ${req.params.gameId}`,
-        };
-        res.status(200).send(json);
     }
 
     deleteAll(req, res) {
