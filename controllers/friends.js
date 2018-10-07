@@ -1,5 +1,4 @@
-
-class Friends {
+class FriendsCtrl {
     constructor() {
         this.fri = [
             {
@@ -62,4 +61,4 @@ class Friends {
     }
 }
 
-module.exports = new Friends();
+module.exports = new FriendsCtrl();

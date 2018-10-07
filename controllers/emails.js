@@ -1,4 +1,4 @@
-class Emails {
+class EmailsCtrl {
     constructor() {
         this.emails = [
             {
@@ -61,4 +61,4 @@ class Emails {
     }
 }
 
-module.exports = new Emails();
+module.exports = new EmailsCtrl();
