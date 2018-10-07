@@ -3,4 +3,8 @@ const addDate = (req, res, next) => {
     next();
 };
 
-module.exports = addDate;
+const notFound = (req, res, next) => {
+    res.status(404).send();
+};
+
+module.exports = { addDate, notFound };
