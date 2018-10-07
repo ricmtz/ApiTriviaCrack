@@ -16,13 +16,10 @@ class UsersCtrl {
         ];
 
         this.getAll = this.getAll.bind(this);
-        this.getAllEmails = this.getAllEmails.bind(this);
         this.get = this.get.bind(this);
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.addEmail = this.addEmail.bind(this);
-        this.removeEmail = this.removeEmail.bind(this);
         this.getAllQuestions = this.getAllQuestions.bind(this);
         this.getQuestion = this.getQuestion.bind(this);
         this.createdQuestion = this.createdQuestion.bind(this);
@@ -47,22 +44,6 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    getAllEmails(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `emails of ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
-    addEmail(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `emails add to ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
     create(req, res) {
         const json = {
             response: 'Ok',
@@ -78,19 +59,7 @@ class UsersCtrl {
         res.status(204).send('Data successfully updated');
     }
 
-    updateEmail(req, res){
-        res.status(204).send('Data successfully updated');
-    }
-
     delete(req, res) {
-        const json = {
-            response: 'Ok',
-            id: req.params.nickname,
-        };
-        res.status(200).send(json);
-    }
-
-    removeEmail(req, res) {
         const json = {
             response: 'Ok',
             id: req.params.nickname,

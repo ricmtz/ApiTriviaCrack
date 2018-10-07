@@ -24,8 +24,7 @@ class Emails {
     getAll(req, res) {
         const json = {
             response: 'Ok',
-            data: this.emails,
-            total: this.emails.length,
+            data: `emails of ${req.params.nickname}`,
         };
         res.status(200).send(json);
     }
@@ -44,21 +43,19 @@ class Emails {
     create(req, res) {
         const json = {
             response: 'Ok',
-            data: {
-                email: req.body.email,
-            },
+            data: `emails add to ${req.params.nickname}`,
         };
         res.status(200).send(json);
     }
 
-    update(req, res) {
+    update(req, res){
         res.status(204).send('Data successfully updated');
     }
 
     delete(req, res) {
         const json = {
             response: 'Ok',
-            email: req.params.userEmail,
+            id: req.params.nickname,
         };
         res.status(200).send(json);
     }
