@@ -1,4 +1,5 @@
 const express = require('express');
+const friendsRouter = require('./friends');
 const { usersCtrl } = require('../controllers');
 
 const router = express.Router();
@@ -17,15 +18,6 @@ router.delete('/:nickname', usersCtrl.delete);
 
 // Update users.
 router.patch('/:nickname', usersCtrl.update);
-
-// Get all friends.
-router.get('/:nickname/friends', usersCtrl.getAllFriends);
-
-// Add friend
-router.post('/:nickname/friends', usersCtrl.addFriend);
-
-// Remove friend
-router.delete('/:nickname/friends', usersCtrl.removeFriend);
 
 // Get all emails
 router.get('/:nickname/emails', usersCtrl.getAllEmails);
@@ -53,5 +45,7 @@ router.delete('/:nickname/questions_users/:questionId', usersCtrl.removeQuestion
 
 // Update question user.
 router.patch('/:nickname/questions_users/:questionId', usersCtrl.updateQuestion);
+
+router.use('/:nickname/friends', friendsRouter);
 
 module.exports = router;
