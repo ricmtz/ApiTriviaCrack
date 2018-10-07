@@ -17,15 +17,12 @@ class UsersCtrl {
 
         this.getAll = this.getAll.bind(this);
         this.getAllEmails = this.getAllEmails.bind(this);
-        this.getAllFriends = this.getAllFriends.bind(this);
         this.get = this.get.bind(this);
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
         this.addEmail = this.addEmail.bind(this);
-        this.addFriend = this.addFriend.bind(this);
         this.removeEmail = this.removeEmail.bind(this);
-        this.removeFriend = this.removeFriend.bind(this);
         this.getAllQuestions = this.getAllQuestions.bind(this);
         this.getQuestion = this.getQuestion.bind(this);
         this.createdQuestion = this.createdQuestion.bind(this);
@@ -58,27 +55,10 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    getAllFriends(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `friends of ${req.params.nickname}`,
-            total: 1,
-        };
-        res.status(200).send(json);
-    }
-
     addEmail(req, res) {
         const json = {
             response: 'Ok',
             data: `emails add to ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
-    addFriend(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `friend add to ${req.params.nickname}`,
         };
         res.status(200).send(json);
     }
@@ -111,14 +91,6 @@ class UsersCtrl {
     }
 
     removeEmail(req, res) {
-        const json = {
-            response: 'Ok',
-            id: req.params.nickname,
-        };
-        res.status(200).send(json);
-    }
-
-    removeFriend(req, res) {
         const json = {
             response: 'Ok',
             id: req.params.nickname,

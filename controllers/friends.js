@@ -23,8 +23,8 @@ class Friends {
     getAll(req, res) {
         const json = {
             response: 'Ok',
-            data: this.fri,
-            total: 2,
+            data: `friends of ${req.params.nickname}`,
+            total: 1,
         };
         res.status(200).send(json);
     }
@@ -43,11 +43,8 @@ class Friends {
 
     create(req, res) {
         const json = {
-            response: 'OK',
-            data: {
-                user_1: req.body.user_1,
-                user_2: req.body.user_2,
-            },
+            response: 'Ok',
+            data: `friend add to ${req.params.nickname}`,
         };
         res.status(200).send(json);
     }
@@ -58,9 +55,8 @@ class Friends {
 
     delete(req, res) {
         const json = {
-            response: 'OK',
-            user_1: req.params.user_1,
-            user_2: req.params.user_2,
+            response: 'Ok',
+            id: req.params.nickname,
         };
         res.status(200).send(json);
     }
