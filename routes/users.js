@@ -20,21 +20,6 @@ router.delete('/:nickname', usersCtrl.delete);
 // Update users.
 router.patch('/:nickname', usersCtrl.update);
 
-// List all questions users.
-router.get('/:nickname/questions_users', usersCtrl.getAllQuestions);
-
-// Find question user.
-router.get('/:nickname/questions_users/:questionId', usersCtrl.getQuestion);
-
-// Create question user
-router.post('/:nickname/questions_users', usersCtrl.createdQuestion);
-
-// Delete question user
-router.delete('/:nickname/questions_users/:questionId', usersCtrl.removeQuestion);
-
-// Update question user.
-router.patch('/:nickname/questions_users/:questionId', usersCtrl.updateQuestion);
-
 router.use('/:nickname/emails', emailsRouter);
 router.use('/:nickname/friends', friendsRouter);
 
