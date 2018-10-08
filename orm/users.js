@@ -8,7 +8,8 @@ class Users {
     }
 
     async getAll() {
-        const result = await db.select(this.name);
+        const data = { deleted: false };
+        const result = await db.select(this.name, [], data);
         if (result.length === 0) return result;
         const response = [];
         result.forEach((row) => {
@@ -18,12 +19,14 @@ class Users {
     }
 
     async get(idUser) {
-        const result = db.select(this.name, [], { id: idUser });
+        const data = { id: idUser, deleted: false };
+        const result = db.select(this.name, [], data);
         return result.length !== 0 ? new User(result[0]) : result;
     }
 
     async getNickname(nicknameUser) {
-        const result = await db.select(this.name, [], { nickname: nicknameUser });
+        const data = { nickname: nicknameUser, deleted: false };
+        const result = await db.select(this.name, [], data);
         return result.length !== 0 ? new User(result[0]) : result;
     }
 
@@ -37,8 +40,18 @@ class Users {
         return result;
     }
 
-    async update(nicknameUser){
-        
+    async update(nicknameUser, data) {
+        const user = new User(data);
+        let result = await db.update(this.name, user, { nickname: nicknameUser });
+        result = await db.select(this.name, ['id'], data);
+        return result;
+    }
+
+    async delete(nicknameUser) {
+        const data = { deleted: true };
+        let result = await db.update(this.name, data, { nickname: nicknameUser });
+        result = await db.select(this.name, ['id'], data);
+        return result;
     }
 
     async getEmails(nicknameUser) {

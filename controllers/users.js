@@ -24,7 +24,6 @@ class UsersCtrl {
     }
 
     async getAll(req, res) {
-        this.inicio = 0;
         const result = await UsersORM.getAll();
         const json = {
             data: result,
@@ -35,7 +34,6 @@ class UsersCtrl {
     }
 
     async get(req, res) {
-        this.inicio = 0;
         const result = await UsersORM.getNickname(req.params.nickname);
         const json = {
             data: result,
@@ -53,14 +51,6 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    addEmail(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `emails add to ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
     addFriend(req, res) {
         const json = {
             response: 'Ok',
@@ -70,27 +60,30 @@ class UsersCtrl {
     }
 
     async create(req, res) {
-        this.inicio = 0;
         const result = await UsersORM.create(req.body);
         const json = {
-            response: 'Ok',
-            data: {
-                nickname: result,
-            },
+            data: result,
         };
+        if (result.length === 0) res.status(404);
         res.status(200).send(json);
     }
 
-    update(req, res) {
-        res.status(204).send('Data successfully updated');
+    async update(req, res) {
+        const result = await UsersORM.update(req.params.nickname, req.body);
+        if (result.length === 0) {
+            res.status(404);
+        } else {
+            res.status(204).send('Data successfully updated');
+        }
     }
 
-    delete(req, res) {
+   async delete(req, res) {
+        const result = await UsersORM.delete(req.params.nickname);
         const json = {
-            response: 'Ok',
             id: req.params.nickname,
         };
-        res.status(200).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 }
 

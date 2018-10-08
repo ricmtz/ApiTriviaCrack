@@ -88,6 +88,22 @@ class DB {
                 .catch(e => reject(e.stack));
         });
     }
+
+    async update(table, data, conditions) {
+        const values = await this.getValuesAssing(data, ', ');
+        let cond = '';
+        if (conditions !== null) {
+            const where = await this.getValuesAssing(conditions, ' AND ');
+            cond = `WHERE ${where}`;
+        }
+        const query = `UPDATE ${table} SET ${values} ${cond}`;
+        this.values = '';
+        return new Promise((resolve, reject) => {
+            this.db.query(query)
+                .then(res => resolve(res))
+                .catch(e => reject(e.stack));
+        });
+    }
 }
 
 module.exports = new DB();
