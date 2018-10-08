@@ -1,12 +1,17 @@
 class Validator {
     static get regex() {
         return {
+            id: /^[0-9]+$/,
             nickname: /^[a-zA-Z][\w]{2,}$/,
             word: /[a-zA-ZñÑ ]{3,}/,
             text: /[\wñÑ #@$%?()]{3,}/,
             password: /^[\wñÑ#@$%]{5,}$/,
             email: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         };
+    }
+
+    static id(data) {
+        return (Validator.regex.id.test(data));
     }
 
     static word(data) {
