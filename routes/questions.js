@@ -1,16 +1,16 @@
 const { Router } = require('express');
 const { questionsCtrl } = require('../controllers');
 
-const questions = Router();
+const router = Router();
 
-questions.get('/', questionsCtrl.getAll);
+router.get('/', questionsCtrl.getAll);
 
-questions.get('/:questionId', questionsCtrl.get);
+router.get('/:questionId', questionsCtrl.get);
 
-questions.post('/', questionsCtrl.create);
+router.post('/', questionsCtrl.create);
 
-questions.delete('/:questionId', questionsCtrl.delete);
+router.delete('/:questionId', questionsCtrl.delete);
 
-questions.patch('/:questionId', questionsCtrl.update);
+router.patch('/:questionId', questionsCtrl.update);
 
-module.exports = questions;
+module.exports = router;

@@ -24,15 +24,6 @@ class UsersCtrl {
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.addEmail = this.addEmail.bind(this);
-        this.addFriend = this.addFriend.bind(this);
-        this.removeEmail = this.removeEmail.bind(this);
-        this.removeFriend = this.removeFriend.bind(this);
-        this.getAllQuestions = this.getAllQuestions.bind(this);
-        this.getQuestion = this.getQuestion.bind(this);
-        this.createdQuestion = this.createdQuestion.bind(this);
-        this.createdQuestion = this.createdQuestion.bind(this);
-        this.updateQuestion = this.updateQuestion.bind(this);
     }
 
     async getAll(req, res) {
@@ -103,70 +94,10 @@ class UsersCtrl {
         res.status(204).send('Data successfully updated');
     }
 
-    updateEmail(req, res){
-        res.status(204).send('Data successfully updated');
-    }
-
     delete(req, res) {
         const json = {
             response: 'Ok',
             id: req.params.nickname,
-        };
-        res.status(200).send(json);
-    }
-
-    removeEmail(req, res) {
-        const json = {
-            response: 'Ok',
-            id: req.params.nickname,
-        };
-        res.status(200).send(json);
-    }
-
-    removeFriend(req, res) {
-        const json = {
-            response: 'Ok',
-            id: req.params.nickname,
-        };
-        res.status(200).send(json);
-    }
-
-    getAllQuestions(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `All questions from ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
-    getQuestion(req, res){
-        const json = {
-            response: 'Ok',
-            data: `Questions ${req.params.questionId} from ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
-    createdQuestion(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `Questions created for ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
-    removeQuestion(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `Question ${req.params.questionId} deleted from ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
-    updateQuestion(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `Question ${req.params.questionId} updated from ${req.params.nickname}`,
         };
         res.status(200).send(json);
     }
