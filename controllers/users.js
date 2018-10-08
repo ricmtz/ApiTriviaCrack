@@ -1,65 +1,67 @@
+const { UsersORM } = require('../orm');
+
 class UsersCtrl {
-    constructor() {
-        this.users = [
-            {
-                id: 1,
-                nickname: 'xXPedro777Xx',
-                email: 'jose@gmail.com',
-                current_points: 777,
-            },
-            {
-                id: 2,
-                nickname: 'xXRuben777Xx',
-                email: 'ruben@gmail.com',
-                current_points: 767,
-            },
-        ];
-
-        this.getAll = this.getAll.bind(this);
-        this.get = this.get.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
+    async getAll(req, res) {
+        const result = await UsersORM.getAll();
+        const json = {
+            data: result,
+            total: result.length,
+        };
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 
-    getAll(req, res) {
+    async get(req, res) {
+        const result = await UsersORM.getNickname(req.params.nickname);
+        const json = {
+            data: result,
+        };
+        if (result.length === 0) res.status(404);
+        res.send(json);
+    }
+
+    static getAllFriends(req, res) {
         const json = {
             response: 'Ok',
-            data: this.users,
-            total: 2,
+            data: `friends of ${req.params.nickname}`,
+            total: 1,
         };
         res.status(200).send(json);
     }
 
-    get(req, res) {
+    static addFriend(req, res) {
         const json = {
             response: 'Ok',
-            data: this.users.find(el => el.nickname === req.params.nickname),
+            data: `friend add to ${req.params.nickname}`,
         };
         res.status(200).send(json);
     }
 
-    create(req, res) {
+    async create(req, res) {
+        const result = await UsersORM.create(req.body);
         const json = {
-            response: 'Ok',
-            data: {
-                id: 100,
-                nickname: req.body.nickname,
-            },
+            data: result,
         };
+        if (result.length === 0) res.status(404);
         res.status(200).send(json);
     }
 
-    update(req, res) {
-        res.status(204).send('Data successfully updated');
+    async update(req, res) {
+        const result = await UsersORM.update(req.params.nickname, req.body);
+        if (result.length === 0) {
+            res.status(404);
+        } else {
+            res.status(204).send('Data successfully updated');
+        }
     }
 
-    delete(req, res) {
+    async delete(req, res) {
+        const result = await UsersORM.delete(req.params.nickname);
         const json = {
-            response: 'Ok',
             id: req.params.nickname,
         };
-        res.status(200).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 }
 
