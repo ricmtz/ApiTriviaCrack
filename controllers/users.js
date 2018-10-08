@@ -1,28 +1,6 @@
 const { UsersORM } = require('../orm');
 
 class UsersCtrl {
-    constructor() {
-        this.users = [
-            {
-                id: 1,
-                nickname: 'xXPedro777Xx',
-                email: 'jose@gmail.com',
-                current_points: 777,
-            },
-            {
-                id: 2,
-                nickname: 'xXRuben777Xx',
-                email: 'ruben@gmail.com',
-                current_points: 767,
-            },
-        ];
-
-        this.getAllFriends = this.getAllFriends.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
-    }
-
     async getAll(req, res) {
         const result = await UsersORM.getAll();
         const json = {
@@ -42,7 +20,7 @@ class UsersCtrl {
         res.send(json);
     }
 
-    getAllFriends(req, res) {
+    static getAllFriends(req, res) {
         const json = {
             response: 'Ok',
             data: `friends of ${req.params.nickname}`,
@@ -51,7 +29,7 @@ class UsersCtrl {
         res.status(200).send(json);
     }
 
-    addFriend(req, res) {
+    static addFriend(req, res) {
         const json = {
             response: 'Ok',
             data: `friend add to ${req.params.nickname}`,
@@ -77,7 +55,7 @@ class UsersCtrl {
         }
     }
 
-   async delete(req, res) {
+    async delete(req, res) {
         const result = await UsersORM.delete(req.params.nickname);
         const json = {
             id: req.params.nickname,

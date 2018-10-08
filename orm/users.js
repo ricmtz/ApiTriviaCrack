@@ -8,8 +8,7 @@ class Users {
     }
 
     async getAll() {
-        const data = { deleted: false };
-        const result = await db.select(this.name, [], data);
+        const result = await db.select(this.name);
         if (result.length === 0) return result;
         const response = [];
         result.forEach((row) => {
@@ -19,13 +18,13 @@ class Users {
     }
 
     async get(idUser) {
-        const data = { id: idUser, deleted: false };
+        const data = { id: idUser };
         const result = db.select(this.name, [], data);
         return result.length !== 0 ? new User(result[0]) : result;
     }
 
     async getNickname(nicknameUser) {
-        const data = { nickname: nicknameUser, deleted: false };
+        const data = { nickname: nicknameUser };
         const result = await db.select(this.name, [], data);
         return result.length !== 0 ? new User(result[0]) : result;
     }
@@ -55,12 +54,12 @@ class Users {
     }
 
     async getEmails(nicknameUser) {
-        let conditions = { nickname: nicknameUser, deleted: false };
+        let conditions = { nickname: nicknameUser };
         const userResult = await db.select(this.name, ['id', 'email'], conditions);
         if (userResult.length !== 0) {
             const user = new User(userResult[0]);
-            conditions = { userid: user.getId(), deleted: false };
-            const result = await db.select(this.emails, ['email'], conditions);
+            conditions = { userid: user.getId() };
+            const result = await db.select(this.emails, ['email', 'deleted'], conditions);
             if (result.length !== 0) {
                 user.setEmails(result);
                 return user;
@@ -71,13 +70,38 @@ class Users {
     }
 
     async addEmail({ nicknameUser, emailUser }) {
-        let conditions = { nickname: nicknameUser, deleted: false };
+        let conditions = { nickname: nicknameUser };
         let result = await db.select(this.name, ['id'], conditions);
         if (result.length !== 0) {
-            console.log('si');
             const user = new User(result[0]);
             conditions = { userid: user.getId(), email: emailUser };
             result = await db.insert(this.emails, conditions);
+            result = await db.select(this.emails, ['email'], conditions);
+        }
+        return result;
+    }
+
+    async updateEmail({ nicknameUser, emailUser }, newEmail) {
+        let conditions = { nickname: nicknameUser };
+        let result = await db.select(this.name, ['id'], conditions);
+        if (result.length !== 0) {
+            const user = new User(result[0]);
+            conditions = { userid: user.getId(), email: emailUser };
+            result = await db.update(this.emails, { email: newEmail }, conditions);
+            conditions = { userid: user.getId(), email: newEmail };
+            result = await db.select(this.emails, ['email'], conditions);
+        }
+        return result;
+    }
+
+    async deleteEmail({ nicknameUser, emailUser }) {
+        let conditions = { nickname: nicknameUser };
+        let result = await db.select(this.name, ['id'], conditions);
+        if (result.length !== 0) {
+            const user = new User(result[0]);
+            conditions = { userid: user.getId(), email: emailUser };
+            result = await db.update(this.emails, { deleted: true }, conditions);
+            conditions = { userid: user.getId(), deleted: true };
             result = await db.select(this.emails, ['email'], conditions);
         }
         return result;

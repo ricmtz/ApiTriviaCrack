@@ -10,7 +10,7 @@ router.get('/', emailsCtrl.getAll);
 router.post('/', emailsCtrl.create);
 
 // Update email
-router.put('/:emailUsr', emailsCtrl.update);
+router.patch('/', emailsCtrl.update);
 
 // Remove email
 router.delete('/', emailsCtrl.delete);
