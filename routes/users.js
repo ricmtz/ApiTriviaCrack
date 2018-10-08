@@ -8,10 +8,10 @@ const router = express.Router();
 router.get('/', usersCtrl.getAll);
 
 // Find users.
-router.get('/:nickname', usersCtrl.get);
+router.get('/:nickname', middlewares.valUser.getUser, usersCtrl.get);
 
 // Create users.
-router.post('/', middlewares.rules.createUser, usersCtrl.create);
+router.post('/', middlewares.valUser.create, usersCtrl.create);
 
 // Delete users.
 router.delete('/:nickname', usersCtrl.delete);
