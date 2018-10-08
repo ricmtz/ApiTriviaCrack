@@ -1,20 +1,16 @@
-const { EmailsORM, FriendsORM } = require('../orm');
-
 class User {
     constructor({
         id, nickname, password, email, admin,
-        score, avatar, emails = [], friends = [],
+        score, avatar, emails, friends,
         deleted, lastlogin,
     }) {
         this.setId(id);
-        this.nickname = nickname;
-        this.password = password;
-        this.email = email;
+        this.setNickname(nickname);
+        this.setPassword(password);
+        this.setEmail(email);
         this.setAdmin(admin);
         this.setScore(score);
         this.setAvatar(avatar);
-        this.setEmails(emails);
-        this.setFriends(friends);
         this.setEmails(emails);
         this.setFriends(friends);
         this.setDeleted(deleted);
@@ -62,15 +58,15 @@ class User {
     }
 
     setNickname(nickname) {
-        this.nickname = nickname;
+        if (nickname !== undefined) this.nickname = nickname;
     }
 
     setPassword(password) {
-        this.password = password;
+        if (password !== undefined) this.password = password;
     }
 
     setEmail(email) {
-        this.email = email;
+        if (email !== undefined) this.email = email;
     }
 
     setAdmin(admin) {
@@ -95,12 +91,14 @@ class User {
 
     setEmails(emails) {
         if (this.id !== undefined) {
-            this.emails = EmailsORM.get(emails);
+            this.emails = emails;
         }
     }
 
     setFriends(friends) {
-        if (this.id !== undefined) this.friends = FriendsORM.get(friends);
+        if (this.id !== undefined) {
+            this.friends = friends;
+        }
     }
 }
 

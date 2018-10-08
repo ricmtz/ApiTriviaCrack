@@ -17,16 +17,14 @@ class UsersCtrl {
             },
         ];
 
-        //this.getAll = this.getAll.bind(this);
-        this.getAllEmails = this.getAllEmails.bind(this);
         this.getAllFriends = this.getAllFriends.bind(this);
-        //this.get = this.get.bind(this);
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
     }
 
     async getAll(req, res) {
+        this.inicio = 0;
         const result = await UsersORM.getAll();
         const json = {
             data: result,
@@ -37,20 +35,13 @@ class UsersCtrl {
     }
 
     async get(req, res) {
+        this.inicio = 0;
         const result = await UsersORM.getNickname(req.params.nickname);
         const json = {
             data: result,
         };
         if (result.length === 0) res.status(404);
         res.send(json);
-    }
-
-    getAllEmails(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `emails of ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
     }
 
     getAllFriends(req, res) {
@@ -79,8 +70,8 @@ class UsersCtrl {
     }
 
     async create(req, res) {
+        this.inicio = 0;
         const result = await UsersORM.create(req.body);
-        console.log(result);
         const json = {
             response: 'Ok',
             data: {

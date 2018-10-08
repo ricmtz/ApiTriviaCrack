@@ -1,3 +1,5 @@
+const { UsersORM } = require('../orm');
+
 class EmailsCtrl {
     constructor() {
         this.emails = [
@@ -21,12 +23,15 @@ class EmailsCtrl {
         this.delete = this.delete.bind(this);
     }
 
-    getAll(req, res) {
+    async getAll(req, res) {
+        this.inicio = 0;
+        const result = await UsersORM.getEmails(req.params.nickname);
+        console.log(result);
         const json = {
-            response: 'Ok',
-            data: `emails of ${req.params.nickname}`,
+            data: result,
         };
-        res.status(200).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 
     get(req, res) {
@@ -40,12 +45,16 @@ class EmailsCtrl {
         res.status(200).send(json);
     }
 
-    create(req, res) {
+    async create(req, res) {
+        this.inicio = 0;
+        const data = { nicknameUser: req.params.nickname, emailUser: req.body.email };
+        const result = await UsersORM.addEmail(data);
         const json = {
             response: 'Ok',
             data: `emails add to ${req.params.nickname}`,
         };
-        res.status(200).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 
     update(req, res){

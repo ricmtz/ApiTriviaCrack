@@ -40,7 +40,6 @@ class DB {
                 else valueAdd = `${valuesArr[i]}`;
                 this.values += ` ${columnsArr[i]} = ${valueAdd}`;
             }
-            console.log(this.values);
             resolve(this.values);
         });
     }
