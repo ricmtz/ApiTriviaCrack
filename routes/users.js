@@ -11,16 +11,7 @@ router.get('/', usersCtrl.getAll);
 router.get('/:nickname', usersCtrl.get);
 
 // Create users.
-router.post('/', (req, res, next) => {
-    middlewares.validator.validate(req, res, next, {
-        body: {
-            nickname: 'word',
-            password: 'positive',
-            admin: 'boolean',
-            email: 'email,required',
-        },
-    });
-}, usersCtrl.create);
+router.post('/', middlewares.rules.createUser, usersCtrl.create);
 
 // Delete users.
 router.delete('/:nickname', usersCtrl.delete);
