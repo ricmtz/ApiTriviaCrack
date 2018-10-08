@@ -1,16 +1,23 @@
 const validator = require('./validator');
 
-class Rules {
-    static createUser(req, res, next) {
+class ValUsers {
+    static create(req, res, next) {
         validator.validate(req, res, next, {
             body: {
-                nickname: 'word',
-                password: 'positive',
-                admin: 'boolean',
+                nickname: 'nickname,required',
+                password: 'password,required',
                 email: 'email,required',
+            },
+        });
+    }
+
+    static getUser(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                nickname: 'nickname,required',
             },
         });
     }
 }
 
-module.exports = Rules;
+module.exports = ValUsers;
