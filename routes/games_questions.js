@@ -1,21 +1,21 @@
 const { Router } = require('express');
-const { gamesCtrl } = require('../controllers');
+const { gamesQuestionsCtrl } = require('../controllers');
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 // Get all games_questions
-router.get('/:gameId/games_questions', gamesCtrl.getAllGamesQuestions);
+router.get('/', gamesQuestionsCtrl.getAll);
 
 // Get question of game
-router.get('/:gameId/:questionId', gamesCtrl.getGameQuestion);
+router.get('/:questionId', gamesQuestionsCtrl.get);
 
 // Create questions
-router.post('/:gameId/games_questions', gamesCtrl.createQuestions);
+router.post('/', gamesQuestionsCtrl.create);
 
 // Delete question
-router.delete('/:gameId/:questionId', gamesCtrl.removeQuestion);
+router.delete('/:questionId', gamesQuestionsCtrl.delete);
 
 // Update question
-router.patch('/:gameId/:questionId', gamesCtrl.updateQuestion);
+router.patch('/:questionId', gamesQuestionsCtrl.update);
 
 module.exports = router;

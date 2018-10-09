@@ -29,8 +29,7 @@ class GamesQuestionsCtrl {
     getAll(req, res) {
         const json = {
             response: 'Ok',
-            data: this.gamesQuestions,
-            total: 2,
+            data: `All questions from ${req.params.gameId}`,
         };
         res.status(200).send(json);
     }
@@ -38,32 +37,31 @@ class GamesQuestionsCtrl {
     get(req, res) {
         const json = {
             response: 'Ok',
-            data: this.gamesQuestions.find(el => el.game === Number(req.params.game)
-          && el.question === Number(req.params.question)),
+            data: `Question ${req.params.questionId} from ${req.params.gameId}`,
         };
         res.status(200).send(json);
     }
 
-    create(req, res) {
+    create(req, res){
         const json = {
-            response: 'OK',
-            data: {
-                game: req.body.game,
-                question: req.body.question,
-            },
+            response: 'Ok',
+            data: `Creation questions to ${req.params.gameId}`,
         };
         res.status(200).send(json);
     }
 
     update(req, res) {
-        res.status(204).send('Data successfully updated');
+        const json = {
+            response: 'Ok',
+            data: `Question ${req.params.questionId} updated from ${req.params.gameId}`,
+        };
+        res.status(200).send(json);
     }
 
     delete(req, res) {
         const json = {
-            response: 'OK',
-            game: req.params.game,
-            question: req.params.question,
+            response: 'Ok',
+            data: `Question ${req.params.questionId} removed from ${req.params.gameId}`,
         };
         res.status(200).send(json);
     }
