@@ -133,6 +133,7 @@ class Rules {
         });
     }
 
+<<<<<<< HEAD
     static updateQuestion(req, res, next) {
         validator.validate(req, res, next, {
             body: {
@@ -141,6 +142,31 @@ class Rules {
                 option1: 'text,optional',
                 option2: 'text,optional',
                 optioncorrect: 'text,optional',
+=======
+    static updateCategory(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                name: 'text,optional',
+                color: 'text,optional',
+>>>>>>> feature/#75-validations-categories
+            },
+        });
+    }
+
+    static createCategory(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                name: 'text,required',
+                color: 'text,required',
+            },
+        });
+    }
+
+    static updateCategory(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                name: 'text,optional',
+                color: 'text,optional',
             },
         });
     }
