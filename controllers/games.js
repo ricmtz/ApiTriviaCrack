@@ -1,82 +1,54 @@
+const { GamesORM } = require('../orm');
+
 class GamesCtrl {
-    constructor() {
-        this.games = [
-            {
-                id: 9,
-                player_1: 8,
-                player_2: 45,
-                answers_player_1: 3,
-                answers_player_2: 4,
-            },
-            {
-                id: 84,
-                player_1: 64,
-                player_2: 71,
-                answers_player_1: 6,
-                answers_player_2: 7,
-            },
-        ];
-
-        this.getAll = this.getAll.bind(this);
-        this.get = this.get.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
-        this.deleteAll = this.deleteAll.bind(this);
+    async getAll(req, res) {
+        const result = await GamesORM.getAll();
+        const json = {
+            data: result,
+            total: result.length
+        };
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 
-    getAll(req, res) {
+    async get(req, res) {
+        const result = await GamesORM.get(req.params.gameId);
         const json = {
-            response: 'Ok',
-            data: this.games,
+            data: result,
         };
+        if (result.length === 0) res.status(404);
+        res.send(json);
+    }
+
+    async create(req, res) {
+        const result = await GamesORM.create(req.body);
+        const json = {
+            data: result,
+        };
+        if (result.length === 0) res.status(404);
         res.status(200).send(json);
     }
 
-    get(req, res) {
+    async update(req, res) {
+        const result = await GamesORM.update(req.params.gameId, req.body);
         const json = {
-            response: 'Ok',
-            data: this.games.find(el => el.id === Number(req.params.gameId)),
+            data: result,
         };
-        res.status(200).send(json);
+        if (result.length === 0) {
+            res.status(404);
+        } else {
+            res.status(204);
+        }
+        res.send(json);
     }
 
-    create(req, res) {
-        const generatedId = this.games[this.games.length - 1].id + 1;
-        const json = {
-            response: 'Created',
-            data: {
-                id: generatedId,
-                url: `https://domain/games/${req.body.player_1}/${req.body.player_2}`,
-            },
-        };
-        res.status(201).send(json);
-    }
-
-    update(req, res) {
-        const json = {
-            response: 'Ok',
-            data: {
-                id: req.params.gameId,
-            },
-        };
-        res.status(200).send(json);
-    }
-
-    delete(req, res) {
-        const json = {
-            response: 'No content',
-            data: {},
-        };
-        res.status(204).send(json);
-    }
-
-    deleteAll(req, res) {
-        const json = {
-            response: 'No content',
-            data: {},
-        };
-        res.status(204).send(json);
+    async delete(req, res) {
+      const result = await GamesORM.delete(req.params.gameId);
+      const json = {
+          data: result,
+      };
+      if (result.length === 0) res.status(404);
+      res.send(json);
     }
 }
 

@@ -14,13 +14,11 @@ router.get('/', gamesCtrl.getAll);
 router.get('/:gameId', gamesCtrl.get);
 
 // Put game
-router.put('/:gameId', gamesCtrl.update);
+router.patch('/:gameId', gamesCtrl.update);
 
 // Delete game
 router.delete('/:gameId', gamesCtrl.delete);
 
-// Delete all games
-router.delete('/', gamesCtrl.deleteAll);
 
 router.use('/:gameId/games_questions', gamesQuestionsRouter);
 
