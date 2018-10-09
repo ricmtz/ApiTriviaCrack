@@ -16,6 +16,33 @@ class DefaultValues {
         req.body.deleted = false;
         next();
     }
+
+    static defaultGame(req, res, next) {
+        req.body.answersplayer1 = 0;
+        req.body.answersplayer2 = 0;
+        req.body.createdate = new Date().toISOString();
+        req.body.finished = false;
+        req.body.deleted = false;
+        next();
+    }
+
+    static defaultGameQuestion(req, res, next) {
+        req.body.selectedoption = 'opt';
+        req.body.correctoption = false;
+        next();
+    }
+
+    static defaultQuestion(req, res, next) {
+        req.body.approved = true;
+        req.body.deleted = false;
+        next();
+    }
+
+    static defaultCategory(req, res, next) {
+        req.body.icon = 'default.png';
+        req.body.deleted = false;
+        next();
+    }
 }
 
 module.exports = DefaultValues;

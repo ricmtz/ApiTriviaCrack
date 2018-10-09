@@ -1,12 +1,12 @@
 const { Router } = require('express');
 const { gamesCtrl } = require('../controllers');
 const gamesQuestionsRouter = require('./games_questions');
-const middlewares = require('../middlewares');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = Router();
 
 // Post game
-router.post('/', middlewares.rules.createGame, gamesCtrl.create);
+router.post('/', [rules.createGame, defaultValues.defaultGame], gamesCtrl.create);
 
 // Get all games
 router.get('/', gamesCtrl.getAll);
@@ -15,7 +15,7 @@ router.get('/', gamesCtrl.getAll);
 router.get('/:gameId', gamesCtrl.get);
 
 // Put game
-router.patch('/:gameId', middlewares.rules.updateGame, gamesCtrl.update);
+router.patch('/:gameId', rules.updateGame, gamesCtrl.update);
 
 // Delete game
 router.delete('/:gameId', gamesCtrl.delete);

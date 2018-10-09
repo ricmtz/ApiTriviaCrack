@@ -2,7 +2,7 @@ const express = require('express');
 const emailsRouter = require('./emails');
 const friendsRouter = require('./friends');
 const { usersCtrl } = require('../controllers');
-const { rules, generator, defaultValues } = require('../middlewares');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = express.Router();
 

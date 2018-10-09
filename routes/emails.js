@@ -11,7 +11,7 @@ router.get('/', emailsCtrl.getAll);
 router.post('/', [rules.createEmail, defaultValues.defaultEmail], emailsCtrl.create);
 
 // Update email
-router.put('/:emailId', rules.updateEmail, emailsCtrl.update);
+router.patch('/:emailId', rules.updateEmail, emailsCtrl.update);
 
 // Remove email
 router.delete('/:emailId', rules.paramsEmails, emailsCtrl.delete);
