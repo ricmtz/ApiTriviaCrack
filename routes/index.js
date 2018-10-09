@@ -4,7 +4,7 @@ const router = Router();
 
 const bodyParser = require('body-parser');
 
-const { notFound } = require('../middlewares/generator');
+const notFound = require('../middlewares/generator');
 
 const usersRouter = require('./users');
 const categoriesRouter = require('./categories');

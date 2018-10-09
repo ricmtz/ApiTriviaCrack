@@ -55,7 +55,7 @@ class Rules {
         });
     }
 
-    static addEmail(req, res, next) {
+    static createEmail(req, res, next) {
         validator.validate(req, res, next, {
             body: {
                 email: 'email,required',

@@ -8,7 +8,7 @@ const router = express.Router({ mergeParams: true });
 router.get('/', emailsCtrl.getAll);
 
 // Add email
-router.post('/', [rules.addEmail, defaultValues.defaultEmail], emailsCtrl.create);
+router.post('/', [rules.createEmail, defaultValues.defaultEmail], emailsCtrl.create);
 
 // Update email
 router.put('/:emailId', rules.updateEmail, emailsCtrl.update);

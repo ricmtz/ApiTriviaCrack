@@ -13,7 +13,7 @@ router.get('/', usersCtrl.getAll);
 router.get('/:nickname', rules.paramsUser, usersCtrl.get);
 
 // Create users.
-router.post('/', [rules.createUser, generator.addDate, defaultValues.defaultUser], usersCtrl.create);
+router.post('/', [rules.createUser, defaultValues.defaultUser], usersCtrl.create);
 
 // Delete users.
 router.delete('/:nickname', rules.paramsUser, usersCtrl.delete);

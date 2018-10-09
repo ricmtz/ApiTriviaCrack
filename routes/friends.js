@@ -8,7 +8,7 @@ const router = Router({ mergeParams: true });
 router.get('/', rules.paramsUser, friendsCtrl.getAll);
 
 // Add friend
-router.post('/', [rules.createFriend, defaultValues.defualtFriend], friendsCtrl.create);
+router.post('/', [rules.createFriend, defaultValues.defaultFriend], friendsCtrl.create);
 
 // Remove friend
 router.delete('/', rules.paramsFriends, friendsCtrl.delete);

@@ -7,7 +7,7 @@ class DefaultValues {
         next();
     }
 
-    static defualtFriend(req, res, next) {
+    static defaultFriend(req, res, next) {
         req.body.friendshipdate = new Date().toISOString();
         next();
     }
