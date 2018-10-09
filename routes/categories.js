@@ -1,10 +1,11 @@
 const { Router } = require('express');
 const { categoriesCtrl } = require('../controllers');
+const middlewares = require('../middlewares');
 
 const router = Router();
 
 // Post category
-router.post('/', categoriesCtrl.create);
+router.post('/', middlewares.rules.createCategory, categoriesCtrl.create);
 
 // Get all categories
 router.get('/', categoriesCtrl.getAll);
@@ -13,12 +14,9 @@ router.get('/', categoriesCtrl.getAll);
 router.get('/:categoryId', categoriesCtrl.get);
 
 // Put category
-router.put('/:categoryId', categoriesCtrl.update);
+router.patch('/:categoryId', middlewares.rules.updateCategory, categoriesCtrl.update);
 
 // Delete category
 router.delete('/:categoryId', categoriesCtrl.delete);
-
-// Delete all categories
-router.delete('/', categoriesCtrl.deleteAll);
 
 module.exports = router;
