@@ -6,6 +6,7 @@ class Validator {
             word: /[a-zA-ZñÑ ]{3,}/,
             text: /[\wñÑ #@$%?()]{3,}/,
             password: /^[\wñÑ#@$%]{5,}$/,
+            file: /^[\w]+\.(png|jpg)$/,
             email: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
         };
     }
@@ -44,6 +45,10 @@ class Validator {
 
     static password(data) {
         return (Validator.regex.password.test(data));
+    }
+
+    static file(data) {
+        return (Validator.regex.file.test(data));
     }
 
     static validate(req, res, next, rules = {}) {

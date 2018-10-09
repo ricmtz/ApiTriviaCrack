@@ -1,15 +1,16 @@
 const { Router } = require('express');
 const { friendsCtrl } = require('../controllers');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = Router({ mergeParams: true });
 
 // Get all friends.
-router.get('/', friendsCtrl.getAll);
+router.get('/', rules.paramsUser, friendsCtrl.getAll);
 
 // Add friend
-router.post('/', friendsCtrl.create);
+router.post('/', [rules.createFriend, defaultValues.defualtFriend], friendsCtrl.create);
 
 // Remove friend
-router.delete('/', friendsCtrl.delete);
+router.delete('/', rules.paramsFriends, friendsCtrl.delete);
 
 module.exports = router;
