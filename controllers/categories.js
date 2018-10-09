@@ -1,5 +1,4 @@
-
-class Categories {
+class CategoriesCtrl {
     constructor() {
         this.categories = [
             {
@@ -80,4 +79,4 @@ class Categories {
     }
 }
 
-module.exports = new Categories();
+module.exports = new CategoriesCtrl();
