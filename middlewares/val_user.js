@@ -11,7 +11,7 @@ class ValUsers {
         });
     }
 
-    static getUser(req, res, next) {
+    static params(req, res, next) {
         validator.validate(req, res, next, {
             params: {
                 nickname: 'nickname,required',
@@ -22,15 +22,15 @@ class ValUsers {
     static update(req, res, next) {
         validator.validate(req, res, next, {
             params: {
-                nickname: 'nickname,required',
+                nickname: 'nickname',
             },
             body: {
-                nickname: 'nickname',
-                password: 'password',
-                email: 'email',
-                score: 'positive',
-                admin: 'boolean',
-                avatar: 'file',
+                nickname: 'nickname,optional',
+                password: 'password,optional',
+                email: 'email,optional',
+                score: 'positive,optional',
+                admin: 'boolean,optional',
+                avatar: 'file,optional',
             },
         });
     }
