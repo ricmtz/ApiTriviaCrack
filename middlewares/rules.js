@@ -85,8 +85,8 @@ class Rules {
     static createGame(req, res, next) {
         validator.validate(req, res, next, {
             body: {
-                player1: 'id,required',
-                player2: 'id,optional',
+                player1: 'nickname,required',
+                player2: 'nickname,optional',
             },
         });
     }
@@ -94,8 +94,8 @@ class Rules {
     static updateGame(req, res, next) {
         validator.validate(req, res, next, {
             body: {
-                player1: 'id,optional',
-                player2: 'id,optional',
+                player1: 'nickname,optional',
+                player2: 'nickname,optional',
             },
         });
     }
