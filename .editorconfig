@@ -14,6 +14,7 @@ insert_final_newline = true
 # Set default charset
 [*.{js,py}]
 charset = utf-8
+indent_size = 4
 
 # 4 space indentation
 [*.py]

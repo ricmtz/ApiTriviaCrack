@@ -1,70 +1,27 @@
 const express = require('express');
+const emailsRouter = require('./emails');
+const friendsRouter = require('./friends');
+const { usersCtrl } = require('../controllers');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = express.Router();
 
 // List all users.
-router.get('/users', (req, res) => {
-    const users = [
-        {
-            id: 1,
-            nickname: 'xXPedro777Xx',
-            email: 'jose@gmail.com',
-            current_points: 777,
-        },
-        {
-            id: 2,
-            nickname: 'xXRuben777Xx',
-            email: 'ruben@gmail.com',
-            current_points: 767,
-        },
-    ];
-    const json = {
-        response: 'Ok',
-        data: users,
-        total: 2,
-    };
-    res.status(200).send(json);
-});
+router.get('/', usersCtrl.getAll);
 
 // Find users.
-router.get('/users/:userId', (req, res) => {
-    const json = {
-        response: 'Ok',
-        data: {
-            id: req.params.userId,
-            nickname: 'xXRuben777Xx',
-            email: 'ruben@gmail.com',
-            current_points: 767,
-        },
-    };
-    res.status(200).send(json);
-});
+router.get('/:nickname', rules.paramsUser, usersCtrl.get);
 
 // Create users.
-router.post('/users', (req, res) => {
-    const json = {
-        response: 'Ok',
-        data: {
-            id: 100,
-            nickname: req.body.nickname,
-        },
-    };
-    res.status(200).send(json);
-});
+router.post('/', [rules.createUser, defaultValues.defaultUser], usersCtrl.create);
 
 // Delete users.
-router.delete('/users/:userId', (req, res) => {
-    const json = {
-        response: 'Ok',
-        id: req.params.userId,
-    };
-    res.status(200).send(json);
-});
+router.delete('/:nickname', rules.paramsUser, usersCtrl.delete);
 
 // Update users.
-router.patch('/users/:userId', (req, res) => {
-    res.status(204).send('Data successfully updated');
-});
+router.patch('/:nickname', rules.updateUser, usersCtrl.update);
 
+router.use('/:nickname/emails', emailsRouter);
+router.use('/:nickname/friends', friendsRouter);
 
 module.exports = router;
