@@ -120,6 +120,30 @@ class Rules {
             },
         });
     }
+
+    static createQuestion(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                category: 'id,required',
+                question: 'text,required',
+                option1: 'text,required',
+                option2: 'text,required',
+                optioncorrect: 'text,required',
+            },
+        });
+    }
+
+    static updateQuestion(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                category: 'id,optional',
+                question: 'text,optional',
+                option1: 'text,optional',
+                option2: 'text,optional',
+                optioncorrect: 'text,optional',
+            },
+        });
+    }
 }
 
 module.exports = Rules;
