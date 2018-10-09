@@ -1,5 +1,6 @@
 class DefaultValues {
     static defaultUser(req, res, next) {
+        req.body.admin = false;
         req.body.score = 0;
         req.body.avatar = 'default.png';
         req.body.lastlogin = new Date().toISOString();

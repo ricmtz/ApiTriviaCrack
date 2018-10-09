@@ -141,6 +141,7 @@ class Rules {
                 option1: 'text,optional',
                 option2: 'text,optional',
                 optioncorrect: 'text,optional',
+                approved: 'boolean,optional',
             },
         });
     }
@@ -159,6 +160,7 @@ class Rules {
             body: {
                 name: 'text,optional',
                 color: 'text,optional',
+                icon: 'file,optional',
             },
         });
     }
