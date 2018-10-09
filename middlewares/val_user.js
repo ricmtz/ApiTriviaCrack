@@ -21,6 +21,9 @@ class ValUsers {
 
     static update(req, res, next) {
         validator.validate(req, res, next, {
+            params: {
+                nickname: 'nickname,required',
+            },
             body: {
                 nickname: 'nickname',
                 password: 'password',

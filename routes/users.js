@@ -17,7 +17,7 @@ router.post('/', middlewares.valUser.create, usersCtrl.create);
 router.delete('/:nickname', usersCtrl.delete);
 
 // Update users.
-router.patch('/:nickname', usersCtrl.update);
+router.patch('/:nickname', middlewares.valUser.update, usersCtrl.update);
 
 // Get all friends.
 router.get('/:nickname/friends', usersCtrl.getAllFriends);
