@@ -18,7 +18,4 @@ router.put('/:categoryId', categoriesCtrl.update);
 // Delete category
 router.delete('/:categoryId', categoriesCtrl.delete);
 
-// Delete all categories
-router.delete('/', categoriesCtrl.deleteAll);
-
 module.exports = router;

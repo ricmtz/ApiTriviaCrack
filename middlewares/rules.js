@@ -81,6 +81,45 @@ class Rules {
             },
         });
     }
+
+    static createGame(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                player1: 'id,required',
+                player2: 'id,optional',
+            },
+        });
+    }
+
+    static updateGame(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                player1: 'id,optional',
+                player2: 'id,optional',
+            },
+        });
+    }
+
+    static createGameQuestion(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                game: 'id,required',
+                question: 'id,required',
+                player: 'id,required',
+            },
+        });
+    }
+
+    static updateGameQuestion(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                game: 'id,optional',
+                question: 'id,optional',
+                player: 'id,optional',
+                selectedoption: 'text,optional',
+            },
+        });
+    }
 }
 
 module.exports = Rules;
