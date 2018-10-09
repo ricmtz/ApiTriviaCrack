@@ -45,7 +45,7 @@ class Rules {
             game: 'id,optional',
             question: 'id,optional',
             player: 'id,optional',
-            selectedoption: 'word,optional',
+            selectedoption: 'text,optional',
         });
     }
 }
