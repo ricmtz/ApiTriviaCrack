@@ -10,8 +10,8 @@ router.post('/', [rules.createCategory, defaultValues.defaultCategory], categori
 // Get all categories
 router.get('/', categoriesCtrl.getAll);
 
-// Get category by Id
-router.get('/:categoryId', categoriesCtrl.get);
+// Get category
+router.get('/:category', categoriesCtrl.get);
 
 // Put category
 router.patch('/:categoryId', rules.updateCategory, categoriesCtrl.update);

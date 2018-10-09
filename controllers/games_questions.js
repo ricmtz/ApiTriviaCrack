@@ -1,3 +1,5 @@
+const { GamesORM } = require('../orm');
+
 class GamesQuestionsCtrl {
     constructor() {
         this.gamesQuestions = [
@@ -42,11 +44,20 @@ class GamesQuestionsCtrl {
         res.status(200).send(json);
     }
 
-    create(req, res){
+    async create(req, res){
+        const data = {
+            game: req.params.gameId,
+            question: req.body.question,
+            player: req.body.player,
+            option: req.body.option
+        }
+        const result = await GamesORM.addAnswer(data);
+        const finish = await GamesORM.finishGame(data);
         const json = {
-            response: 'Ok',
-            data: `Creation questions to ${req.params.gameId}`,
+            data: result,
+            finish_game: finish,
         };
+        if (result.length === 0) res.status(404);
         res.status(200).send(json);
     }
 

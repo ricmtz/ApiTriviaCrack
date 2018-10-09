@@ -1,6 +1,5 @@
 exports.Game = require('./game');
 exports.User = require('./user');
-exports.Friend = require('./friend');
+exports.Answer = require('./answer');
 exports.Category = require('./category');
-exports.Email = require('./email');
-exports.Games_Questions = require('./games_questions');
+exports.Question = require('./questions');

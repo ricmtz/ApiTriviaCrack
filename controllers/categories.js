@@ -1,72 +1,54 @@
+const { CategoriesORM } = require('../orm');
+
 class CategoriesCtrl {
-    constructor() {
-        this.categories = [
-            {
-                id: 5,
-                name: 'Databases',
-                color: 'Red',
-                icon: 'Icon.png',
-            },
-            {
-                id: 6,
-                name: 'Software Engineering',
-                color: 'Blue',
-                icon: 'IconSE.png',
-            },
-        ];
-
-        this.getAll = this.getAll.bind(this);
-        this.get = this.get.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
+    async getAll(req, res) {
+      const result = await CategoriesORM.getAll();
+      const json = {
+          data: result,
+          total: result.length,
+      };
+      if (result.length === 0) res.status(404);
+      res.send(json);
     }
 
-    getAll(req, res) {
+    async get(req, res) {
+        const result = await CategoriesORM.getCategory(req.params.category);
         const json = {
-            response: 'Ok',
-            data: this.categories,
+            data: result,
         };
+        if (result.length === 0) res.status(404);
+        res.send(json);
+    }
+
+    async create(req, res) {
+        const result = await CategoriesORM.create(req.body);
+        const json = {
+            data: result,
+        };
+        if (result.length === 0) res.status(404);
         res.status(200).send(json);
     }
 
-    get(req, res) {
+    async update(req, res) {
+        const result = await CategoriesORM.update(req.params.category, req.body);
         const json = {
-            response: 'Ok',
-            data: this.categories.find(c => c.id === Number(req.params.categoryId)),
+            data: result,
         };
-        res.status(200).send(json);
+        if (result.length === 0) {
+            res.status(404);
+        } else {
+            res.status(204);
+        }
+        res.send(json);
     }
 
-    create(req, res) {
-        const generatedId = this.categories[this.categories.length - 1].id + 1;
+    async delete(req, res) {
+        const result = await CategoriesORM.delete(req.params.category);
         const json = {
-            response: 'Created',
-            data: {
-                id: generatedId,
-                url: `https://domain/categories/${req.body.name}`,
-            },
+            data: result,
         };
-        res.status(201).send(json);
-    }
-
-    update(req, res) {
-        const json = {
-            response: 'Ok',
-            data: {
-                id: req.params.categoryId,
-                name: req.body.name,
-            },
-        };
-        res.status(200).send(json);
-    }
-
-    delete(req, res) {
-        const json = {
-            response: 'No content',
-            data: {},
-        };
-        res.status(204).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 }
 

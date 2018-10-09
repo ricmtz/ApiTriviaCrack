@@ -1,61 +1,34 @@
+const { UsersORM } = require('../orm');
+
 class FriendsCtrl {
-    constructor() {
-        this.fri = [
-            {
-                user_1: 1,
-                user_2: 3,
-                friendship_date: '01/15/2018',
-            },
-            {
-                user_1: 6,
-                user_2: 3,
-                friendship_date: '03/27/2018',
-            },
-        ];
-        this.getAll = this.getAll.bind(this);
-        this.get = this.get.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
+    async getAll(req, res) {
+        const result = await UsersORM.getFriends(req.params.nickname);
+        const json = {
+            data: result,
+            total: result.length,
+        };
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 
-    getAll(req, res) {
+    async create(req, res) {
+        const data = { nicknameFriend: req.body.friend, date: '2018-09-09' };
+        const result = await UsersORM.addFriend(req.params.nickname, data);
         const json = {
-            response: 'Ok',
-            data: `friends of ${req.params.nickname}`,
-            total: 1,
+            data: result,
         };
+        if (result.length === 0) res.status(404);
         res.status(200).send(json);
     }
 
-    get(req, res) {
-        const json = {
-            response: 'Ok',
-            data: {
-                user_1: req.params.user_1,
-                user_2: req.params.user_2,
-                friendship_date: '03/27/2018',
-            },
+    async delete(req, res) {
+        const data = {
+            nicknameUser: req.params.nickname,
+            nicknameFriend: req.params.friend
         };
-        res.status(200).send(json);
-    }
-
-    create(req, res) {
+        const result = await UsersORM.deleteFriend(data);
         const json = {
-            response: 'Ok',
-            data: `friend add to ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
-    update(req, res) {
-        res.status(204).send('Data is updated');
-    }
-
-    delete(req, res) {
-        const json = {
-            response: 'Ok',
-            id: req.params.nickname,
+            data: result,
         };
         res.status(200).send(json);
     }
