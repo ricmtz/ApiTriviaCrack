@@ -20,23 +20,6 @@ class UsersCtrl {
         res.send(json);
     }
 
-    static getAllFriends(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `friends of ${req.params.nickname}`,
-            total: 1,
-        };
-        res.status(200).send(json);
-    }
-
-    static addFriend(req, res) {
-        const json = {
-            response: 'Ok',
-            data: `friend add to ${req.params.nickname}`,
-        };
-        res.status(200).send(json);
-    }
-
     async create(req, res) {
         const result = await UsersORM.create(req.body);
         const json = {
@@ -48,17 +31,21 @@ class UsersCtrl {
 
     async update(req, res) {
         const result = await UsersORM.update(req.params.nickname, req.body);
+        const json = {
+            data: result,
+        };
         if (result.length === 0) {
             res.status(404);
         } else {
-            res.status(204).send('Data successfully updated');
+            res.status(204);
         }
+        res.send(json);
     }
 
     async delete(req, res) {
         const result = await UsersORM.delete(req.params.nickname);
         const json = {
-            id: req.params.nickname,
+            data: result,
         };
         if (result.length === 0) res.status(404);
         res.send(json);

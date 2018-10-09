@@ -30,7 +30,7 @@ class User {
     }
 
     getEmail() {
-        return this.principalEmail;
+        return this.email;
     }
 
     getAmdin() {

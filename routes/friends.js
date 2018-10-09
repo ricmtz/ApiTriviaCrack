@@ -10,6 +10,6 @@ router.get('/', friendsCtrl.getAll);
 router.post('/', friendsCtrl.create);
 
 // Remove friend
-router.delete('/', friendsCtrl.delete);
+router.delete('/:friend', friendsCtrl.delete);
 
 module.exports = router;

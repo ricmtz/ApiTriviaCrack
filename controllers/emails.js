@@ -5,6 +5,7 @@ class EmailsCtrl {
         const result = await UsersORM.getEmails(req.params.nickname);
         const json = {
             data: result,
+            total: result.length,
         };
         if (result.length === 0) res.status(404);
         res.send(json);
@@ -28,6 +29,7 @@ class EmailsCtrl {
         } else {
             res.status(204).send('Data successfully updated');
         }
+        res.send(result);
     }
 
     async delete(req, res) {
