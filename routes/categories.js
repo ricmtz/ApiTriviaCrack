@@ -1,10 +1,11 @@
 const { Router } = require('express');
 const { categoriesCtrl } = require('../controllers');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = Router();
 
 // Post category
-router.post('/', categoriesCtrl.create);
+router.post('/', [rules.createCategory, defaultValues.defaultCategory], categoriesCtrl.create);
 
 // Get all categories
 router.get('/', categoriesCtrl.getAll);
@@ -12,10 +13,10 @@ router.get('/', categoriesCtrl.getAll);
 // Get category
 router.get('/:category', categoriesCtrl.get);
 
-// Update category.
-router.patch('/:category', categoriesCtrl.update);
+// Put category
+router.patch('/:categoryId', rules.updateCategory, categoriesCtrl.update);
 
 // Delete category
-router.delete('/:category', categoriesCtrl.delete);
+router.delete('/:categoryId', categoriesCtrl.delete);
 
 module.exports = router;

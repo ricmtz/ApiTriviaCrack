@@ -2,6 +2,7 @@ const express = require('express');
 const emailsRouter = require('./emails');
 const friendsRouter = require('./friends');
 const { usersCtrl } = require('../controllers');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = express.Router();
 
@@ -9,16 +10,16 @@ const router = express.Router();
 router.get('/', usersCtrl.getAll);
 
 // Find users.
-router.get('/:nickname', usersCtrl.get);
+router.get('/:nickname', rules.paramsUser, usersCtrl.get);
 
 // Create users.
-router.post('/', usersCtrl.create);
+router.post('/', [rules.createUser, defaultValues.defaultUser], usersCtrl.create);
 
 // Delete users.
-router.delete('/:nickname', usersCtrl.delete);
+router.delete('/:nickname', rules.paramsUser, usersCtrl.delete);
 
 // Update users.
-router.patch('/:nickname', usersCtrl.update);
+router.patch('/:nickname', rules.updateUser, usersCtrl.update);
 
 router.use('/:nickname/emails', emailsRouter);
 router.use('/:nickname/friends', friendsRouter);

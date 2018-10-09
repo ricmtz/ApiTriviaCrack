@@ -3,6 +3,9 @@ const { Router } = require('express');
 const router = Router();
 
 const bodyParser = require('body-parser');
+
+const notFound = require('../middlewares/generator');
+
 const usersRouter = require('./users');
 const categoriesRouter = require('./categories');
 const questionsRouter = require('./questions');
@@ -19,5 +22,7 @@ router.use('/users', usersRouter);
 router.use('/categories', categoriesRouter);
 router.use('/questions', questionsRouter);
 router.use('/games', gamesRouter);
+
+router.use(notFound);
 
 module.exports = router;
