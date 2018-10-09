@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { gamesQuestionsCtrl } = require('../controllers');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = Router({ mergeParams: true });
 
@@ -10,12 +11,12 @@ router.get('/', gamesQuestionsCtrl.getAll);
 router.get('/:questionId', gamesQuestionsCtrl.get);
 
 // Create questions
-router.post('/', gamesQuestionsCtrl.create);
+router.post('/', [rules.createGameQuestion, defaultValues.defaultGameQuestion], gamesQuestionsCtrl.create);
 
 // Delete question
 router.delete('/:questionId', gamesQuestionsCtrl.delete);
 
 // Update question
-router.patch('/:questionId', gamesQuestionsCtrl.update);
+router.patch('/:questionId', rules.updateGameQuestion, gamesQuestionsCtrl.update);
 
 module.exports = router;

@@ -1,5 +1,6 @@
 const express = require('express');
 const { emailsCtrl } = require('../controllers');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = express.Router({ mergeParams: true });
 
@@ -7,12 +8,12 @@ const router = express.Router({ mergeParams: true });
 router.get('/', emailsCtrl.getAll);
 
 // Add email
-router.post('/', emailsCtrl.create);
+router.post('/', [rules.createEmail, defaultValues.defaultEmail], emailsCtrl.create);
 
 // Update email
-router.put('/:emailUsr', emailsCtrl.update);
+router.patch('/:emailId', rules.updateEmail, emailsCtrl.update);
 
 // Remove email
-router.delete('/', emailsCtrl.delete);
+router.delete('/:emailId', rules.paramsEmails, emailsCtrl.delete);
 
 module.exports = router;

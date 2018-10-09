@@ -20,7 +20,6 @@ class CategoriesCtrl {
         this.create = this.create.bind(this);
         this.update = this.update.bind(this);
         this.delete = this.delete.bind(this);
-        this.deleteAll = this.deleteAll.bind(this);
     }
 
     getAll(req, res) {
@@ -63,14 +62,6 @@ class CategoriesCtrl {
     }
 
     delete(req, res) {
-        const json = {
-            response: 'No content',
-            data: {},
-        };
-        res.status(204).send(json);
-    }
-
-    deleteAll(req, res) {
         const json = {
             response: 'No content',
             data: {},
