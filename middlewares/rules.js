@@ -15,8 +15,8 @@ class Rules {
     static createCategory(req, res, next) {
         validator.validate(req, res, next, {
             body: {
-                name: 'word,required',
-                color: 'word,required',
+                name: 'text,required',
+                color: 'text,required',
             },
         });
     }
@@ -24,8 +24,8 @@ class Rules {
     static updateCategory(req, res, next) {
         validator.validate(req, res, next, {
             body: {
-                name: 'word,optional',
-                color: 'word,optional',
+                name: 'text,optional',
+                color: 'text,optional',
             },
         });
     }
