@@ -5,9 +5,10 @@ class Rules {
         validator.validate(req, res, next, {
             body: {
                 nickname: 'word',
-                password: 'positive,optional',
+                password: 'boolean,optional',
                 admin: 'boolean',
                 email: 'email,required',
+                nombre: 'word,optional',
             },
         });
     }

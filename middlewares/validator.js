@@ -55,19 +55,16 @@ class Validator {
 
         Object.entries(rules).forEach(([part, fields]) => {
             Object.entries(fields).forEach(([field, validations]) => {
-                validations.split(',').forEach((v) => {
-                    if (v !== 'optional') {
-                        if (!Validator[v](req[part][field] || '')) {
-                            if (Array.isArray(error.details[field])) {
-                                error.details[field].push(`The field ${field} should be a valid ${v}`);
-                            } else {
-                                error.details[field] = [`The field ${field} should be a valid ${v}`];
-                            }
+                const [v, needed] = validations.split(',');
+                if (Validator.required(req[part][field] || '') && needed === 'optional') {
+                    if (!Validator[v](req[part][field] || '')) {
+                        if (Array.isArray(error.details[field])) {
+                            error.details[field].push(`The field ${field} should be a valid ${v}`);
+                        } else {
+                            error.details[field] = [`The field ${field} should be a valid ${v}`];
                         }
-                    } else {
-                        delete error.details[field];
                     }
-                });
+                }
             });
         });
 
