@@ -5,7 +5,7 @@ class Rules {
         validator.validate(req, res, next, {
             body: {
                 nickname: 'word',
-                password: 'positive',
+                password: 'positive,optional',
                 admin: 'boolean',
                 email: 'email,required',
             },
