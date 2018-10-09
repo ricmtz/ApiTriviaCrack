@@ -5,12 +5,12 @@ const router = Router();
 
 router.get('/', questionsCtrl.getAll);
 
-router.get('/:questionId', questionsCtrl.get);
+router.get('/:question', questionsCtrl.get);
 
 router.post('/', questionsCtrl.create);
 
-router.delete('/:questionId', questionsCtrl.delete);
+router.delete('/:question', questionsCtrl.delete);
 
-router.patch('/:questionId', questionsCtrl.update);
+router.patch('/:question', questionsCtrl.update);
 
 module.exports = router;

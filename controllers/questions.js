@@ -1,3 +1,5 @@
+const { QuestionsORM } = require('../orm');
+
 class QuestionsCtrl {
     constructor() {
         this.questions = [
@@ -26,43 +28,54 @@ class QuestionsCtrl {
         this.delete = this.delete.bind(this);
     }
 
-    getAll(req, res) {
+    async getAll(req, res) {
+        const result = await QuestionsORM.getAll();
         const json = {
-            response: 'Ok',
-            data: this.questions,
-            total: 2,
+            data: result,
+            total: result.length,
         };
+        if (result.length === 0) res.status(404);
+        res.send(json);
+    }
+
+    async get(req, res) {
+        const result = await QuestionsORM.get(req.params.question);
+        const json = {
+            data: result,
+        };
+        if (result.length === 0) res.status(404);
+        res.send(json);
+    }
+
+    async create(req, res) {
+        const result = await QuestionsORM.create(req.body);
+        const json = {
+            data: result,
+        };
+        if (result.length === 0) res.status(404);
         res.status(200).send(json);
     }
 
-    get(req, res) {
+    async update(req, res) {
+        const result = await QuestionsORM.update(req.params.question, req.body);
         const json = {
-            response: 'Ok',
-            data: this.questions.find(el => el.id === Number(req.params.questionId)),
+            data: result,
         };
-        res.status(200).send(json);
+        if (result.length === 0) {
+            res.status(404);
+        } else {
+            res.status(204);
+        }
+        res.send(json);
     }
 
-    create(req, res) {
+    async delete(req, res) {
+        const result = await QuestionsORM.delete(req.params.question);
         const json = {
-            response: 'OK',
-            data: {
-                questionId: req.body.questionId,
-            },
+            data: result,
         };
-        res.status(200).send(json);
-    }
-
-    update(req, res) {
-        res.status(204).send('Data successfully updated');
-    }
-
-    delete(req, res) {
-        const json = {
-            response: 'OK',
-            questionID: req.params.questionId,
-        };
-        res.status(200).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 }
 

@@ -30,7 +30,6 @@ class CategoriesCtrl {
     }
 
     async update(req, res) {
-        res.send('ho');
         const result = await CategoriesORM.update(req.params.category, req.body);
         const json = {
             data: result,

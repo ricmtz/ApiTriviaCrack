@@ -11,7 +11,7 @@ class Categories {
     }
 
     async getAll() {
-        const result = await db.select(this.name);
+        const result = await db.select(this.name, [], { deleted: false });
         if (result.length === 0) return result;
         const response = [];
         result.forEach((row) => {
@@ -20,14 +20,14 @@ class Categories {
         return response;
     }
 
-    async get(idUser) {
-        const data = { id: idUser };
-        const result = db.select(this.name, [], data);
+    async get(idCategory) {
+        const data = { id: idCategory, deleted: false };
+        const result = await db.select(this.name, [], data);
         return result.length !== 0 ? new Category(result[0]) : this.msgNoCategory;
     }
 
     async getCategory(category) {
-        const data = { name: category };
+        const data = { name: category, deleted: false };
         const result = await db.select(this.name, [], data);
         return result.length !== 0 ? new Category(result[0]) : this.msgNoCategory;
     }
@@ -39,15 +39,12 @@ class Categories {
 
     async create(data) {
         const category = new Category(data);
-        console.log(category);
         let exist = await this.existData(this.name, { name: category.getName() });
         if (exist) return this.msgExistName;
         exist = await this.existData(this.name, { color: category.getColor() });
         if (exist) return this.msgExistColor;
         let result = await db.insert(this.name, category);
-        console.log(result);
         result = await db.select(this.name, ['id'], category);
-        console.log(result);
         if (result.length !== 0) {
             category.setId(result[0].id);
             return category;
@@ -59,12 +56,11 @@ class Categories {
         const res = await db.select(this.name, ['id'], { name: nameCategory });
         if (res.length === 0) return this.msgNoCategory;
         const category = new Category(data);
-        console.log(category);
-        let exist = await this.existData(this.name, { nickname: category.getName() });
+        let exist = await this.existData(this.name, { name: category.getName() });
         if (exist) return this.msgExistName;
-        exist = await this.existData(this.name, { email: category.getColor() });
+        exist = await this.existData(this.name, { color: category.getColor() });
         if (exist) return this.msgExistColor;
-        let result = await db.update(this.name, category, { name: nameCategory });
+        let result = await db.update(this.name, category, { name: nameCategory, deleted: false});
         result = await db.select(this.name, ['id'], data);
         return result;
     }
@@ -73,7 +69,7 @@ class Categories {
         const res = await db.select(this.name, ['id'], { name: nameCategory });
         if (res.length === 0) return this.msgNoCategory;
         const data = { deleted: true };
-        let result = await db.update(this.name, data, { name: nameCategory });
+        let result = await db.update(this.name, data, { name: nameCategory, deleted: false });
         result = await db.select(this.name, ['id'], data);
         return result;
     }

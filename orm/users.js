@@ -7,7 +7,7 @@ class Users {
         this.emails = 'emails';
         this.friends = 'friends';
         this.msgNoUser = 'This user not exist';
-        this.msgNoCreateUser = 'Dont can create user';
+        this.msgNoCreateUser = 'Dont create user';
         this.msgExistNickname = 'This nickname already exists';
         this.msgExistEmail = 'This email already exists';
         this.msgNoExistEmail = 'This email not exists';
@@ -28,7 +28,7 @@ class Users {
 
     async get(idUser) {
         const data = { id: idUser };
-        const result = db.select(this.name, [], data);
+        const result = await db.select(this.name, [], data);
         return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
     }
 
