@@ -2,10 +2,10 @@ class Category {
     constructor({
         id, name, color, icon,
     }) {
-        this.id = id;
-        this.name = name;
-        this.color = color;
-        this.icon = icon;
+        this.setId(id);
+        this.setName(name);
+        this.setColor(color);
+        this.setIcon(icon);
     }
 
     getId() {
@@ -25,19 +25,19 @@ class Category {
     }
 
     setId(id) {
-        this.id = id;
+        if (id !== undefined) this.id = id;
     }
 
     setName(name) {
-        this.name = name;
+        if (name !== undefined) this.name = name;
     }
 
     setColor(color) {
-        this.color = color;
+        if (color !== undefined) this.color = color;
     }
 
     setIcon(icon) {
-        this.icon = icon;
+        if (icon !== undefined) this.icon = icon;
     }
 }
 

@@ -9,16 +9,13 @@ router.post('/', categoriesCtrl.create);
 // Get all categories
 router.get('/', categoriesCtrl.getAll);
 
-// Get category by Id
-router.get('/:categoryId', categoriesCtrl.get);
+// Get category
+router.get('/:category', categoriesCtrl.get);
 
-// Put category
-router.put('/:categoryId', categoriesCtrl.update);
+// Update category.
+router.patch('/:category', categoriesCtrl.update);
 
 // Delete category
-router.delete('/:categoryId', categoriesCtrl.delete);
-
-// Delete all categories
-router.delete('/', categoriesCtrl.deleteAll);
+router.delete('/:category', categoriesCtrl.delete);
 
 module.exports = router;

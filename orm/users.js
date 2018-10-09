@@ -61,7 +61,7 @@ class Users {
     }
 
     async update(nicknameUser, data) {
-        const resUser = await db.select(this.name, ['count(*)'], { nickname: nicknameUser });
+        const resUser = await db.select(this.name, ['id'], { nickname: nicknameUser });
         if (resUser.length === 0) return this.msgNoUser;
         const user = new User(data);
         let exist = await this.existData(this.name, { nickname: user.getNickname() });
@@ -76,8 +76,8 @@ class Users {
     }
 
     async delete(nicknameUser) {
-        const resUser = await db.select(this.name, ['count(*)'], { nickname: nicknameUser });
-        if (resUser[0].count == 0) return this.msgNoUser;
+        const resUser = await db.select(this.name, ['id'], { nickname: nicknameUser });
+        if (resUser.length === 0) return this.msgNoUser;
         const data = { deleted: true };
         let result = await db.update(this.name, data, { nickname: nicknameUser });
         result = await db.select(this.name, ['id'], data);
