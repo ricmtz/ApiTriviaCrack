@@ -81,4 +81,4 @@ Campos:
 4.- Agregar Rutas para logear.
     router.post('/register', middleware.aut.resgister);
     router.post('/login', middleware.aut.login);
-    router.post('/logout', middleware.aut.logout);
+    router.get('/logout', middleware.aut.logout);
