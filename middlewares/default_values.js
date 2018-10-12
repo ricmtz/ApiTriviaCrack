@@ -37,6 +37,7 @@ class DefaultValues {
     static defaultQuestion(req, res, next) {
         req.body.approved = true;
         req.body.deleted = false;
+        req.body.createdate = new Date().toISOString();
         next();
     }
 

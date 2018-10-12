@@ -127,6 +127,7 @@ class Rules {
                 option1: 'text,required',
                 option2: 'text,required',
                 optioncorrect: 'text,required',
+                userid: 'id,required',
             },
         });
     }
