@@ -100,10 +100,13 @@ class Rules {
 
     static createGameQuestion(req, res, next) {
         validator.validate(req, res, next, {
+            params: {
+                gameId: 'id,required',
+            },
             body: {
-                game: 'id,required',
                 question: 'id,required',
-                player: 'id,required',
+                player: 'text,required',
+                option: 'text,required',
             },
         });
     }
