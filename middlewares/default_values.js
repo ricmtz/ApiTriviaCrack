@@ -18,6 +18,7 @@ class DefaultValues {
         next();
     }
 
+
     static defaultGame(req, res, next) {
         req.body.answersplayer1 = 0;
         req.body.answersplayer2 = 0;
