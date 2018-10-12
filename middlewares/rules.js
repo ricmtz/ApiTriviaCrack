@@ -65,19 +65,17 @@ class Rules {
 
     static updateEmail(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                emailId: 'id,required',
-            },
             body: {
-                email: 'email,required',
+                newEmail: 'email,required',
+                oldEmail: 'email,required',
             },
         });
     }
 
     static paramsEmails(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                emailId: 'id,required',
+            body: {
+                email: 'email,required',
             },
         });
     }
@@ -102,10 +100,13 @@ class Rules {
 
     static createGameQuestion(req, res, next) {
         validator.validate(req, res, next, {
+            params: {
+                gameId: 'id,required',
+            },
             body: {
-                game: 'id,required',
                 question: 'id,required',
-                player: 'id,required',
+                player: 'text,required',
+                option: 'text,required',
             },
         });
     }
@@ -129,6 +130,7 @@ class Rules {
                 option1: 'text,required',
                 option2: 'text,required',
                 optioncorrect: 'text,required',
+                userid: 'id,required',
             },
         });
     }

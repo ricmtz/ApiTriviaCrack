@@ -18,9 +18,10 @@ class DefaultValues {
         next();
     }
 
+
     static defaultGame(req, res, next) {
-        req.body.answersplayer1 = 0;
-        req.body.answersplayer2 = 0;
+        req.body.answersplayer1 = -1;
+        req.body.answersplayer2 = -1;
         req.body.createdate = new Date().toISOString();
         req.body.finished = false;
         req.body.deleted = false;
@@ -36,6 +37,7 @@ class DefaultValues {
     static defaultQuestion(req, res, next) {
         req.body.approved = true;
         req.body.deleted = false;
+        req.body.createdate = new Date().toISOString();
         next();
     }
 

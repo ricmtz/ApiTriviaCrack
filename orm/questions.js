@@ -5,23 +5,29 @@ class Questions {
     constructor() {
         this.name = 'questions';
         this.categories = 'categories';
+        this.users = 'users';
         this.msgNoCategoy = 'This category no exist';
         this.msgNoCreateQuestion = 'Dont create question';
         this.msgNoQuestion = 'This question dont exist';
+        this.msgNoUser = 'This user dont exist';
     }
 
     async create(data) {
         const question = new Question(data);
-        let result = await db.select(this.categories, ['id'], { name: data.category });
+        let result = await db.select(this.categories, ['id'], { id: data.category });
         if (result.length === 0) return this.msgNoCategory;
-        question.setCategory(result[0].id);
         result = await db.insert(this.name, question);
         result = await db.select(this.name, ['id'], question);
-        if (result.length !== 0) {
-            question.setId(result[0].id);
-            return question;
-        }
-        return this.msgNoCreateQuestion;
+        if (result.length === 0) return this.msgNoCreateQuestion;
+        question.setId(result[0].id);
+        return question;
+    }
+
+    async addNicknameUser(question) {
+        const result = await db.select(this.users, ['nickname'], { id: question.getUserid() });
+        if (result.length === 0) return this.msgNoUser;
+        question.setUser(result[0].nickname);
+        return question;
     }
 
     async getAll() {
@@ -35,9 +41,12 @@ class Questions {
     }
 
     async get(idQuestion) {
-        const data = { id: Number(idQuestion), deleted: false };
+        const data = { id: idQuestion, deleted: false };
         const result = await db.select(this.name, [], data);
-        return result.length !== 0 ? new Question(result[0]) : this.msgNoQuestion;
+        if (result.length === 0) return this.msgNoQuestion;
+        let question = new Question(result[0]);
+        question = await this.addNicknameUser(question);
+        return question;
     }
 
     async getQuestion(nameQuestion) {
@@ -47,24 +56,23 @@ class Questions {
     }
 
     async update(idQuestion, data) {
-        console.log(data);
+        let result = await db.select(this.name, ['id'], { id: idQuestion, deleted: false });
+        if (result.length === 0) return this.msgNoQuestion;
         const question = new Question(data);
-        console.log(question);
         if (data.category !== undefined) {
-            const result = await db.select(this.categories, ['id'], { name: data.category });
+            result = await db.select(this.categories, ['id'], { id: data.category });
             if (result.length === 0) return this.msgNoCategory;
-            question.setCategory(result[0].id);
         }
-        console.log(question);
-        let result = await db.update(this.name, question, { id: idQuestion });
+        result = await db.update(this.name, question, { id: idQuestion });
         result = await db.select(this.name, ['id'], data);
-        console.log(result);
         return result;
     }
 
     async delete(idQuestion) {
+        let result = await db.select(this.name, ['id'], { id: idQuestion, deleted: false });
+        if (result.length === 0) return this.msgNoQuestion;
         const data = { deleted: true };
-        let result = await db.update(this.name, data, { id: idQuestion });
+        result = await db.update(this.name, data, { id: idQuestion });
         result = await db.select(this.name, ['id'], data);
         return result;
     }
