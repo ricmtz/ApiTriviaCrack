@@ -20,8 +20,8 @@ class DefaultValues {
 
 
     static defaultGame(req, res, next) {
-        req.body.answersplayer1 = 0;
-        req.body.answersplayer2 = 0;
+        req.body.answersplayer1 = -1;
+        req.body.answersplayer2 = -1;
         req.body.createdate = new Date().toISOString();
         req.body.finished = false;
         req.body.deleted = false;

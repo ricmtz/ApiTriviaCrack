@@ -12,13 +12,14 @@ class Users {
         this.msgNoExistGame = 'This game not exist';
         this.msgNoExistQuestion = 'This question not exist';
         this.msgNoCreateGame = 'Dont create answer';
+        this.msgNoUpdate = 'Dont update this data';
+    }
 
-        this.msgExistNickname = 'This nickname already exists';
-        this.msgExistEmail = 'This email already exists';
-        this.msgNoExistEmail = 'This email not exists';
-        this.msgSameUser = 'It is the same user';
-        this.msgFriendExist = 'This friendship already exists';
-        this.msgNoFriendExist = 'This friendship not exists';
+    async getOponent() {
+        const games = await db.select(this.users, [], { deleted: false });
+        const max = games.length - 1;
+        const pos = Math.round(Math.random() * max);
+        return games[pos];
     }
 
     async create(data) {
@@ -26,23 +27,30 @@ class Users {
         let result = await db.select(this.users, ['id'], { nickname: data.player1 });
         if (result.length === 0) return this.msgNoUser;
         game.setPlayer1(result[0].id);
-        result = await db.select(this.users, ['id'], { nickname: data.player2 });
-        if (result.length === 0) return this.msgNoUser;
-        game.setPlayer2(result[0].id);
-        result = await db.select(this.users, ['id'], { nickname: data.player1 });
-        if (result === 0) return this.msgNoUser;
+        let oponent = data.player2;
+        if (data.player2 === undefined) {
+            result = await this.getOponent();
+            console.log(result);
+            oponent = result.nickname;
+            game.setPlayer2(result.id);
+        } else {
+            result = await db.select(this.users, ['id'], { nickname: data.player2 });
+            if (result.length === 0) return this.msgNoUser;
+            game.setPlayer2(result[0].id);
+        }
         result = await db.insert(this.name, game);
         result = await db.select(this.name, ['id'], game);
-        if (result.length !== 0) {
-            game.setId(result[result.length - 1].id);
-            return game;
-        }
-        return this.msgNoCreateGame;
+        if (result.length === 0) return this.msgNoCreateGame;
+        game.setId(result[result.length - 1].id);
+        game.setPlayer1(data.player1);
+        game.setPlayer2(oponent);
+        return game;
     }
 
     async get(idGame) {
         const conditions = { 'games.id': idGame, 'games.deleted': false };
         const columns = [
+            { column: 'games.id', as: 'id' },
             { column: 'u1.nickname', as: 'player1' },
             { column: 'u2.nickname', as: 'player2' },
             { column: 'scoreplayer1', as: 'scoreplayer1' },
@@ -66,6 +74,7 @@ class Users {
     async getAll() {
         const conditions = { 'games.deleted': false };
         const columns = [
+            { column: 'games.id', as: 'id' },
             { column: 'u1.nickname', as: 'player1' },
             { column: 'u2.nickname', as: 'player2' },
             { column: 'scoreplayer1', as: 'scoreplayer1' },
@@ -91,15 +100,23 @@ class Users {
     }
 
     async update(idGame, data) {
+        if (data.player1 !== undefined || data.player2 !== undefined
+            || data.createdate !== undefined) {
+            return this.msgNoUpdate;
+        }
+        let result = await db.select(this.name, ['id'], { id: idGame, deleted: false });
+        if (result.length === 0) return this.msgNoExistGame;
         const game = new Game(data);
-        let result = await db.update(this.name, game, { id: idGame, deleted: false });
+        result = await db.update(this.name, game, { id: idGame, deleted: false });
         result = await db.select(this.name, ['id'], data);
-        return result;
+        return result.length === 0 ? result : result[0];
     }
 
     async delete(idGame) {
-        let result = await db.update(this.name, { deleted: true }, { id: idGame });
-        return result;
+        let result = await db.select(this.name, ['id'], { id: idGame, deleted: false });
+        if (result.length === 0) return this.msgNoExistGame;
+        result = await db.update(this.name, { deleted: true }, { id: idGame });
+        return result.length === 0 ? result : result[0];
     }
 
     async getPosPlayer(userid) {
