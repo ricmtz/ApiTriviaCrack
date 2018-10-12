@@ -11,7 +11,7 @@ router.post('/', [rules.createCategory, defaultValues.defaultCategory], categori
 router.get('/', categoriesCtrl.getAll);
 
 // Get category
-router.get('/:category', categoriesCtrl.get);
+router.get('/:categoryId', categoriesCtrl.get);
 
 // Put category
 router.patch('/:categoryId', rules.updateCategory, categoriesCtrl.update);

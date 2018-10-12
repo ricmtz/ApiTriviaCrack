@@ -52,24 +52,24 @@ class Categories {
         return this.msgNoCreateCategory;
     }
 
-    async update(nameCategory, data) {
-        const res = await db.select(this.name, ['id'], { name: nameCategory });
+    async update(idcategory, data) {
+        const res = await db.select(this.name, ['id'], { id: idcategory });
         if (res.length === 0) return this.msgNoCategory;
         const category = new Category(data);
         let exist = await this.existData(this.name, { name: category.getName() });
         if (exist) return this.msgExistName;
         exist = await this.existData(this.name, { color: category.getColor() });
         if (exist) return this.msgExistColor;
-        let result = await db.update(this.name, category, { name: nameCategory, deleted: false});
+        let result = await db.update(this.name, category, { id: idcategory, deleted: false });
         result = await db.select(this.name, ['id'], data);
         return result;
     }
 
-    async delete(nameCategory) {
-        const res = await db.select(this.name, ['id'], { name: nameCategory });
+    async delete(idcategory) {
+        const res = await db.select(this.name, ['id'], { id: idcategory });
         if (res.length === 0) return this.msgNoCategory;
         const data = { deleted: true };
-        let result = await db.update(this.name, data, { name: nameCategory, deleted: false });
+        let result = await db.update(this.name, data, { id: idcategory, deleted: false });
         result = await db.select(this.name, ['id'], data);
         return result;
     }
