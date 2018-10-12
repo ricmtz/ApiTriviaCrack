@@ -66,6 +66,7 @@ class Users {
     async getAll() {
         const conditions = { 'games.deleted': false };
         const columns = [
+            // { column: 'games.id', as: 'id' },
             { column: 'u1.nickname', as: 'player1' },
             { column: 'u2.nickname', as: 'player2' },
             { column: 'scoreplayer1', as: 'scoreplayer1' },
@@ -162,6 +163,27 @@ class Users {
             }
         }
         return false;
+    }
+
+    async getAllGamesQuestions(gameId) {
+        const conditions = { 'games_questions.game': gameId };
+        const columns = [
+            { column: 'games_questions.id', as: 'id' },
+            { column: 'q.question', as: 'question' },
+            { column: 'u.nickname', as: 'player' },
+            { column: 'games_questions.option', as: 'option' },
+            { column: 'games_questions.correct', as: 'correct' },
+        ];
+        const join = [
+            {
+                type: 'JOIN', table: 'questions', as: 'q', condition: 'q.id = games_questions.question',
+            },
+            {
+                type: 'JOIN', table: 'users', as: 'u', condition: 'u.id = games_questions.player',
+            },
+        ];
+        const result = await db.select(this.answers, columns, conditions, 'AND', join);
+        return result;
     }
 }
 
