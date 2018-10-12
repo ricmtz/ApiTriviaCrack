@@ -185,6 +185,26 @@ class Users {
         const result = await db.select(this.answers, columns, conditions, 'AND', join);
         return result;
     }
+
+    async getGameQuestion(gameId, questionId) {
+        const conditions = { 'games_questions.game': gameId, 'games_questions.id': questionId };
+        const columns = [
+            { column: 'q.question', as: 'question' },
+            { column: 'u.nickname', as: 'player' },
+            { column: 'games_questions.option', as: 'option' },
+            { column: 'games_questions.correct', as: 'correct' },
+        ];
+        const join = [
+            {
+                type: 'JOIN', table: 'questions', as: 'q', condition: 'q.id = games_questions.question',
+            },
+            {
+                type: 'JOIN', table: 'users', as: 'u', condition: 'u.id = games_questions.player',
+            },
+        ];
+        const result = await db.select(this.answers, columns, conditions, 'AND', join);
+        return result;
+    }
 }
 
 module.exports = new Users();
