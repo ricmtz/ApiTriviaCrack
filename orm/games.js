@@ -13,6 +13,7 @@ class Users {
         this.msgNoExistQuestion = 'This question not exist';
         this.msgNoCreateGame = 'Dont create answer';
         this.msgNoUpdate = 'Dont update this data';
+        this.msgMaxQuestions = 'You answered your 10 questions';
     }
 
     async getOponent() {
@@ -135,7 +136,10 @@ class Users {
 
     async addAnswer(data) {
         const answer = new Answer(data);
-        let result = await db.select(this.name, ['id'], { id: answer.getGame() });
+        let conditions = { game: answer.getGame(), player: answer.getPlayer() };
+        let result = await db.select(this.answers, ['count(*)'], conditions);
+        if (result[0].count >= 10) return this.msgMaxQuestions;
+        result = await db.select(this.name, ['id'], { id: answer.getGame() });
         if (result.length === 0) return this.msgNoExistGame;
         result = await db.select(this.questions, ['id'], { id: answer.getQuestion() });
         if (result.length === 0) return this.msgNoExistQuestion;
@@ -144,7 +148,7 @@ class Users {
         answer.setPlayer(result[0].id);
         const user = await this.getPosPlayer(answer.getPlayer());
         if (user === 0) return this.msgNoUser;
-        const conditions = { id: answer.getQuestion(), optioncorrect: answer.getOption() };
+        conditions = { id: answer.getQuestion(), optioncorrect: answer.getOption() };
         result = await db.select(this.questions, ['id'], conditions);
         if (result.length === 0) answer.setCorrect(false);
         else answer.setCorrect(true);
