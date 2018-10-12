@@ -67,19 +67,15 @@ $ node index.js
 ```
 
 ## Demo URL
-<div align="center">
-  <a href="https://www.getpostman.com/collections/e4e893d5230a0a4cac35">
-    <img src="https://www.getpostman.com/img/v2/logo-glyph.png" height="75" width="75">
-  </a>
-  <a href="https://www.getpostman.com/collections/e4e893d5230a0a4cac35">
-    <img src="https://www.getpostman.com/img/v2/logo-glyph.png" height="75" width="75">
-  </a>
-</div>
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/e4e893d5230a0a4cac35#?env%5Bapi%5D=W3sia2V5IjoiaG9zdCIsInZhbHVlIjoiaHR0cHM6Ly9hcGktdHJpdmlhLWNyYWNrLmhlcm9rdWFwcC5jb20iLCJkZXNjcmlwdGlvbiI6IiIsImVuYWJsZWQiOnRydWV9XQ==)
 
 
 ## App URL
 <div align="center">
-  [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/e4e893d5230a0a4cac35#?env%5Bapi%5D=W3sia2V5IjoiaG9zdCIsInZhbHVlIjoiaHR0cHM6Ly9hcGktdHJpdmlhLWNyYWNrLmhlcm9rdWFwcC5jb20iLCJkZXNjcmlwdGlvbiI6IiIsImVuYWJsZWQiOnRydWV9XQ==)
+  <a href="https://api-trivia-crack.herokuapp.com/" target="_blank">
+    <img src="https://png.icons8.com/color/1600/heroku.png" height="75" width="75">
+  </a>
 </div>
 
 ## Collaborators
