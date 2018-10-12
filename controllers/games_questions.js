@@ -12,11 +12,12 @@ class GamesQuestionsCtrl {
     }
 
     static async get(req, res) {
+        const result = await GamesORM.getGameQuestion(req.params.gameId, req.params.questionId);
         const json = {
-            response: 'Ok',
-            data: `Question ${req.params.questionId} from ${req.params.gameId}`,
+            data: result,
         };
-        res.status(200).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 
     static async create(req, res) {
