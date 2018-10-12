@@ -12,9 +12,9 @@ class Questions {
         this.setOptioncorrect(optioncorrect);
         this.setApproved(approved);
         this.setDeleted(deleted);
-        this.setUserid(userid);
         this.setCreatedate(createdate);
         this.setApproveddate(approveddate);
+        this.setUserid(userid);
     }
 
     getId() {
@@ -51,6 +51,10 @@ class Questions {
 
     getUserid() {
         return this.userid;
+    }
+
+    getUser() {
+        return this.user;
     }
 
     getCreatedate() {
@@ -95,6 +99,10 @@ class Questions {
 
     setUserid(userid) {
         if (userid !== undefined) this.userid = userid;
+    }
+
+    setUser(user) {
+        if (user !== undefined) this.user = user;
     }
 
     setCreatedate(createdate) {

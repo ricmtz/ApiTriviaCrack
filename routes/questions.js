@@ -12,6 +12,6 @@ router.post('/', [rules.createQuestion, defaultValues.defaultQuestion], question
 
 router.delete('/:question', questionsCtrl.delete);
 
-router.patch('/:questionId', rules.updateQuestion, questionsCtrl.update);
+router.patch('/:question', rules.updateQuestion, questionsCtrl.update);
 
 module.exports = router;
