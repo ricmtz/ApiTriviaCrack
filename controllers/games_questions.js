@@ -38,9 +38,17 @@ class GamesQuestionsCtrl {
     }
 
     static async update(req, res) {
+        const data = {
+            id: req.params.questionId,
+            game: req.params.gameId,
+            question: req.body.question,
+            player: req.body.player,
+            selectedoption: req.body.selectedoption,
+        };
+        const result = await GamesORM.updateGameQuestion(data);
         const json = {
             response: 'Ok',
-            data: `Question ${req.params.questionId} updated from ${req.params.gameId}`,
+            data: result,
         };
         res.status(200).send(json);
     }

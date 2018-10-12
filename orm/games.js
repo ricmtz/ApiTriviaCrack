@@ -14,6 +14,7 @@ class Users {
         this.msgNoCreateGame = 'Dont create answer';
         this.msgNoUpdate = 'Dont update this data';
         this.msgMaxQuestions = 'You answered your 10 questions';
+        this.msgNoExistOption = 'Option does not exist';
     }
 
     async getOponent() {
@@ -221,6 +222,47 @@ class Users {
         ];
         const result = await db.select(this.answers, columns, conditions, 'AND', join);
         return result;
+    }
+
+    async updateGameQuestion(newData) {
+        const answer = new Answer(newData);
+        let result = null;
+        if (answer.getGame()) {
+            result = await db.select(this.games, ['id'], { id: answer.getGame() });
+        }
+        if (result.length === 0) return this.msgNoExistGame;
+        if (answer.getQuestion()) {
+            result = await db.select(this.questions, ['id'], { id: answer.getQuestion() });
+        }
+        if (result.length === 0) return this.msgNoExistQuestion;
+        if (answer.getPlayer()) {
+            result = await db.select(this.users, ['id'], { id: answer.getPlayer() });
+        }
+        if (result.lenght === 0) return this.msgNoUser;
+        if (answer.getOption()) {
+            result = await db.select(this.questions, ['id'], {
+                option1: answer.getOption(),
+                option2: answer.getOption(),
+                optioncorrect: answer.getOption(),
+            }, ' OR ');
+        }
+        if (result.length === 0) return this.msgNoExistOption;
+
+        result = await db.select(this.questions, ['id'], { optioncorrect: answer.getOption() });
+        if (result) {
+            answer.setCorrect(false);
+        } else {
+            answer.setCorrect(true);
+        }
+
+        console.table(answer);
+        result = await db.update(this.answers, answer, {
+            id: answer.getId(),
+        });
+
+        result = await db.select(this.answers, ['id'], answer);
+        if (result.length === 0) return this.msgNoCreateAnswers;
+        return (result.length === 0) ? result : answer;
     }
 }
 
