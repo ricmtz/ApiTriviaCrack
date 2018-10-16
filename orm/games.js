@@ -41,7 +41,7 @@ class Users {
             game.setPlayer2(result[0].id);
         }
         result = await db.insert(this.name, game);
-        result = await db.select(this.name, ['id'], game);
+        result = await db.select(this.name, ['id'], game); // FIXME El id viene en el resultado del insert, no hay necesidad de hacer otro query
         if (result.length === 0) return this.msgNoCreateGame;
         game.setId(result[result.length - 1].id);
         game.setPlayer1(data.player1);
@@ -151,7 +151,7 @@ class Users {
         if (result.length === 0) answer.setCorrect(false);
         else answer.setCorrect(true);
         result = await db.insert(this.answers, answer);
-        result = await db.select(this.answers, ['id'], answer);
+        result = await db.select(this.answers, ['id'], answer); // FIXME Podrian construir el objeto con los datos que mandaron sin necesidad de hacer otro query
         if (result.length === 0) return this.msgNoCreateAnswers;
         return result[result.length - 1];
     }

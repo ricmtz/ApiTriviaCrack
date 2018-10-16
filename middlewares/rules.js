@@ -1,5 +1,10 @@
 const validator = require('./validator');
 
+// FIXME Este diseño centralizado puede afectar en el mantenimiento, ya que al ver
+// una ruta no es claras su validaciones hasta que se viene hasta este archivo.
+// No es malo!!! solo una manera diferente.
+// FIXME Todos los métodos deben estar documentados
+
 class Rules {
     static createUser(req, res, next) {
         validator.validate(req, res, next, {

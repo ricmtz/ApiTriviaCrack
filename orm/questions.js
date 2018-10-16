@@ -1,6 +1,8 @@
 const { db } = require('../db');
 const { Question } = require('../models');
 
+// FIXME En los metodos getAll se debe permitir paginado y filtrado
+
 class Questions {
     constructor() {
         this.name = 'questions';
@@ -17,7 +19,7 @@ class Questions {
         let result = await db.select(this.categories, ['id'], { id: data.category });
         if (result.length === 0) return this.msgNoCategory;
         result = await db.insert(this.name, question);
-        result = await db.select(this.name, ['id'], question);
+        result = await db.select(this.name, ['id'], question); // FIXME El se obtiene directo al hacer insert, no es necesario hacer otro query
         if (result.length === 0) return this.msgNoCreateQuestion;
         question.setId(result[0].id);
         return question;
@@ -64,7 +66,7 @@ class Questions {
             if (result.length === 0) return this.msgNoCategory;
         }
         result = await db.update(this.name, question, { id: idQuestion });
-        result = await db.select(this.name, ['id'], data);
+        result = await db.select(this.name, ['id'], data);  // FIXME Podrian construir el objeto con los datos que mandaron sin necesidad de hacer otro query
         return result;
     }
 
@@ -73,7 +75,7 @@ class Questions {
         if (result.length === 0) return this.msgNoQuestion;
         const data = { deleted: true };
         result = await db.update(this.name, data, { id: idQuestion });
-        result = await db.select(this.name, ['id'], data);
+        result = await db.select(this.name, ['id'], data); // FIXME Podrian construir el objeto con los datos que mandaron sin necesidad de hacer otro query
         return result;
     }
 }

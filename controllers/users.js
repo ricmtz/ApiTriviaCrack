@@ -1,6 +1,9 @@
 const { UsersORM } = require('../orm');
 
+// FIXME Todos los métodos deben estar documentados
+
 class UsersCtrl {
+    // FIXME En los metodos getAll se debe permitir paginado y filtrado
     static async getAll(req, res) {
         const result = await UsersORM.getAll();
         const json = {
@@ -25,6 +28,7 @@ class UsersCtrl {
         const json = {
             data: result,
         };
+        // FIXME Me sangraron los ojos al ver este tipo de condicionales en una linea, please FIXME
         if ((typeof result) === 'string') res.status(404);
         else res.status(201);
         res.send(json);

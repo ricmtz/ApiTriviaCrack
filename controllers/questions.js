@@ -1,5 +1,7 @@
 const { QuestionsORM } = require('../orm');
 
+// FIXME Todos los métodos deben estar documentados
+
 class QuestionsCtrl {
     constructor() {
         this.questions = [
@@ -22,6 +24,7 @@ class QuestionsCtrl {
         ];
     }
 
+    // FIXME En los metodos getAll se debe permitir paginado y filtrado
     static async getAll(req, res) {
         const result = await QuestionsORM.getAll();
         const json = {

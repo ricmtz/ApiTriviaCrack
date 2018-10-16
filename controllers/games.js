@@ -1,6 +1,9 @@
 const { GamesORM } = require('../orm');
 
+// FIXME Todos los métodos deben estar documentados
+
 class GamesCtrl {
+    // FIXME En los metodos getAll se debe permitir paginado y filtrado
     static async getAll(req, res) {
         const result = await GamesORM.getAll();
         const json = {

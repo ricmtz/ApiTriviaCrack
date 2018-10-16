@@ -1,3 +1,5 @@
+// FIXME Todos los métodos deben estar documentados
+
 class Answer {
     constructor({
         id, game, question, player, selectedoption, correct,

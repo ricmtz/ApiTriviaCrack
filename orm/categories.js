@@ -1,6 +1,8 @@
 const { db } = require('../db');
 const { Category } = require('../models');
 
+// FIXME Todos los métodos deben estar documentados
+
 class Categories {
     constructor() {
         this.name = 'categories';
