@@ -32,6 +32,13 @@ class Users {
         return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
     }
 
+    async login(data) {
+        const user = new User(data);
+        const cond = { id: user.getId(), password: user.getPassword() };
+        const result = await db.select(this.name, [], cond);
+        return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
+    }
+
     async getNickname(nicknameUser) {
         const data = { nickname: nicknameUser };
         const result = await db.select(this.name, [], data);
