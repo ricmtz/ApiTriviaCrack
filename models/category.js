@@ -1,3 +1,5 @@
+// FIXME Todos los métodos deben estar documentados
+
 class Category {
     constructor({
         id, name, color, icon,

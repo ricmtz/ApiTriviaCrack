@@ -1,3 +1,9 @@
+// FIXME El nombre dle archivo debe ser camelCase
+// FIXME Este diseño centralizado puede afectar en sistemas muy grandes,
+// los valores default podrian definirse en el controlador o en el modelo para
+// hacerlo a nivel "dominio", o esta mal aqui, solo le veo el problema cuando el sistema crezca.
+// FIXME Todos los métodos deben estar documentados
+
 class DefaultValues {
     static defaultUser(req, res, next) {
         req.body.admin = false;

@@ -1,6 +1,9 @@
 const { UsersORM } = require('../orm');
 
+// FIXME Todos los métodos deben estar documentados
+
 class EmailsCtrl {
+    // FIXME En los metodos getAll se debe permitir paginado y filtrado
     static async getAll(req, res) {
         const result = await UsersORM.getEmails(req.params.nickname);
         const json = {
