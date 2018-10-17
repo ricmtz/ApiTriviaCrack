@@ -76,6 +76,23 @@ Campos:
                 return next({err});
             }
         }
+
+        sessionAtivate(toke){
+            // if(Token.active(token)) {
+            if (token == req.token()){
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        authentication(req, res, nexy){
+            if(sessionAtivate(req.token)){
+                next();
+            }else{
+                return next(err);
+            }
+        }
     }
 
 4.- Agregar Rutas para logear.

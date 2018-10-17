@@ -1,0 +1,11 @@
+DB_HOST=ec2-54-225-241-25.compute-1.amazonaws.com
+DB_NAME=d7p6pvubuuj282
+DB_USER=sntdvghnwjotys
+DB_PORT=5432
+DB_PASSWORD=ee28dd17f43a191748f3244e83001aa43f6eeba57f6f3ffcd20efa0309c2be1a
+DB_URL=postgres://sntdvghnwjotys:ee28dd17f43a191748f3244e83001aa43f6eeba57f6f3ffcd20efa0309c2be1a@ec2-54-225-241-25.compute-1.amazonaws.com:5432/d7p6pvubuuj282
+DB_CLI=heroku pg:psql postgresql-tapered-85215 --app api-trivia-crack
+PORT=3000
+SESSION_TIME=1
+SECRET=ARTEMIS
+SALT_ROUNDS=10

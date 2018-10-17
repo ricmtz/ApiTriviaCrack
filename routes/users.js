@@ -6,8 +6,10 @@ const { rules, defaultValues, auth } = require('../middlewares');
 
 const router = express.Router();
 
+// router.use(auth.session);
+
 // List all users.
-router.get('/', usersCtrl.getAll);
+router.get('/', auth.session, usersCtrl.getAll);
 
 // Find users.
 router.get('/:nickname', rules.paramsUser, usersCtrl.get);
