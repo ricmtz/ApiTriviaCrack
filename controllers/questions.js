@@ -45,6 +45,9 @@ class QuestionsCtrl {
     }
 
     static async create(req, res) {
+        req.body.approved = false;
+        req.body.deleted = false;
+        req.body.createdate = new Date().toISOString();
         const result = await QuestionsORM.create(req.body);
         const json = {
             data: result,
