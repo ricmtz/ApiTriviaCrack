@@ -6,12 +6,42 @@ const validator = require('./validator');
 // FIXME Todos los métodos deben estar documentados
 
 class Rules {
-    static createUser(req, res, next) {
+    static paramsCategories(req, res, next) {
         validator.validate(req, res, next, {
-            body: {
-                nickname: 'nickname,required',
-                password: 'password,required',
-                email: 'email,required',
+            params: {
+                categoryId: 'id,required',
+            },
+        });
+    }
+
+    static paramsFriends(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                friendNickname: 'nickname,required',
+            },
+        });
+    }
+
+    static paramsGamesQuestions(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                questionId: 'id,required',
+            },
+        });
+    }
+
+    static paramsGames(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                gameId: 'id,required',
+            },
+        });
+    }
+
+    static paramsQuestions(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                question: 'id,required',
             },
         });
     }
@@ -24,11 +54,19 @@ class Rules {
         });
     }
 
+
+    static createUser(req, res, next) {
+        validator.validate(req, res, next, {
+            body: {
+                nickname: 'nickname,required',
+                password: 'password,required',
+                email: 'email,required',
+            },
+        });
+    }
+
     static updateUser(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                nickname: 'nickname',
-            },
             body: {
                 nickname: 'nickname,optional',
                 password: 'password,optional',
@@ -42,25 +80,13 @@ class Rules {
 
     static createFriend(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                nickname: 'nickname',
-            },
             body: {
                 nickname: 'nickname,required',
             },
         });
     }
 
-    static paramsFriends(req, res, next) {
-        validator.validate(req, res, next, {
-            params: {
-                nickname: 'nickname',
-                friendNickname: 'nickname',
-            },
-        });
-    }
-
-    static createEmail(req, res, next) {
+    static checkEmail(req, res, next) {
         validator.validate(req, res, next, {
             body: {
                 email: 'email,required',
@@ -77,13 +103,6 @@ class Rules {
         });
     }
 
-    static paramsEmails(req, res, next) {
-        validator.validate(req, res, next, {
-            body: {
-                email: 'email,required',
-            },
-        });
-    }
 
     static createGame(req, res, next) {
         validator.validate(req, res, next, {
@@ -105,9 +124,6 @@ class Rules {
 
     static createGameQuestion(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                gameId: 'id,required',
-            },
             body: {
                 question: 'id,required',
                 player: 'text,required',
