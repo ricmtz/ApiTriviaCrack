@@ -7,6 +7,12 @@ class Tokens {
         this.msgNoToken = 'Token not found';
         this.msgExistToken = 'Token already exists';
         this.msgNoCreateToken = 'Could not create token';
+
+        this.active = this.active.bind(this);
+        this.get = this.get.bind(this);
+        this.existData = this.existData.bind(this);
+        this.create = this.create.bind(this);
+        this.delete = this.delete.bind(this);
     }
 
     async active(searchToken) {
@@ -34,8 +40,9 @@ class Tokens {
 
     async create(data) {
         const tokenObj = new Token(data);
-
-        const exist = await this.existData(this.name, { token: tokenObj.getName() });
+        console.log('recibi token');
+        console.table(tokenObj);
+        const exist = await this.existData(this.name, { token: tokenObj.getToken() });
         if (exist) return this.msgExistToken;
 
         let result = await db.insert(this.name, tokenObj);
@@ -60,4 +67,4 @@ class Tokens {
     }
 }
 
-module.exports = Tokens;
+module.exports = new Tokens();

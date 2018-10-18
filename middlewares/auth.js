@@ -4,7 +4,11 @@ const { UsersORM, TokensORM } = require('../orm');
 
 class Auth {
     constructor() {
+        this.register = this.register.bind(this);
         this.createToken = this.createToken.bind(this);
+        this.login = this.login.bind(this);
+        this.logout = this.logout.bind(this);
+        this.session = this.session.bind(this);
     }
 
     async register(req, res, next) {
@@ -20,27 +24,28 @@ class Auth {
 
     async createToken(user) {
         let res = null;
+        let err = null;
 
         const currDate = new Date();
         const expireDate = new Date(currDate);
         expireDate.setHours(expireDate.getHours() + process.env.SESSION_TIME);
 
-        bcrypt.hash(`${user.getNickname()}${process.env.SECRET}`, process.env.SALT_ROUNDS, async (err, hash) => {
-            if (err) {
-                res = err;
-                return;
-            }
 
-            res = await TokensORM.create({
-                token: hash,
-                createdat: currDate.getTime(),
-                expiresat: expireDate.getTime(),
-                type: 's',
-                status: '1',
-                userid: user.getId(),
-            });
+        let cad = `${user.getNickname()}${(new Date()).getTime()}`;
+        res = await bcrypt.hash(cad, 10).then((hashRes) => {
+            return hashRes;
         });
-        return res;
+
+        if (err) return err;
+        const resToken = await TokensORM.create({
+            token: res,
+            createdat: currDate.toISOString(),
+            expires: expireDate.toISOString(),
+            type: 's',
+            status: '1',
+            userid: user.getId(),
+        });
+        return resToken;
     }
 
     async login(req, res, next) {
@@ -63,14 +68,13 @@ class Auth {
     }
 
     async session(res, req, next) {
-        console.log(req.body)
         if (!req.body.token) next({ data: 'Token missing' });
         const token = await TokensORM.get(req.body.token);
         if (typeof (token) !== typeof (Token)) next(token);
 
         if (TokensORM.active(token.getToken())) next();
         else next({ data: 'The session has expired' });
-        next
+        next();
     }
 }
 

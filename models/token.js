@@ -1,11 +1,11 @@
 class Token {
     constructor({
-        id, token, createdat, expiresat, type, status, userid,
+        id, token, createdat, expires, type, status, userid,
     }) {
         this.setId(id);
         this.setToken(token);
         this.setCreatedAt(createdat);
-        this.setExpiresAt(expiresat);
+        this.setExpires(expires);
         this.setType(type);
         this.setStatus(status);
         this.setUserId(userid);
@@ -23,8 +23,8 @@ class Token {
         return this.createdat;
     }
 
-    getExpiresAt() {
-        return this.expiresat;
+    getExpires() {
+        return this.expires;
     }
 
     getType() {
@@ -40,7 +40,7 @@ class Token {
     }
 
     setId(id) {
-        this.id = id;
+        if (id !== undefined) this.id = id;
     }
 
     setToken(token) {
@@ -51,8 +51,8 @@ class Token {
         this.createdAt = createdAt;
     }
 
-    setExpiresAt(expiresat) {
-        this.expiresat = expiresat;
+    setExpires(expires) {
+        this.expires = expires;
     }
 
     setType(type) {

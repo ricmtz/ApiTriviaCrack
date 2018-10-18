@@ -9,7 +9,7 @@ const router = express.Router();
 // router.use(auth.session);
 
 // List all users.
-router.get('/', auth.session, usersCtrl.getAll);
+router.get('/', usersCtrl.getAll);
 
 // Find users.
 router.get('/:nickname', rules.paramsUser, usersCtrl.get);

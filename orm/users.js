@@ -168,7 +168,6 @@ class Users {
             },
         ];
         const result = await db.select(this.friends, columns, conditions, ' OR ', join);
-        console.log(result);
         return result;
     }
 

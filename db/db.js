@@ -95,6 +95,7 @@ class DB {
         if (join !== []) joins = await this.getJoins(join);
         const query = `SELECT ${dis} ${col} FROM ${table} ${joins} ${cond} `;
         this.values = '';
+        console.log(query);
         return new Promise((resolve, reject) => {
             this.db.query(query)
                 .then(res => resolve(res))

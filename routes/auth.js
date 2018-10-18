@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const { rules, defaultValues, auth } = require('../middlewares');
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 router.post('/register', [rules.createUser, defaultValues.defaultUser], auth.register);
 router.post('/login', auth.login);
