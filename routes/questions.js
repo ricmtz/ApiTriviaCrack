@@ -4,17 +4,22 @@ const { rules } = require('../middlewares');
 
 const router = Router();
 
+// Validation param question
+router.use('/:question', rules.paramsQuestions);
+
+// Get all question.
 router.get('/', questionsCtrl.getAll);
 
-// FIXME Falta validar el param :question
+// Get question.
 router.get('/:question', questionsCtrl.get);
 
+// Create question.
 router.post('/', rules.createQuestion, questionsCtrl.create);
 
-// FIXME Falta validar el param :question
+// Remove question.
 router.delete('/:question', questionsCtrl.delete);
 
-// FIXME Falta validar el param :question
+// Update question.
 router.patch('/:question', rules.updateQuestion, questionsCtrl.update);
 
 module.exports = router;
