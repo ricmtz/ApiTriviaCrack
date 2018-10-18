@@ -8,12 +8,12 @@ const router = express.Router({ mergeParams: true });
 router.get('/', emailsCtrl.getAll);
 
 // Add email
-router.post('/', rules.createEmail, emailsCtrl.create);
+router.post('/', rules.checkEmail, emailsCtrl.create);
 
 // Update email
 router.patch('/', rules.updateEmail, emailsCtrl.update);
 
 // Remove email
-router.delete('/', rules.paramsEmails, emailsCtrl.delete);
+router.delete('/', rules.checkEmail, emailsCtrl.delete);
 
 module.exports = router;
