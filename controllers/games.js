@@ -24,6 +24,11 @@ class GamesCtrl {
     }
 
     static async create(req, res) {
+        req.body.answersplayer1 = -1;
+        req.body.answersplayer2 = -1;
+        req.body.createdate = new Date().toISOString();
+        req.body.finished = false;
+        req.body.deleted = false;
         const result = await GamesORM.create(req.body);
         const json = {
             data: result,
