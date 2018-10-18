@@ -4,6 +4,9 @@ const { rules } = require('../middlewares');
 
 const router = Router({ mergeParams: true });
 
+// Validation param friendNickname
+router.use('/:friendNickname', rules.paramsFriends);
+
 // Get all friends.
 router.get('/', rules.paramsUser, friendsCtrl.getAll);
 
@@ -11,6 +14,6 @@ router.get('/', rules.paramsUser, friendsCtrl.getAll);
 router.post('/', rules.createFriend, friendsCtrl.create);
 
 // Remove friend
-router.delete('/:friendNickname', rules.paramsFriends, friendsCtrl.delete);
+router.delete('/:friendNickname', friendsCtrl.delete);
 
 module.exports = router;
