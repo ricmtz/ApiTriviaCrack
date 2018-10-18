@@ -1,11 +1,11 @@
 const { Router } = require('express');
 const { categoriesCtrl } = require('../controllers');
-const { rules, defaultValues } = require('../middlewares');
+const { rules } = require('../middlewares');
 
 const router = Router();
 
-// Post category
-router.post('/', [rules.createCategory, defaultValues.defaultCategory], categoriesCtrl.create);
+// Create category
+router.post('/', rules.createCategory, categoriesCtrl.create);
 
 // Get all categories
 router.get('/', categoriesCtrl.getAll);

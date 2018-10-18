@@ -1,12 +1,12 @@
 const { Router } = require('express');
 const { gamesCtrl } = require('../controllers');
 const gamesQuestionsRouter = require('./games_questions');
-const { rules, defaultValues } = require('../middlewares');
+const { rules } = require('../middlewares');
 
 const router = Router();
 
 // Post game
-router.post('/', [rules.createGame, defaultValues.defaultGame], gamesCtrl.create);
+router.post('/', rules.createGame, gamesCtrl.create);
 
 // Get all games
 router.get('/', gamesCtrl.getAll);

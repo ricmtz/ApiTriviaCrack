@@ -2,7 +2,7 @@ const express = require('express');
 const emailsRouter = require('./emails');
 const friendsRouter = require('./friends');
 const { usersCtrl } = require('../controllers');
-const { rules, defaultValues } = require('../middlewares');
+const { rules } = require('../middlewares');
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.get('/', usersCtrl.getAll);
 router.get('/:nickname', rules.paramsUser, usersCtrl.get);
 
 // Create users.
-router.post('/', [rules.createUser, defaultValues.defaultUser], usersCtrl.create);
+router.post('/', rules.createUser, usersCtrl.create);
 
 // Delete users.
 router.delete('/:nickname', rules.paramsUser, usersCtrl.delete);

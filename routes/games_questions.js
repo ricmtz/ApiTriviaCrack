@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { gamesQuestionsCtrl } = require('../controllers');
-const { rules, defaultValues } = require('../middlewares');
+const { rules } = require('../middlewares');
 
 const router = Router({ mergeParams: true });
 
@@ -12,7 +12,7 @@ router.get('/', gamesQuestionsCtrl.getAll);
 router.get('/:questionId', gamesQuestionsCtrl.get);
 
 // Create questions
-router.post('/', [rules.createGameQuestion, defaultValues.defaultGameQuestion], gamesQuestionsCtrl.create);
+router.post('/', rules.createGameQuestion, gamesQuestionsCtrl.create);
 
 // Delete question
 // FIXME Falta validar el param :questionId
