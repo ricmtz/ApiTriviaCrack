@@ -24,6 +24,11 @@ class UsersCtrl {
     }
 
     static async create(req, res) {
+        req.body.admin = false;
+        req.body.score = 0;
+        req.body.avatar = 'default.png';
+        req.body.lastlogin = new Date().toISOString();
+        req.body.deleted = false;
         const result = await UsersORM.create(req.body);
         const json = {
             data: result,
