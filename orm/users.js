@@ -52,11 +52,12 @@ class Users {
 
     async create(data) {
         const user = new User(data);
-        let exist = await this.existData(this.name, { nickname: user.getNickname() });
+        let exist = false;
+        await db.exists(this.name, { nickname: user.getNickname() }).then(exist = true).catch();
         if (exist) return this.msgExistNickname;
-        exist = await this.existData(this.name, { email: user.getEmail() });
+        await db.exists(this.name, { email: user.getEmail() }).then(exist = true).catch();
         if (exist) return this.msgExistEmail;
-        exist = await this.existData(this.emails, { email: user.getEmail() });
+        await db.exists(this.emails, { email: user.getEmail() }).then(exist = true).catch();
         if (exist) return this.msgExistEmail;
         let result = await db.insert(this.name, user);
         result = await db.select(this.name, ['id'], user);

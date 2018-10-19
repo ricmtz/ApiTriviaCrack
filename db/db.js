@@ -1,4 +1,6 @@
-const pgp = require('pg-promise')();
+const pgp = require('pg-promise')({
+    capSQL: true,
+});
 require('dotenv').config();
 
 
@@ -80,52 +82,67 @@ class DB {
         });
     }
 
+    async exists(table, conditions) {
+        return new Promise((resolve, reject) => {
+            this.db.many(pgp.as.format('SELECT * FROM $<tab#> $<where^>',
+                {
+                    tab: table,
+                    where: DB.getWhere(conditions, ' AND '),
+                })).then(res => resolve(res))
+                .catch(e => reject(e))
+        });
+    }
+
+    static getWhere(conditions, logOp) {
+        return conditions ? `WHERE ${pgp.helpers.sets(conditions).replace(',', logOp)}` : '';
+    }
+
+    static getColsQuery(cols) {
+        console.log(cols);
+        return (cols && cols.length) ? pgp.helpers.ColumnSet(cols).names : '*';
+    }
+
     async select(table, columns = [], conditions = null, extra = ' AND ', join = [], distinct = false) {
         if (table === undefined) return 'Error: table name is undefined';
-        let col = '*';
-        let dis = '';
-        let cond = '';
+        let dist = '';
         let joins = '';
-        if (columns.length !== 0) col = await this.getColumns(columns);
-        if (distinct) dis = 'DISTINCT';
-        if (conditions !== null) {
-            const where = await this.getValuesAssing(conditions, extra);
-            cond = `WHERE ${where}`;
-        }
+        if (distinct) dist = 'DISTINCT';
         if (join !== []) joins = await this.getJoins(join);
+<<<<<<< Updated upstream
         const query = `SELECT ${dis} ${col} FROM ${table} ${joins} ${cond} `;
         this.values = '';
         console.log(query);
+=======
+        const query2 = pgp.as.format('SELECT $<dis#> $<cols#> FROM $<tab#> $<join#> $<where^>',
+            {
+                dis: dist,
+                cols: DB.getColsQuery(columns),
+                tab: table,
+                join: joins,
+                where: DB.getWhere(conditions, extra),
+            });
+>>>>>>> Stashed changes
         return new Promise((resolve, reject) => {
-            this.db.query(query)
+            this.db.many(query2)
                 .then(res => resolve(res))
                 .catch(e => reject(e.stack));
         });
     }
 
     async insert(table, data) {
-        const columns = Object.keys(data).toString();
-        const values = await this.getValues(data);
-        const query = `INSERT INTO ${table} (${columns}) VALUES (${values})`;
-        this.values = '';
+        const query = pgp.helpers.insert(data, null, table);
+        console.log(query);
         return new Promise((resolve, reject) => {
-            this.db.query(query)
+            this.db.none(query)
                 .then(res => resolve(res))
                 .catch(e => reject(e));
         });
     }
 
     async update(table, data, conditions, extra = ' AND ') {
-        const values = await this.getValuesAssing(data, ', ');
-        let cond = '';
-        if (conditions !== null) {
-            const where = await this.getValuesAssing(conditions, extra);
-            cond = `WHERE ${where}`;
-        }
-        const query = `UPDATE ${table} SET ${values} ${cond}`;
-        this.values = '';
+        const query = `${pgp.helpers.update(data, null, table)} ${DB.getWhere(conditions, extra)}`;
         return new Promise((resolve, reject) => {
-            this.db.query(query)
+            this.db.none(query)
                 .then(res => resolve(res))
                 .catch(e => reject(e));
         });
