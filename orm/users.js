@@ -17,19 +17,23 @@ class Users {
     }
 
     async getAll() {
-        const result = await db.select(this.name);
-        if (result.length === 0) return result;
-        const response = [];
-        result.forEach((row) => {
-            response.push(new User(row));
-        });
-        return response;
+        let result = null;
+
+        await db.select(this.name)
+            .then((res) => { result = this.processResult(res); })
+            .catch(err => Promise.reject(err));
+
+        return result;
     }
 
     async get(idUser) {
-        const data = { id: idUser };
-        const result = await db.select(this.name, [], data);
-        return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
+        let result = null;
+
+        await db.select(this.name, [], { id: idUser })
+            .then((res) => { result = this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoUser)));
+
+        return result;
     }
 
     async login(data) {
@@ -39,57 +43,93 @@ class Users {
         return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
     }
 
-    async getNickname(nicknameUser) {
-        const data = { nickname: nicknameUser };
-        const result = await db.select(this.name, [], data);
-        return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
+    async getByNickname(nicknameUser) {
+        let result = null;
+
+        await db.select(this.name, [], { nickname: nicknameUser })
+            .then((res) => { result = this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoUser)));
+
+        return result;
     }
 
     async existData(table, condition) {
         const result = await db.select(table, ['count(*)'], condition);
-        return (result[0].count != 0);
+        return (result[0].count !== 0);
+    }
+
+    async existsAttribs(user) {
+        let error = null;
+
+        await db.exists(this.name, { nickname: user.getNickname() })
+            .then(() => { error = true; }).catch(() => {});
+        if (error) {
+            return Promise.reject(new Error(this.msgExistNickname));
+        }
+
+        await db.exists(this.name, { email: user.getEmail() })
+            .then(() => { error = true; }).catch(() => {});
+        if (error) {
+            return Promise.reject(new Error(this.msgExistEmail));
+        }
+
+        await db.exists(this.emails, { email: user.getEmail() })
+            .then(() => { error = true; }).catch(() => {});
+        if (error) {
+            return Promise.reject(new Error(this.msgExistEmail));
+        }
+
+        return null;
+    }
+
+    processResult(rows) {
+        if (!rows) {
+            return null;
+        }
+
+        if (rows.length === 1) {
+            return new User(rows[0]);
+        }
+
+        const usersList = [];
+        rows.forEach((row) => { usersList.push(new User(row)); });
+        return usersList;
     }
 
     async create(data) {
+        let result = null;
+
         const user = new User(data);
-        let exist = false;
-        await db.exists(this.name, { nickname: user.getNickname() }).then(exist = true).catch();
-        if (exist) return this.msgExistNickname;
-        await db.exists(this.name, { email: user.getEmail() }).then(exist = true).catch();
-        if (exist) return this.msgExistEmail;
-        await db.exists(this.emails, { email: user.getEmail() }).then(exist = true).catch();
-        if (exist) return this.msgExistEmail;
-        let result = await db.insert(this.name, user);
-        result = await db.select(this.name, ['id'], user);
-        if (result.length !== 0) {
-            user.setId(result[0].id);
-            return user;
-        }
-        return this.msgNoCreateUser;
+
+        await this.existsAttribs(user).catch(err => Promise.reject(err));
+
+        await db.insert(this.name, user).catch(err => Promise.reject(err));
+        await db.select(this.name, ['id'], { nickname: user.getNickname() })
+            .then((res) => { result = this.processResult(res); })
+            .catch(err => Promise.reject(err));
+
+        user.setId(result.getId());
+        return user;
     }
 
     async update(nicknameUser, data) {
-        const resUser = await db.select(this.name, ['id'], { nickname: nicknameUser });
-        if (resUser.length === 0) return this.msgNoUser;
+        await db.select(this.name, ['id'], { nickname: nicknameUser })
+            .catch(() => Promise.reject(new Error(this.msgNoUser)));
+
         const user = new User(data);
-        let exist = await this.existData(this.name, { nickname: user.getNickname() });
-        if (exist) return this.msgExistNickname;
-        exist = await this.existData(this.name, { email: user.getEmail() });
-        if (exist) return this.msgExistEmail;
-        exist = await this.existData(this.emails, { email: user.getEmail() });
-        if (exist) return this.msgExistEmail;
-        let result = await db.update(this.name, user, { nickname: nicknameUser });
-        result = await db.select(this.name, ['id'], data);
-        return result;
+
+        await this.existsAttribs(user).catch(err => Promise.reject(err));
+
+        await db.update(this.name, user, { nickname: nicknameUser })
+            .catch(err => Promise.reject(err));
     }
 
     async delete(nicknameUser) {
-        const resUser = await db.select(this.name, ['id'], { nickname: nicknameUser });
-        if (resUser.length === 0) return this.msgNoUser;
-        const data = { deleted: true };
-        let result = await db.update(this.name, data, { nickname: nicknameUser });
-        result = await db.select(this.name, ['id'], data);
-        return result;
+        await db.select(this.name, ['id'], { nickname: nicknameUser })
+            .catch(() => Promise.reject(new Error(this.msgNoUser)));
+
+        await db.delete(this.name, { nickname: nicknameUser })
+            .catch(err => Promise.reject(err));
     }
 
     async getEmails(nicknameUser) {
