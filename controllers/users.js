@@ -2,53 +2,38 @@ const { UsersORM } = require('../orm');
 
 class UsersCtrl {
     async getAll(req, res) {
-        const result = await UsersORM.getAll();
-        const json = {
-            data: result,
-            total: result.length,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await UsersORM.getAll()
+            .then((usrs) => {
+                res.status(200).send({
+                    data: usrs,
+                    total: usrs.length,
+                });
+            })
+            .catch((err) => { res.status(404).send({ data: err }); });
     }
 
     async get(req, res) {
-        const result = await UsersORM.getNickname(req.params.nickname);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await UsersORM.getByNickname(req.params.nickname)
+            .then((usr) => { res.status(200).send({ data: usr }); })
+            .catch((err) => { res.status(404).send({ data: err }); });
     }
 
     async create(req, res) {
-        const result = await UsersORM.create(req.body);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) res.status(404);
-        res.status(200).send(json);
+        await UsersORM.create(req.body)
+            .then((usr) => { res.status(200).send({ data: usr }); })
+            .catch((err) => { res.status(404).send({ data: err }); });
     }
 
     async update(req, res) {
-        const result = await UsersORM.update(req.params.nickname, req.body);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) {
-            res.status(404);
-        } else {
-            res.status(204);
-        }
-        res.send(json);
+        await UsersORM.update(req.params.nickname, req.body)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err }); });
     }
 
     async delete(req, res) {
-        const result = await UsersORM.delete(req.params.nickname);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await UsersORM.delete(req.params.nickname)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err }); });
     }
 }
 
