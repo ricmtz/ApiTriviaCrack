@@ -24,6 +24,8 @@ class CategoriesCtrl {
     }
 
     static async create(req, res) {
+        req.body.icon = 'default.png';
+        req.body.deleted = false;
         const result = await CategoriesORM.create(req.body);
         const json = {
             data: result,

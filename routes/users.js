@@ -2,26 +2,28 @@ const express = require('express');
 const emailsRouter = require('./emails');
 const friendsRouter = require('./friends');
 const { usersCtrl } = require('../controllers');
-const { rules, defaultValues } = require('../middlewares');
+const { rules } = require('../middlewares');
 
 const router = express.Router();
+
+// Validation param nickname
+router.use('/:nickname', rules.paramsUser);
 
 // List all users.
 router.get('/', usersCtrl.getAll);
 
 // Find users.
-router.get('/:nickname', rules.paramsUser, usersCtrl.get);
+router.get('/:nickname', usersCtrl.get);
 
 // Create users.
-router.post('/', [rules.createUser, defaultValues.defaultUser], usersCtrl.create);
+router.post('/', rules.createUser, usersCtrl.create);
 
 // Delete users.
-router.delete('/:nickname', rules.paramsUser, usersCtrl.delete);
+router.delete('/:nickname', usersCtrl.delete);
 
 // Update users.
 router.patch('/:nickname', rules.updateUser, usersCtrl.update);
 
-// FIXME Falta validar los params de nickname para estos dos grupos de rutas
 router.use('/:nickname/emails', emailsRouter);
 router.use('/:nickname/friends', friendsRouter);
 
