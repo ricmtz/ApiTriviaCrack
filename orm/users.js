@@ -29,7 +29,7 @@ class Users {
     async get(idUser) {
         let result = null;
 
-        await db.select(this.name, [], { id: idUser })
+        await db.select(this.name, { id: idUser })
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
 
@@ -39,14 +39,14 @@ class Users {
     async login(data) {
         const user = new User(data);
         const cond = { id: user.getId(), password: user.getPassword() };
-        const result = await db.select(this.name, [], cond);
+        const result = await db.select(this.name, cond);
         return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
     }
 
     async getByNickname(nicknameUser) {
         let result = null;
 
-        await db.select(this.name, [], { nickname: nicknameUser })
+        await db.select(this.name, { nickname: nicknameUser })
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
 
@@ -54,7 +54,7 @@ class Users {
     }
 
     async existData(table, condition) {
-        const result = await db.select(table, ['count(*)'], condition);
+        const result = await db.select(table, condition, ['count(*)']);
         return (result[0].count !== 0);
     }
 
@@ -87,6 +87,10 @@ class Users {
             return null;
         }
 
+        if (!Array.isArray(rows)) {
+            return new User(rows);
+        }
+
         if (rows.length === 1) {
             return new User(rows[0]);
         }
@@ -104,7 +108,7 @@ class Users {
         await this.existsAttribs(user).catch(err => Promise.reject(err));
 
         await db.insert(this.name, user).catch(err => Promise.reject(err));
-        await db.select(this.name, ['id'], { nickname: user.getNickname() })
+        await db.select(this.name, { nickname: user.getNickname() }, ['id'])
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
 
@@ -113,7 +117,7 @@ class Users {
     }
 
     async update(nicknameUser, data) {
-        await db.select(this.name, ['id'], { nickname: nicknameUser })
+        await db.select(this.name, { nickname: nicknameUser }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
 
         const user = new User(data);
@@ -125,7 +129,7 @@ class Users {
     }
 
     async delete(nicknameUser) {
-        await db.select(this.name, ['id'], { nickname: nicknameUser })
+        await db.select(this.name, { nickname: nicknameUser }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
 
         await db.delete(this.name, { nickname: nicknameUser })
