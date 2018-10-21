@@ -16,10 +16,10 @@ class Users {
         this.msgNoFriendExist = 'This friendship not exists';
     }
 
-    async getAll() {
+    async getAll(pageNum) {
         let result = null;
 
-        await db.select(this.name)
+        await db.select(this.name, null, [], pageNum)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
 

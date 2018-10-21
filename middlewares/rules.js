@@ -11,6 +11,14 @@ class Rules {
         });
     }
 
+    static getAllUsers(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                page: 'positive,optional',
+            },
+        });
+    }
+
     static paramsUser(req, res, next) {
         validator.validate(req, res, next, {
             params: {

@@ -2,14 +2,14 @@ const { UsersORM } = require('../orm');
 
 class UsersCtrl {
     async getAll(req, res) {
-        await UsersORM.getAll()
+        await UsersORM.getAll(req.query.page)
             .then((usrs) => {
                 res.status(200).send({
                     data: usrs,
                     total: usrs.length,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err }); });
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async get(req, res) {

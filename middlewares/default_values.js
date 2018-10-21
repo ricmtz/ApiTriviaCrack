@@ -1,4 +1,15 @@
 class DefaultValues {
+    static defaultPage(req, res, next) {
+        if (req.query) {
+            if (typeof (req.query.page) === 'undefined') {
+                req.query.page = 0;
+            } else {
+                req.query.page = Number(req.query.page);
+            }
+        }
+        next();
+    }
+
     static defaultUser(req, res, next) {
         req.body.admin = false;
         req.body.score = 0;
