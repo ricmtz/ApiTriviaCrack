@@ -1,7 +1,8 @@
 const { db } = require('../db');
 const { Game, Answer } = require('../models');
+const UsersORM = require('./users');
 
-class Users {
+class Games {
     constructor() {
         this.name = 'games';
         this.users = 'users';
@@ -24,101 +25,61 @@ class Users {
         return games[pos];
     }
 
+    async getAll(page) {
+        let result = null;
+        await db.selectPaged(this.name, {}, [], page)
+            .then((res) => { result = this.processResult(res); })
+            .catch(err => Promise.reject(err));
+        return result;
+    }
+
+    async get(gameId) {
+        let result = null;
+        await db.selectNonDel(this.name, { id: gameId }, [])
+            .then((res) => { result = this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoExistGame)));
+        return result;
+    }
+
     async create(data) {
+        let result = null;
         const game = new Game(data);
-        let result = await db.select(this.users, ['id'], { nickname: data.player1 });
-        if (result.length === 0) return this.msgNoUser;
-        game.setPlayer1(result[0].id);
-        let oponent = data.player2;
-        if (data.player2 === undefined) {
-            result = await this.getOponent();
-            console.log(result);
-            oponent = result.nickname;
-            game.setPlayer2(result.id);
-        } else {
-            result = await db.select(this.users, ['id'], { nickname: data.player2 });
-            if (result.length === 0) return this.msgNoUser;
-            game.setPlayer2(result[0].id);
-        }
-        result = await db.insert(this.name, game);
-        result = await db.select(this.name, ['id'], game); // FIXME El id viene en el resultado del insert, no hay necesidad de hacer otro query
-        if (result.length === 0) return this.msgNoCreateGame;
-        game.setId(result[result.length - 1].id);
-        game.setPlayer1(data.player1);
-        game.setPlayer2(oponent);
+        // await this.existsAttribs(game)
+        //     .catch(err => Promise.reject(err));
+        let idP1 = null;
+        await UsersORM.getByNickname(game.getPlayer1())
+            .then((usr) => { idP1 = usr.getId(); })
+            .catch((err) => { Promise.reject(err); });
+        game.setPlayer1(idP1);
+        let idP2 = null;
+        await UsersORM.getByNickname(game.getPlayer2())
+            .then((usr) => { idP2 = usr.getId(); })
+            .catch((err) => { Promise.reject(err); });
+        game.setPlayer2(idP2);
+        await db.insert(this.name, game)
+            .catch((err) => { Promise.reject(err); });
+        await db.selectNonDel(this.name, { player1: idP1, player2: idP2 }, ['id'])
+            .then((res) => { result = this.processResult(res); })
+            .catch(err => Promise.reject(err));
+        game.setId(result.getId());
         return game;
     }
 
-    async get(idGame) {
-        const conditions = { 'games.id': idGame, 'games.deleted': false };
-        const columns = [
-            { column: 'games.id', as: 'id' },
-            { column: 'u1.nickname', as: 'player1' },
-            { column: 'u2.nickname', as: 'player2' },
-            { column: 'scoreplayer1', as: 'scoreplayer1' },
-            { column: 'scoreplayer2', as: 'scoreplayer2' },
-            { column: 'createdate', as: 'createdate' },
-            { column: 'finished', as: 'finished' },
-        ];
-        const join = [
-            {
-                type: 'JOIN', table: 'users', as: 'u1', condition: 'u1.id = games.player1',
-            },
-            {
-                type: 'JOIN', table: 'users', as: 'u2', condition: 'u2.id = games.player2',
-            },
-        ];
-        const result = await db.select(this.name, columns, conditions, ' AND ', join);
-        if (result.length === 0) return this.msgNoExistGame;
-        return new Game(result[0]);
-    }
-
-    async getAll() {
-        const conditions = { 'games.deleted': false };
-        const columns = [
-            { column: 'games.id', as: 'id' },
-            { column: 'u1.nickname', as: 'player1' },
-            { column: 'u2.nickname', as: 'player2' },
-            { column: 'scoreplayer1', as: 'scoreplayer1' },
-            { column: 'scoreplayer2', as: 'scoreplayer2' },
-            { column: 'createdate', as: 'createdate' },
-            { column: 'finished', as: 'finished' },
-        ];
-        const join = [
-            {
-                type: 'JOIN', table: 'users', as: 'u1', condition: 'u1.id = games.player1',
-            },
-            {
-                type: 'JOIN', table: 'users', as: 'u2', condition: 'u2.id = games.player2',
-            },
-        ];
-        const result = await db.select(this.name, columns, conditions, ' AND ', join);
-        if (result.length === 0) return this.msgNoExistGame;
-        const response = [];
-        result.forEach((row) => {
-            response.push(new Game(row));
-        });
-        return response;
-    }
-
-    async update(idGame, data) {
-        if (data.player1 !== undefined || data.player2 !== undefined
-            || data.createdate !== undefined) {
-            return this.msgNoUpdate;
-        }
-        let result = await db.select(this.name, ['id'], { id: idGame, deleted: false });
-        if (result.length === 0) return this.msgNoExistGame;
+    async update(gameId, data) {
+        await db.selectNonDel(this.name, { id: gameId }, ['id'])
+            .catch(() => Promise.reject(new Error(this.msgNoExistGame)));
         const game = new Game(data);
-        result = await db.update(this.name, game, { id: idGame, deleted: false });
-        result = await db.select(this.name, ['id'], data);
-        return result.length === 0 ? result : result[0];
+        await this.existsAttribs(game)
+            .catch(err => Promise.reject(err));
+        await db.update(this.name, game, { id: gameId, deleted: false })
+            .catch(err => Promise.reject(err));
     }
 
-    async delete(idGame) {
-        let result = await db.select(this.name, ['id'], { id: idGame, deleted: false });
-        if (result.length === 0) return this.msgNoExistGame;
-        result = await db.update(this.name, { deleted: true }, { id: idGame });
-        return result.length === 0 ? result : result[0];
+    async delete(gameId) {
+        await db.selectNonDel(this.name, { id: gameId }, ['id'])
+            .catch(() => Promise.reject(new Error(this.msgNoExistGame)));
+        await db.delete(this.name, { id: gameId })
+            .catch(err => Promise.reject(err));
     }
 
     async getPosPlayer(userid) {
@@ -128,11 +89,6 @@ class Users {
         data = { player2: userid };
         exist = await this.existData(this.name, data);
         return (exist) ? 2 : 0;
-    }
-
-    async existData(table, condition) {
-        const result = await db.select(table, ['count(*)'], condition);
-        return (result[0].count != 0);
     }
 
     async addAnswer(data) {
@@ -183,87 +139,35 @@ class Users {
         return false;
     }
 
-    async getAllGamesQuestions(gameId) {
-        const conditions = { 'games_questions.game': gameId };
-        const columns = [
-            { column: 'games_questions.id', as: 'id' },
-            { column: 'q.question', as: 'question' },
-            { column: 'u.nickname', as: 'player' },
-            { column: 'games_questions.option', as: 'option' },
-            { column: 'games_questions.correct', as: 'correct' },
-        ];
-        const join = [
-            {
-                type: 'JOIN', table: 'questions', as: 'q', condition: 'q.id = games_questions.question',
-            },
-            {
-                type: 'JOIN', table: 'users', as: 'u', condition: 'u.id = games_questions.player',
-            },
-        ];
-        const result = await db.select(this.answers, columns, conditions, 'AND', join);
-        return result;
+    processResult(rows) {
+        if (!rows) {
+            return null;
+        }
+        if (!Array.isArray(rows)) {
+            return new Game(rows);
+        }
+        if (rows.length === 1) {
+            return new Game(rows[0]);
+        }
+        const categoriesList = [];
+        rows.forEach((row) => { categoriesList.push(new Game(row)); });
+        return categoriesList;
     }
 
-    async getGameQuestion(gameId, questionId) {
-        const conditions = { 'games_questions.game': gameId, 'games_questions.id': questionId };
-        const columns = [
-            { column: 'q.question', as: 'question' },
-            { column: 'u.nickname', as: 'player' },
-            { column: 'games_questions.option', as: 'option' },
-            { column: 'games_questions.correct', as: 'correct' },
-        ];
-        const join = [
-            {
-                type: 'JOIN', table: 'questions', as: 'q', condition: 'q.id = games_questions.question',
-            },
-            {
-                type: 'JOIN', table: 'users', as: 'u', condition: 'u.id = games_questions.player',
-            },
-        ];
-        const result = await db.select(this.answers, columns, conditions, 'AND', join);
-        return result;
-    }
-
-    async updateGameQuestion(newData) {
-        const answer = new Answer(newData);
-        let result = null;
-        if (answer.getGame()) {
-            result = await db.select(this.games, ['id'], { id: answer.getGame() });
+    async existsAttribs(game) {
+        let error = null;
+        error = await db.exists(this.users, { nickname: game.getPlayer1() })
+            .catch(() => { });
+        if (!error) {
+            return Promise.reject(new Error(this.msgNoUser));
         }
-        if (result.length === 0) return this.msgNoExistGame;
-        if (answer.getQuestion()) {
-            result = await db.select(this.questions, ['id'], { id: answer.getQuestion() });
+        error = await db.exists(this.users, { nickname: game.getPlayer2() })
+            .catch(() => { });
+        if (!error) {
+            return Promise.reject(new Error(this.msgNoUser));
         }
-        if (result.length === 0) return this.msgNoExistQuestion;
-        if (answer.getPlayer()) {
-            result = await db.select(this.users, ['id'], { id: answer.getPlayer() });
-        }
-        if (result.lenght === 0) return this.msgNoUser;
-        if (answer.getOption()) {
-            result = await db.select(this.questions, ['id'], {
-                option1: answer.getOption(),
-                option2: answer.getOption(),
-                optioncorrect: answer.getOption(),
-            }, ' OR ');
-        }
-        if (result.length === 0) return this.msgNoExistOption;
-
-        result = await db.select(this.questions, ['id'], { optioncorrect: answer.getOption() });
-        if (result) {
-            answer.setCorrect(false);
-        } else {
-            answer.setCorrect(true);
-        }
-
-        console.table(answer);
-        result = await db.update(this.answers, answer, {
-            id: answer.getId(),
-        });
-
-        result = await db.select(this.answers, ['id'], answer);
-        if (result.length === 0) return this.msgNoCreateAnswers;
-        return (result.length === 0) ? result : answer;
+        return null;
     }
 }
 
-module.exports = new Users();
+module.exports = new Games();

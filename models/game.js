@@ -19,6 +19,14 @@ class Game {
         return this.id;
     }
 
+    getPlayer1() {
+        return this.player1;
+    }
+
+    getPlayer2() {
+        return this.player2;
+    }
+
     getPlayers() {
         return [this.player1, this.player2];
     }
