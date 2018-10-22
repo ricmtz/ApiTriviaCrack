@@ -8,15 +8,18 @@ const router = Router({ mergeParams: true });
 router.get('/', gamesQuestionsCtrl.getAll);
 
 // Get question of game
+// FIXME Falta validar el param :questionId
 router.get('/:questionId', gamesQuestionsCtrl.get);
 
 // Create questions
 router.post('/', [rules.createGameQuestion, defaultValues.defaultGameQuestion], gamesQuestionsCtrl.create);
 
 // Delete question
+// FIXME Falta validar el param :questionId
 router.delete('/:questionId', gamesQuestionsCtrl.delete);
 
 // Update question
+// FIXME Falta validar el param :questionId
 router.patch('/:questionId', rules.updateGameQuestion, gamesQuestionsCtrl.update);
 
 module.exports = router;

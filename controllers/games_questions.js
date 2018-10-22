@@ -1,56 +1,35 @@
 const { GamesORM } = require('../orm');
 
+// FIXME Todos los métodos deben estar documentados
+
 class GamesQuestionsCtrl {
-    constructor() {
-        this.gamesQuestions = [
-            {
-                game: 1,
-                question: 1,
-                selected_option_player_1: 'Puerta Ordenadas Operable',
-                option_player_1: false,
-                selected_option_player_2: 'Programación Orientada a Objetos',
-                option_player_2: true,
-            },
-            {
-                game: 1,
-                question: 2,
-                selected_option_player_1: 'Linus',
-                option_player_1: false,
-                selected_option_player_2: 'BIll',
-                option_player_2: true,
-            },
-        ];
-
-        this.getAll = this.getAll.bind(this);
-        this.get = this.get.bind(this);
-        this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
-    }
-
-    getAll(req, res) {
+    // FIXME En los metodos getAll se debe permitir paginado y filtrado
+    async getAll(req, res) {
+        const result = await GamesORM.getAllGamesQuestions(req.params.gameId);
         const json = {
-            response: 'Ok',
-            data: `All questions from ${req.params.gameId}`,
+            data: result,
+            total: result.length,
         };
-        res.status(200).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 
-    get(req, res) {
+    async get(req, res) {
+        const result = await GamesORM.getGameQuestion(req.params.gameId, req.params.questionId);
         const json = {
-            response: 'Ok',
-            data: `Question ${req.params.questionId} from ${req.params.gameId}`,
+            data: result,
         };
-        res.status(200).send(json);
+        if (result.length === 0) res.status(404);
+        res.send(json);
     }
 
-    async create(req, res){
+    async create(req, res) {
         const data = {
             game: req.params.gameId,
             question: req.body.question,
             player: req.body.player,
-            option: req.body.option
-        }
+            option: req.body.option,
+        };
         const result = await GamesORM.addAnswer(data);
         const finish = await GamesORM.finishGame(data);
         const json = {
@@ -61,15 +40,23 @@ class GamesQuestionsCtrl {
         res.status(200).send(json);
     }
 
-    update(req, res) {
+    async update(req, res) {
+        const data = {
+            id: req.params.questionId,
+            game: req.params.gameId,
+            question: req.body.question,
+            player: req.body.player,
+            selectedoption: req.body.selectedoption,
+        };
+        const result = await GamesORM.updateGameQuestion(data);
         const json = {
             response: 'Ok',
-            data: `Question ${req.params.questionId} updated from ${req.params.gameId}`,
+            data: result,
         };
         res.status(200).send(json);
     }
 
-    delete(req, res) {
+    async delete(req, res) {
         const json = {
             response: 'Ok',
             data: `Question ${req.params.questionId} removed from ${req.params.gameId}`,

@@ -57,8 +57,12 @@ class DB {
         return query;
     }
 
-    insertQuery(table, data) {
-        return pgp.helpers.insert(data, null, table);
+    insertQuery(table, data, retCol) {
+        let query = pgp.helpers.insert(data, null, table);
+        if (retCol) {
+            query += pgp.as.format(' RETURNING $<col#>', { col: retCol });
+        }
+        return query;
     }
 
     updateQuery(table, data, conditions, logOp = DEFAULT_LOG_OP) {
@@ -181,10 +185,10 @@ class DB {
         });
     }
 
-    async insert(table, data) {
+    async insert(table, data, retCol) {
         return new Promise((resolve, reject) => {
-            this.db.none(this.insertQuery(table, data))
-                .then(res => resolve(res))
+            this.db.one(this.insertQuery(table, data, retCol))
+                .then(res => resolve(res[retCol]))
                 .catch(e => reject(e));
         });
     }

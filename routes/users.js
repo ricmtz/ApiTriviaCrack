@@ -23,6 +23,7 @@ router.delete('/:nickname', rules.paramsUser, usersCtrl.delete);
 // Update users.
 router.patch('/:nickname', rules.updateUser, usersCtrl.update);
 
+// FIXME Falta validar los params de nickname para estos dos grupos de rutas
 router.use('/:nickname/emails', emailsRouter);
 router.use('/:nickname/friends', friendsRouter);
 

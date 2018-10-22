@@ -1,3 +1,5 @@
+// FIXME Todos los métodos deben estar documentados
+
 class User {
     constructor({
         id, nickname, password, email, admin,

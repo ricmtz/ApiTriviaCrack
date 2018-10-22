@@ -1,14 +1,18 @@
 const { db } = require('../db');
 const { Question } = require('../models');
 
+// FIXME En los metodos getAll se debe permitir paginado y filtrado
+
 class Questions {
     constructor() {
         this.name = 'questions';
         this.categories = 'categories';
         this.msgExisQuestion = 'This question already exist.';
+        this.users = 'users';
         this.msgNoCategoy = 'This category no exist';
         this.msgNoCreateQuestion = 'Dont create question';
         this.msgNoQuestion = 'This question dont exist';
+        this.msgNoUser = 'This user dont exist';
     }
 
     async getAll(page) {

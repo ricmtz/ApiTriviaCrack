@@ -1,3 +1,5 @@
+// FIXME Todos los métodos deben estar documentados
+
 class Game {
     constructor({
         id, player1, player2, scoreplayer1, scoreplayer2,

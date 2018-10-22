@@ -1,12 +1,14 @@
+// FIXME Todos los métodos deben estar documentados
+
 class Answer {
     constructor({
-        id, game, question, player, option, correct,
+        id, game, question, player, selectedoption, correct,
     }) {
         this.setId(id);
         this.setGame(game);
         this.setPlayer(player);
         this.setQuestion(question);
-        this.setOption(option);
+        this.setOption(selectedoption);
         this.setCorrect(correct);
     }
 

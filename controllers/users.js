@@ -1,5 +1,7 @@
 const { UsersORM } = require('../orm');
 
+// FIXME Todos los métodos deben estar documentados
+
 class UsersCtrl {
     async getAll(req, res) {
         await UsersORM.getAll(req.query.page)

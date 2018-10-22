@@ -11,6 +11,6 @@ router.get('/', rules.paramsUser, friendsCtrl.getAll);
 router.post('/', [rules.createFriend, defaultValues.defaultFriend], friendsCtrl.create);
 
 // Remove friend
-router.delete('/', rules.paramsFriends, friendsCtrl.delete);
+router.delete('/:friendNickname', rules.paramsFriends, friendsCtrl.delete);
 
 module.exports = router;

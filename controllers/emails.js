@@ -1,13 +1,15 @@
 const { UsersORM } = require('../orm');
 
+// FIXME Todos los métodos deben estar documentados
+
 class EmailsCtrl {
+    // FIXME En los metodos getAll se debe permitir paginado y filtrado
     async getAll(req, res) {
         const result = await UsersORM.getEmails(req.params.nickname);
         const json = {
             data: result,
-            total: result.length,
         };
-        if (result.length === 0) res.status(404);
+        if ((typeof result) === 'string') res.status(404);
         res.send(json);
     }
 
@@ -17,29 +19,27 @@ class EmailsCtrl {
         const json = {
             data: result,
         };
-        if (result.length === 0) res.status(404);
+        if ((typeof result) === 'string') res.status(404);
+        else res.status(201);
         res.send(json);
     }
 
     async update(req, res) {
         const data = { nicknameUser: req.params.nickname, emailUser: req.body.oldEmail };
         const result = await UsersORM.updateEmail(data, req.body.newEmail);
-        if (result.length === 0) {
+        if ((typeof result) === 'string') {
             res.status(404);
-        } else {
-            res.status(204).send('Data successfully updated');
-        }
-        res.send(result);
+            res.send({ data: result });
+        } else res.status(204).send();
     }
 
     async delete(req, res) {
         const data = { nicknameUser: req.params.nickname, emailUser: req.body.email };
         const result = await UsersORM.deleteEmail(data);
-        if (result.length === 0) {
+        if ((typeof result) === 'string') {
             res.status(404);
-        } else {
-            res.status(204).send('Data successfully updated');
-        }
+            res.send({ data: result });
+        } else res.status(204).send();
     }
 }
 

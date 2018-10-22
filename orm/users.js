@@ -33,16 +33,12 @@ class Users {
     }
 
     async create(data) {
-        let result = null;
         const user = new User(data);
         await this.existsAttribs(user)
             .catch(err => Promise.reject(err));
-        await db.insert(this.name, user)
+        await db.insert(this.name, user, 'id')
+            .then((res) => { user.setId(res); })
             .catch(err => Promise.reject(err));
-        await db.selectNonDel(this.name, { nickname: user.getNickname() }, ['id'])
-            .then((res) => { result = this.processResult(res); })
-            .catch(err => Promise.reject(err));
-        user.setId(result.getId());
         return user;
     }
 
@@ -69,13 +65,6 @@ class Users {
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
         return result;
-    }
-
-    async login(data) {
-        const user = new User(data);
-        const cond = { id: user.getId(), password: user.getPassword() };
-        const result = await db.selectNonDel(this.name, cond);
-        return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
     }
 
     processResult(rows) {
@@ -114,11 +103,10 @@ class Users {
     }
 
     async getEmails(nicknameUser) {
-        let conditions = { nickname: nicknameUser };
-        const userResult = await db.select(this.name, ['id', 'email'], conditions);
+        const userResult = await this.getUser(nicknameUser, ['id', 'email']);
         if (userResult.length === 0) return this.msgNoUser;
         const user = new User(userResult[0]);
-        conditions = { userid: user.getId() };
+        const conditions = { userid: user.getId(), deleted: false };
         const result = await db.select(this.emails, ['email'], conditions);
         if (result.length !== 0) {
             user.setEmails(result);
@@ -128,36 +116,32 @@ class Users {
     }
 
     async addEmail({ nicknameUser, emailUser }) {
-        let conditions = { nickname: nicknameUser };
-        let result = await db.select(this.name, ['id', 'email'], conditions);
+        let result = await this.getUser(nicknameUser, ['id', 'email']);
         if (result.length === 0) return this.msgNoUser;
         const user = new User(result[0]);
         let exist = await this.existData(this.name, { email: emailUser });
         if (exist) return this.msgExistEmail;
         exist = await this.existData(this.emails, { email: emailUser });
         if (exist) return this.msgExistEmail;
-        conditions = { userid: user.getId(), email: emailUser };
+        const conditions = { userid: user.getId(), email: emailUser };
         result = await db.insert(this.emails, conditions);
         result = await db.select(this.emails, ['email'], conditions);
         return result;
     }
 
     async updateEmail({ nicknameUser, emailUser }, newEmail) {
-        let conditions = { nickname: nicknameUser };
-        let result = await db.select(this.name, ['id'], conditions);
-        if (result.length !== 0) {
-            const user = new User(result[0]);
-            let exist = await this.existData(this.name, { email: newEmail });
-            if (exist) return this.msgExistEmail;
-            exist = await this.existData(this.emails, { email: newEmail });
-            if (exist) return this.msgExistEmail;
-            conditions = { userid: user.getId(), email: emailUser };
-            result = await db.update(this.emails, { email: newEmail }, conditions);
-            conditions = { userid: user.getId(), email: newEmail };
-            result = await db.select(this.emails, ['email'], conditions);
-            return result;
-        }
-        return 'This user not exist';
+        let result = await this.getUser(nicknameUser, ['id', 'email']);
+        if (result.length === 0) return 'This user not exist';
+        const user = new User(result[0]);
+        let exist = await this.existData(this.name, { email: newEmail });
+        if (exist) return this.msgExistEmail;
+        exist = await this.existData(this.emails, { email: newEmail });
+        if (exist) return this.msgExistEmail;
+        let conditions = { userid: user.getId(), email: emailUser };
+        result = await db.update(this.emails, { email: newEmail }, conditions);
+        conditions = { userid: user.getId(), email: newEmail };
+        result = await db.select(this.emails, ['email'], conditions);
+        return (result.length === 0) ? result : result[0];
     }
 
     async deleteEmail({ nicknameUser, emailUser }) {
@@ -165,13 +149,13 @@ class Users {
         let result = await db.select(this.name, ['id'], conditions);
         if (result.length === 0) return this.msgNoUser;
         const user = new User(result[0]);
-        const exist = await this.existData(this.name, { email: emailUser });
+        const exist = await this.existData(this.emails, { email: emailUser, deleted: false });
         if (!exist) return this.msgNoExistEmail;
         conditions = { userid: user.getId(), email: emailUser };
         result = await db.update(this.emails, { deleted: true }, conditions);
         conditions = { userid: user.getId(), deleted: true };
         result = await db.select(this.emails, ['email'], conditions);
-        return result;
+        return (result.length === 0) ? result : result[0];
     }
 
     async getFriends(nicknameUser) {
@@ -198,13 +182,13 @@ class Users {
         const exist1 = await this.existData(this.friends, data);
         data = { user1: userid2, user2: userid1 };
         const exist2 = await this.existData(this.friends, data);
-        return (exist1.length !== 0 || exist2.length !== 0);
+        return (exist1 === true || exist2 === true);
     }
 
     async addFriend(nicknameUser, { nicknameFriend, date }) {
-        let user1 = await db.select(this.name, ['id'], { nickname: nicknameUser });
-        let user2 = await db.select(this.name, ['id'], { nickname: nicknameFriend });
-        if (user1.length !== 0 && user2.length !== 0) return this.msgNoUser;
+        let user1 = await this.getUser(nicknameUser, ['id']);
+        let user2 = await this.getUser(nicknameFriend, ['id']);
+        if (user1.length === 0 || user2.length === 0) return this.msgNoUser;
         user1 = new User(user1[0]);
         user2 = new User(user2[0]);
         if (user1.getId() === user2.getId()) return this.msgSameUser;
@@ -213,14 +197,14 @@ class Users {
         let data = { user1: user1.getId(), user2: user2.getId(), friendshipdate: date };
         let result = await db.insert(this.friends, data);
         data = { user1: user1.getId(), user2: user2.getId(), friendshipdate: date };
-        result = await db.select(this.friends, ['count(*)'], data);
-        return result;
+        result = await db.select(this.friends, ['friendshipdate'], data);
+        return (result.length === 0) ? result : result[0];
     }
 
     async deleteFriend({ nicknameUser, nicknameFriend }) {
-        let user1 = await db.select(this.name, ['id'], { nickname: nicknameUser });
-        let user2 = await db.select(this.name, ['id'], { nickname: nicknameFriend });
-        if (user1.length !== 0 && user2.length !== 0) return this.msgNoUser;
+        let user1 = await this.getUser(nicknameUser, ['id']);
+        let user2 = await this.getUser(nicknameFriend, ['id']);
+        if (user1.length === 0 || user2.length === 0) return this.msgNoUser;
         user1 = new User(user1[0]);
         user2 = new User(user2[0]);
         const exist = await this.existFriendship(user1.getId(), user2.getId());

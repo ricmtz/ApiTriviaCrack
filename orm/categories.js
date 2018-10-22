@@ -1,6 +1,8 @@
 const { db } = require('../db');
 const { Category } = require('../models');
 
+// FIXME Todos los métodos deben estar documentados
+
 class Categories {
     constructor() {
         this.name = 'categories';
@@ -27,16 +29,12 @@ class Categories {
     }
 
     async create(data) {
-        let result = null;
         const category = new Category(data);
         await this.existsAttribs(category)
             .catch(err => Promise.reject(err));
-        await db.insert(this.name, category)
+        await db.insert(this.name, category, 'id')
+            .then((res) => { category.setId(res); })
             .catch((err) => { Promise.reject(err); });
-        await db.selectNonDel(this.name, { name: category.getName() }, ['id'])
-            .then((res) => { result = this.processResult(res); })
-            .catch((err) => { Promise.reject(err); });
-        category.setId(result.getId());
         return category;
     }
 
