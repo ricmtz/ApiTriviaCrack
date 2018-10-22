@@ -8,10 +8,10 @@ const router = Router();
 router.post('/', [rules.createCategory, defaultValues.defaultCategory], categoriesCtrl.create);
 
 // Get all categories
-router.get('/', categoriesCtrl.getAll);
+router.get('/', [rules.getAllElements, defaultValues.defaultPage], categoriesCtrl.getAll);
 
 // Get category
-router.get('/:categoryId', categoriesCtrl.get);
+router.get('/:categoryId', rules.paramsCategory, categoriesCtrl.get);
 
 // Put category
 router.patch('/:categoryId', rules.updateCategory, categoriesCtrl.update);

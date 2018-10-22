@@ -1,17 +1,7 @@
 const validator = require('./validator');
 
 class Rules {
-    static createUser(req, res, next) {
-        validator.validate(req, res, next, {
-            body: {
-                nickname: 'nickname,required',
-                password: 'password,required',
-                email: 'email,required',
-            },
-        });
-    }
-
-    static getAllUsers(req, res, next) {
+    static getAllElements(req, res, next) {
         validator.validate(req, res, next, {
             query: {
                 page: 'positive,optional',
@@ -19,10 +9,12 @@ class Rules {
         });
     }
 
-    static paramsUser(req, res, next) {
+    static createUser(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
+            body: {
                 nickname: 'nickname,required',
+                password: 'password,required',
+                email: 'email,required',
             },
         });
     }
@@ -39,6 +31,14 @@ class Rules {
                 score: 'positive,optional',
                 admin: 'boolean,optional',
                 avatar: 'file,optional',
+            },
+        });
+    }
+
+    static paramsUser(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                nickname: 'nickname,required',
             },
         });
     }
@@ -169,6 +169,14 @@ class Rules {
                 name: 'text,optional',
                 color: 'text,optional',
                 icon: 'file,optional',
+            },
+        });
+    }
+
+    static paramsCategory(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                categoryId: 'id,required',
             },
         });
     }
