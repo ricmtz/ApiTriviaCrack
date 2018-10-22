@@ -39,4 +39,4 @@ class UsersCtrl {
     }
 }
 
-module.exports = UsersCtrl;
+module.exports = new UsersCtrl();

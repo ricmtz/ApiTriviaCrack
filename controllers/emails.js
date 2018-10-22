@@ -4,7 +4,7 @@ const { UsersORM } = require('../orm');
 
 class EmailsCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
-    static async getAll(req, res) {
+    async getAll(req, res) {
         const result = await UsersORM.getEmails(req.params.nickname);
         const json = {
             data: result,
@@ -13,7 +13,7 @@ class EmailsCtrl {
         res.send(json);
     }
 
-    static async create(req, res) {
+    async create(req, res) {
         const data = { nicknameUser: req.params.nickname, emailUser: req.body.email };
         const result = await UsersORM.addEmail(data);
         const json = {
@@ -24,7 +24,7 @@ class EmailsCtrl {
         res.send(json);
     }
 
-    static async update(req, res) {
+    async update(req, res) {
         const data = { nicknameUser: req.params.nickname, emailUser: req.body.oldEmail };
         const result = await UsersORM.updateEmail(data, req.body.newEmail);
         if ((typeof result) === 'string') {
@@ -33,7 +33,7 @@ class EmailsCtrl {
         } else res.status(204).send();
     }
 
-    static async delete(req, res) {
+    async delete(req, res) {
         const data = { nicknameUser: req.params.nickname, emailUser: req.body.email };
         const result = await UsersORM.deleteEmail(data);
         if ((typeof result) === 'string') {
@@ -43,4 +43,4 @@ class EmailsCtrl {
     }
 }
 
-module.exports = EmailsCtrl;
+module.exports = new EmailsCtrl();

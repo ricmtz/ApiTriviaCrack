@@ -47,4 +47,4 @@ class QuestionsCtrl {
     }
 }
 
-module.exports = QuestionsCtrl;
+module.exports = new QuestionsCtrl();

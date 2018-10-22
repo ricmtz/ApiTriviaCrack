@@ -37,4 +37,4 @@ class CategoriesCtrl {
     }
 }
 
-module.exports = CategoriesCtrl;
+module.exports = new CategoriesCtrl();
