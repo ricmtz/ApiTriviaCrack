@@ -33,16 +33,12 @@ class Users {
     }
 
     async create(data) {
-        let result = null;
         const user = new User(data);
         await this.existsAttribs(user)
             .catch(err => Promise.reject(err));
-        await db.insert(this.name, user)
+        await db.insert(this.name, user, 'id')
+            .then((res) => { user.setId(res); })
             .catch(err => Promise.reject(err));
-        await db.selectNonDel(this.name, { nickname: user.getNickname() }, ['id'])
-            .then((res) => { result = this.processResult(res); })
-            .catch(err => Promise.reject(err));
-        user.setId(result.getId());
         return user;
     }
 
@@ -69,13 +65,6 @@ class Users {
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
         return result;
-    }
-
-    async login(data) {
-        const user = new User(data);
-        const cond = { id: user.getId(), password: user.getPassword() };
-        const result = await db.selectNonDel(this.name, cond);
-        return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
     }
 
     processResult(rows) {
