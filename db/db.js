@@ -127,6 +127,18 @@ class DB {
     }
 
     async select(tab, cond, col) {
+        return new Promise((resolve, reject) => {
+            this.db.many(this.selectQuery({
+                table: tab,
+                conditions: cond,
+                columns: col,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async selectNonDel(tab, cond, col) {
         let conds = cond;
         if (!conds) {
             conds = { deleted: false };
