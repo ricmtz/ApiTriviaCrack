@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const CHECK_DELETED_ENTRIES = true;
 const DEFAULT_LOG_OP = ' AND ';
+const DEFAULT_ORDER_BY_COLUMN = 'id';
 const REG_PER_PAGE = 10;
 const DEFAULT_PAGE = 1;
 
@@ -22,17 +23,39 @@ class DB {
         this.db = pgp(cn);
     }
 
-    selectQuery(table, conditions = null, del = false, columns = [], page = DEFAULT_PAGE,
-        logOp = DEFAULT_LOG_OP, colOrd = 'id') {
-        return pgp.as.format('SELECT $<cols^> FROM $<tab#> $<where^> ORDER BY $<ord^> LIMIT $<lim#> OFFSET $<off#>',
-            {
-                cols: this.getColsQuery(columns),
-                tab: table,
-                where: this.getWhere(conditions, logOp, del),
-                ord: colOrd,
-                lim: REG_PER_PAGE,
-                off: (page - 1) * REG_PER_PAGE,
+    selectQuery(params) {
+        if (!params || !params.table) {
+            return '';
+        }
+        let query = pgp.as.format('SELECT $<cols^> FROM $<tab#>', {
+            cols: this.getColsQuery(params.columns),
+            tab: params.table,
+        });
+        if (params.conditions) {
+            let { logOp } = params;
+            if (!logOp) {
+                logOp = DEFAULT_LOG_OP;
+            }
+            query += pgp.as.format(' WHERE $<where^>', {
+                where: this.getWhere(params.conditions, logOp),
             });
+        }
+        if (params.orderBy) {
+            query += pgp.as.format(' ORDER BY $<col#>', {
+                col: params.orderBy,
+            });
+        }
+        if (params.limit) {
+            query += pgp.as.format(' LIMIT $<lim#>', {
+                lim: params.limit,
+            });
+        }
+        if (params.offset) {
+            query += pgp.as.format(' OFFSET $<off#>', {
+                off: params.offset,
+            });
+        }
+        return query;
     }
 
     insertQuery(table, data) {
@@ -40,33 +63,35 @@ class DB {
     }
 
     updateQuery(table, data, conditions, logOp = DEFAULT_LOG_OP) {
-        return `${pgp.helpers.update(data, null, table)} ${this.getWhere(conditions, logOp)}`;
+        return pgp.as.format('$<update^> WHERE $<where^>', {
+            update: pgp.helpers.update(data, null, table),
+            where: this.getWhere(conditions, logOp),
+        });
     }
 
     deleteQuery(table, conditions) {
         return this.updateQuery(table, { deleted: true }, conditions);
     }
 
-    getWhere(conditions, logOp, deleted = false) {
+    getWhere(conditions, logOp) {
         if (!conditions) {
             return '';
         }
 
-        const conds = conditions;
-        if (!deleted) {
-            conds.deleted = false;
-        }
-        return `WHERE ${pgp.helpers.sets(conds).replace(',', logOp)}`;
+        return `${pgp.helpers.sets(conditions).replace(',', logOp)}`;
     }
 
     getColsQuery(cols) {
         return (cols && cols.length) ? pgp.helpers.ColumnSet(cols).names : '*';
     }
 
-    async countRegs(table) {
+    async countRegs(tab) {
         return new Promise((resolve, reject) => {
-            this.db.one(pgp.as.format('SELECT count(*) FROM $<tab#>', {
-                tab: table,
+            this.db.one(pgp.as.format('SELECT count(*) FROM ($<query^>) AS x', {
+                query: this.selectQuery({
+                    table: tab,
+                    conditions: { deleted: false },
+                }),
             })).then(res => resolve(Number(res.count)))
                 .catch(err => reject(err));
         });
@@ -90,22 +115,47 @@ class DB {
         return Promise.resolve();
     }
 
-    async exists(table, conditions, deleted = CHECK_DELETED_ENTRIES) {
+    async exists(tab, cond) {
         return new Promise((resolve, reject) => {
-            if (!table) {
+            if (!tab) {
                 reject(new Error('Table name is undefined'));
             }
-
-            this.db.one(this.selectQuery(table, conditions, deleted))
+            const conds = cond;
+            conds.deleted = CHECK_DELETED_ENTRIES;
+            this.db.one(this.selectQuery({ table: tab, conditions: cond }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     }
 
-    async select(table, conditions = null, columns = [], page) {
-        await this.validatePage(table, page).catch(err => Promise.reject(err));
+    async select(tab, cond, col) {
         return new Promise((resolve, reject) => {
-            this.db.many(this.selectQuery(table, conditions, false, columns, page))
+            const conds = cond;
+            conds.deleted = false;
+            this.db.many(this.selectQuery({
+                table: tab,
+                conditions: conds,
+                columns: col,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async selectPaged(tab, cond, col, page = DEFAULT_PAGE) {
+        await this.validatePage(tab, page).catch(err => Promise.reject(err));
+
+        return new Promise((resolve, reject) => {
+            const conds = cond;
+            conds.deleted = false;
+            this.db.many(this.selectQuery({
+                table: tab,
+                conditions: conds,
+                columns: col,
+                orderBy: DEFAULT_ORDER_BY_COLUMN,
+                limit: REG_PER_PAGE,
+                offset: (page - 1) * REG_PER_PAGE,
+            }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });

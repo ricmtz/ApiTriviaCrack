@@ -19,7 +19,7 @@ class Users {
     async getAll(pageNum) {
         let result = null;
 
-        await db.select(this.name, null, [], pageNum)
+        await db.selectPaged(this.name, {}, [], pageNum)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
 
