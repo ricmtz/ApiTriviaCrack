@@ -66,9 +66,18 @@ class Games {
         await db.exists(this.name, { id: gameId }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoExistGame)));
         const game = new Game(data);
-        // await this.existsAttribs(game)
-        //     .catch(err => Promise.reject(err));
-        console.log(game);
+        await this.existsAttribs(game)
+            .catch(err => Promise.reject(err));
+        if (game.getPlayer1()) {
+            await UsersORM.getByNickname(game.getPlayer1())
+                .then((res) => { game.setPlayer1(res.getId()); })
+                .catch((err) => { Promise.reject(err); });
+        }
+        if (game.getPlayer2()) {
+            await UsersORM.getByNickname(game.getPlayer2())
+                .then((res) => { game.setPlayer2(res.getId()); })
+                .catch((err) => { Promise.reject(err); });
+        }
         await db.update(this.name, game, { id: gameId, deleted: false })
             .catch(err => Promise.reject(err));
     }
