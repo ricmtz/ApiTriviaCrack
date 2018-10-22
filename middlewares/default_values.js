@@ -1,8 +1,8 @@
 class DefaultValues {
     static defaultPage(req, res, next) {
         if (req.query) {
-            if (typeof (req.query.page) === 'undefined') {
-                req.query.page = 0;
+            if (typeof (req.query.page) === 'undefined' || req.query.page === '0') {
+                req.query.page = 1;
             } else {
                 req.query.page = Number(req.query.page);
             }
