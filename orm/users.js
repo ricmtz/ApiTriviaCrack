@@ -61,20 +61,20 @@ class Users {
     async existsAttribs(user) {
         let error = null;
 
-        await db.exists(this.name, { nickname: user.getNickname() })
-            .then(() => { error = true; }).catch(() => {});
+        error = await db.exists(this.name, { nickname: user.getNickname() })
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExistNickname));
         }
 
-        await db.exists(this.name, { email: user.getEmail() })
-            .then(() => { error = true; }).catch(() => {});
+        error = await db.exists(this.name, { email: user.getEmail() })
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExistEmail));
         }
 
-        await db.exists(this.emails, { email: user.getEmail() })
-            .then(() => { error = true; }).catch(() => {});
+        error = await db.exists(this.emails, { email: user.getEmail() })
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExistEmail));
         }
