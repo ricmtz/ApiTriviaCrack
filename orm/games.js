@@ -42,10 +42,9 @@ class Games {
     }
 
     async create(data) {
-        let result = null;
         const game = new Game(data);
-        // await this.existsAttribs(game)
-        //     .catch(err => Promise.reject(err));
+        await this.existsAttribs(game)
+            .catch(err => Promise.reject(err));
         let idP1 = null;
         await UsersORM.getByNickname(game.getPlayer1())
             .then((usr) => { idP1 = usr.getId(); })
@@ -56,21 +55,20 @@ class Games {
             .then((usr) => { idP2 = usr.getId(); })
             .catch((err) => { Promise.reject(err); });
         game.setPlayer2(idP2);
-        await db.insert(this.name, game)
+        await db.insert(this.name, game, 'id')
+            .then((res) => { game.setId(res); })
             .catch((err) => { Promise.reject(err); });
-        await db.selectNonDel(this.name, { player1: idP1, player2: idP2 }, ['id'])
-            .then((res) => { result = this.processResult(res); })
-            .catch(err => Promise.reject(err));
-        game.setId(result.getId());
         return game;
     }
 
     async update(gameId, data) {
-        await db.selectNonDel(this.name, { id: gameId }, ['id'])
+        console.log(gameId, data);
+        await db.exists(this.name, { id: gameId }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoExistGame)));
         const game = new Game(data);
-        await this.existsAttribs(game)
-            .catch(err => Promise.reject(err));
+        // await this.existsAttribs(game)
+        //     .catch(err => Promise.reject(err));
+        console.log(game);
         await db.update(this.name, game, { id: gameId, deleted: false })
             .catch(err => Promise.reject(err));
     }
@@ -82,34 +80,26 @@ class Games {
             .catch(err => Promise.reject(err));
     }
 
-    async getPosPlayer(userid) {
-        let data = { player1: userid };
-        let exist = await this.existData(this.name, data);
-        if (exist) return 1;
-        data = { player2: userid };
-        exist = await this.existData(this.name, data);
-        return (exist) ? 2 : 0;
-    }
-
     async addAnswer(data) {
         const answer = new Answer(data);
-        let result = await db.select(this.name, ['id'], { id: answer.getGame() });
-        if (result.length === 0) return this.msgNoExistGame;
-        result = await db.select(this.questions, ['id'], { id: answer.getQuestion() });
-        if (result.length === 0) return this.msgNoExistQuestion;
-        result = await db.select(this.users, ['id'], { nickname: answer.getPlayer() });
-        if (result.lenght === 0) return this.msgNoUser;
-        answer.setPlayer(result[0].id);
-        const user = await this.getPosPlayer(answer.getPlayer());
-        if (user === 0) return this.msgNoUser;
-        const conditions = { id: answer.getQuestion(), optioncorrect: answer.getOption() };
-        result = await db.select(this.questions, ['id'], conditions);
-        if (result.length === 0) answer.setCorrect(false);
-        else answer.setCorrect(true);
-        result = await db.insert(this.answers, answer);
-        result = await db.select(this.answers, ['id'], answer); // FIXME Podrian construir el objeto con los datos que mandaron sin necesidad de hacer otro query
-        if (result.length === 0) return this.msgNoCreateAnswers;
-        return result[result.length - 1];
+        await this.existsAttribsAnsw(answer)
+            .catch(err => Promise.reject(err));
+        await UsersORM.getByNickname(answer.getPlayer())
+            .then((res) => { answer.setPlayer(res.getId()); })
+            .catch((err) => { Promise.reject(err); });
+
+        await this.existsPlayer(answer.getGame(), answer.getPlayer())
+            .catch(err => Promise.reject(err));
+
+        await db.selectNonDel(this.questions,
+            { id: answer.getQuestion(), optioncorrect: answer.getOption() })
+            .then(() => { answer.setCorrect(true); })
+            .catch(() => { answer.setCorrect(false); });
+
+        await db.insert(this.answers, answer, 'id')
+            .then((res) => { answer.setId(res); })
+            .catch(err => Promise.reject(err));
+        return answer;
     }
 
     async finishGame(data) {
@@ -155,15 +145,49 @@ class Games {
     }
 
     async existsAttribs(game) {
-        let error = null;
-        error = await db.exists(this.users, { nickname: game.getPlayer1() })
+        let exist = null;
+        if (game.getPlayer1()) {
+            exist = await db.exists(this.users, { nickname: game.getPlayer1() })
+                .catch(() => { });
+            if (!exist) {
+                return Promise.reject(new Error(this.msgNoUser));
+            }
+        }
+        if (game.getPlayer2()) {
+            exist = await db.exists(this.users, { nickname: game.getPlayer2() })
+                .catch(() => { });
+            if (!exist) {
+                return Promise.reject(new Error(this.msgNoUser));
+            }
+        }
+        return null;
+    }
+
+    async existsAttribsAnsw(answer) {
+        let exist = null;
+        exist = await db.exists(this.name, { id: answer.getGame() })
             .catch(() => { });
-        if (!error) {
+        if (!exist) {
+            return Promise.reject(new Error(this.msgNoCreateGame));
+        }
+        exist = await db.exists(this.questions, { id: answer.getQuestion() })
+            .catch(() => { });
+        if (!exist) {
+            return Promise.reject(new Error(this.msgNoExistQuestion));
+        }
+        exist = await db.exists(this.users, { nickname: answer.getPlayer() });
+        if (!exist) {
             return Promise.reject(new Error(this.msgNoUser));
         }
-        error = await db.exists(this.users, { nickname: game.getPlayer2() })
+        return null;
+    }
+
+    async existsPlayer(gameId, userId) {
+        const p1 = await db.exists(this.name, { id: gameId, player1: userId })
             .catch(() => { });
-        if (!error) {
+        const p2 = await db.exists(this.name, { id: gameId, player2: userId })
+            .catch(() => { });
+        if (!p1 || !p2) {
             return Promise.reject(new Error(this.msgNoUser));
         }
         return null;
