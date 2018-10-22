@@ -68,7 +68,7 @@ class Game {
     }
 
     setScoreplayer2(count) {
-        if (count !== undefined) this.scorePlayer2 = count;
+        if (count !== undefined) this.scoreplayer2 = count;
     }
 
     setCreatedate(date) {
