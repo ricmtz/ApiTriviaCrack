@@ -42,7 +42,6 @@ class Users {
         await db.selectNonDel(this.name, { nickname: user.getNickname() }, ['id'])
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
-
         user.setId(result.getId());
         return user;
     }

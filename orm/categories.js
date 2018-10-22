@@ -27,16 +27,17 @@ class Categories {
     }
 
     async create(data) {
-        this.result = null;
+        let result = null;
         const category = new Category(data);
         await this.existsAttribs(category)
             .catch(err => Promise.reject(err));
         await db.insert(this.name, category)
             .catch((err) => { Promise.reject(err); });
         await db.selectNonDel(this.name, { name: category.getName() }, ['id'])
-            .then((res) => { this.processResult(res); })
+            .then((res) => { result = this.processResult(res); })
             .catch((err) => { Promise.reject(err); });
-        return this.result;
+        category.setId(result.getId());
+        return category;
     }
 
     async update(categoryId, data) {
