@@ -18,96 +18,27 @@ class Users {
 
     async getAll(pageNum) {
         let result = null;
-
-        await db.selectPaged(this.name, null, [], pageNum)
+        await db.selectPaged(this.name, {}, [], pageNum)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
-
         return result;
     }
 
     async get(idUser) {
         let result = null;
-
         await db.selectNonDel(this.name, { id: idUser })
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
-
         return result;
-    }
-
-    async login(data) {
-        const user = new User(data);
-        const cond = { id: user.getId(), password: user.getPassword() };
-        const result = await db.selectNonDel(this.name, cond);
-        return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
-    }
-
-    async getByNickname(nicknameUser) {
-        let result = null;
-
-        await db.selectNonDel(this.name, { nickname: nicknameUser })
-            .then((res) => { result = this.processResult(res); })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-
-        return result;
-    }
-
-    async existData(table, condition) {
-        const result = await db.select(table, condition, ['count(*)']);
-        return (result[0].count !== 0);
-    }
-
-    async existsAttribs(user) {
-        let error = null;
-
-        error = await db.exists(this.name, { nickname: user.getNickname() })
-            .catch(() => {});
-        if (error) {
-            return Promise.reject(new Error(this.msgExistNickname));
-        }
-
-        error = await db.exists(this.name, { email: user.getEmail() })
-            .catch(() => {});
-        if (error) {
-            return Promise.reject(new Error(this.msgExistEmail));
-        }
-
-        error = await db.exists(this.emails, { email: user.getEmail() })
-            .catch(() => {});
-        if (error) {
-            return Promise.reject(new Error(this.msgExistEmail));
-        }
-
-        return null;
-    }
-
-    processResult(rows) {
-        if (!rows) {
-            return null;
-        }
-
-        if (!Array.isArray(rows)) {
-            return new User(rows);
-        }
-
-        if (rows.length === 1) {
-            return new User(rows[0]);
-        }
-
-        const usersList = [];
-        rows.forEach((row) => { usersList.push(new User(row)); });
-        return usersList;
     }
 
     async create(data) {
         let result = null;
-
         const user = new User(data);
-
-        await this.existsAttribs(user).catch(err => Promise.reject(err));
-
-        await db.insert(this.name, user).catch(err => Promise.reject(err));
+        await this.existsAttribs(user)
+            .catch(err => Promise.reject(err));
+        await db.insert(this.name, user)
+            .catch(err => Promise.reject(err));
         await db.selectNonDel(this.name, { nickname: user.getNickname() }, ['id'])
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
@@ -119,21 +50,68 @@ class Users {
     async update(nicknameUser, data) {
         await db.selectNonDel(this.name, { nickname: nicknameUser }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
-
         const user = new User(data);
-
-        await this.existsAttribs(user).catch(err => Promise.reject(err));
-
-        await db.update(this.name, user, { nickname: nicknameUser })
+        await this.existsAttribs(user)
+            .catch(err => Promise.reject(err));
+        await db.update(this.name, user, { nickname: nicknameUser, deleted: false })
             .catch(err => Promise.reject(err));
     }
 
     async delete(nicknameUser) {
         await db.selectNonDel(this.name, { nickname: nicknameUser }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
-
         await db.delete(this.name, { nickname: nicknameUser })
             .catch(err => Promise.reject(err));
+    }
+
+    async getByNickname(nicknameUser) {
+        let result = null;
+        await db.selectNonDel(this.name, { nickname: nicknameUser })
+            .then((res) => { result = this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoUser)));
+        return result;
+    }
+
+    async login(data) {
+        const user = new User(data);
+        const cond = { id: user.getId(), password: user.getPassword() };
+        const result = await db.selectNonDel(this.name, cond);
+        return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
+    }
+
+    processResult(rows) {
+        if (!rows) {
+            return null;
+        }
+        if (!Array.isArray(rows)) {
+            return new User(rows);
+        }
+        if (rows.length === 1) {
+            return new User(rows[0]);
+        }
+        const usersList = [];
+        rows.forEach((row) => { usersList.push(new User(row)); });
+        return usersList;
+    }
+
+    async existsAttribs(user) {
+        let error = null;
+        error = await db.exists(this.name, { nickname: user.getNickname() })
+            .catch(() => {});
+        if (error) {
+            return Promise.reject(new Error(this.msgExistNickname));
+        }
+        error = await db.exists(this.name, { email: user.getEmail() })
+            .catch(() => {});
+        if (error) {
+            return Promise.reject(new Error(this.msgExistEmail));
+        }
+        error = await db.exists(this.emails, { email: user.getEmail() })
+            .catch(() => {});
+        if (error) {
+            return Promise.reject(new Error(this.msgExistEmail));
+        }
+        return null;
     }
 
     async getEmails(nicknameUser) {

@@ -10,25 +10,20 @@ class Categories {
         this.msgExistColor = 'This color already exists';
     }
 
-    async getAll({ page }) {
+    async getAll(page) {
+        let result = null;
         await db.selectPaged(this.name, {}, [], page)
-            .then((res) => { this.processResult(res); })
+            .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
-        return this.result;
+        return result;
     }
 
-    async get({ categoryId }) {
-        await db.select(this.name, { id: categoryId, deleted: false })
-            .then((res) => { this.processResult(res); })
+    async get(categoryId) {
+        let result = null;
+        await db.selectNonDel(this.name, { id: categoryId })
+            .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoCategory)));
-        return this.result;
-    }
-
-    async getCategory({ name }) {
-        await db.select(this.name, { name, deleted: false })
-            .then((res) => { this.processResult(res); })
-            .catch(() => Promise.reject(new Error(this.msgNoCategory)));
-        return this.result;
+        return result;
     }
 
     async create(data) {
@@ -38,14 +33,14 @@ class Categories {
             .catch(err => Promise.reject(err));
         await db.insert(this.name, category)
             .catch((err) => { Promise.reject(err); });
-        await db.select(this.name, { name: category.getName() }, [])
+        await db.selectNonDel(this.name, { name: category.getName() }, ['id'])
             .then((res) => { this.processResult(res); })
             .catch((err) => { Promise.reject(err); });
         return this.result;
     }
 
-    async update({ categoryId }, data) {
-        await db.select(this.name, { id: categoryId }, ['id'])
+    async update(categoryId, data) {
+        await db.selectNonDel(this.name, { id: categoryId }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoCategory)));
         const category = new Category(data);
         await this.existsAttribs(category)
@@ -54,34 +49,37 @@ class Categories {
             .catch(err => Promise.reject(err));
     }
 
-    async delete({ categoryId }) {
-        await db.select(this.name, { id: categoryId }, ['id'])
+    async delete(categoryId) {
+        await db.selectNonDel(this.name, { id: categoryId }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoCategory)));
         await db.delete(this.name, { id: categoryId })
             .catch(err => Promise.reject(err));
     }
 
     processResult(rows) {
-        this.result = null;
         if (!rows) {
-            this.res = null;
+            return null;
         }
-        if (!Array.isArray(rows) || rows.length === 1) {
-            this.result = new Category(rows);
+        if (!Array.isArray(rows)) {
+            return new Category(rows);
         }
-        this.result = [];
-        rows.forEach((row) => { this.result.push(new Category(row)); });
+        if (rows.length === 1) {
+            return new Category(rows[0]);
+        }
+        const categoriesList = [];
+        rows.forEach((row) => { categoriesList.push(new Category(row)); });
+        return categoriesList;
     }
 
     async existsAttribs(category) {
         let error = null;
         error = await db.exists(this.name, { name: category.getName() })
-            .catch(err => Promise.reject(err));
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExistName));
         }
         error = await db.exists(this.name, { color: category.getColor() })
-            .catch(err => Promise.reject(err));
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExistColor));
         }
