@@ -47,8 +47,8 @@ class Token {
         this.token = token;
     }
 
-    setCreatedAt(createdAt) {
-        this.createdAt = createdAt;
+    setCreatedAt(createdat) {
+        this.createdat = createdat;
     }
 
     setExpires(expires) {
@@ -64,7 +64,7 @@ class Token {
     }
 
     setUserId(userid) {
-        this.userId = userid;
+        this.userid = userid;
     }
 }
 

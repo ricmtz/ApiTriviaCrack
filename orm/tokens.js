@@ -5,7 +5,6 @@ class Tokens {
     constructor() {
         this.name = 'tokens';
         this.msgNoToken = 'Token not found';
-        this.msgExistToken = 'Token already exists';
         this.msgNoCreateToken = 'Could not create token';
 
         this.active = this.active.bind(this);
@@ -38,21 +37,39 @@ class Tokens {
         return (result[0].count != 0);
     }
 
+    processResult(rows) {
+        if (!rows) {
+            return null;
+        }
+
+        if (!Array.isArray(rows)) {
+            return new Token(rows);
+        }
+
+        if (rows.length === 1) {
+            return new Token(rows[0]);
+        }
+
+        const usersList = [];
+        rows.forEach((row) => { usersList.push(new Token(row)); });
+        return usersList;
+    }
+
     async create(data) {
+        let result = null;
         const tokenObj = new Token(data);
-        console.log('recibi token');
-        console.table(tokenObj);
-        const exist = await this.existData(this.name, { token: tokenObj.getToken() });
-        if (exist) return this.msgExistToken;
 
-        let result = await db.insert(this.name, tokenObj);
-        result = await db.select(this.name, ['id'], tokenObj);
+        await db.insert(this.name, tokenObj).catch(err => Promise.reject(err));
+        await db.select(this.name, { token: tokenObj.getToken() }, ['id'])
+            .then((res) => { result = this.processResult(res); })
+            .catch(err => Promise.reject(err));
 
-        if (result.length !== 0) {
-            tokenObj.setId(result[0].id);
+        if (result) {
+            tokenObj.setId(result.getId());
             return tokenObj;
         }
-        return this.msgNoCreateToken;
+
+        return Promise.reject(this.msgNoCreateToken);
     }
 
     async delete(searchToken) {

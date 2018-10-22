@@ -19,7 +19,7 @@ class Users {
     async getAll(pageNum) {
         let result = null;
 
-        await db.selectPaged(this.name, {}, [], pageNum)
+        await db.selectPaged(this.name, null, [], pageNum)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
 
@@ -29,7 +29,7 @@ class Users {
     async get(idUser) {
         let result = null;
 
-        await db.select(this.name, { id: idUser })
+        await db.selectNonDel(this.name, { id: idUser })
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
 
@@ -39,14 +39,14 @@ class Users {
     async login(data) {
         const user = new User(data);
         const cond = { id: user.getId(), password: user.getPassword() };
-        const result = await db.select(this.name, cond);
+        const result = await db.selectNonDel(this.name, cond);
         return result.length !== 0 ? new User(result[0]) : this.msgNoUser;
     }
 
     async getByNickname(nicknameUser) {
         let result = null;
 
-        await db.select(this.name, { nickname: nicknameUser })
+        await db.selectNonDel(this.name, { nickname: nicknameUser })
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
 
@@ -61,20 +61,20 @@ class Users {
     async existsAttribs(user) {
         let error = null;
 
-        await db.exists(this.name, { nickname: user.getNickname() })
-            .then(() => { error = true; }).catch(() => {});
+        error = await db.exists(this.name, { nickname: user.getNickname() })
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExistNickname));
         }
 
-        await db.exists(this.name, { email: user.getEmail() })
-            .then(() => { error = true; }).catch(() => {});
+        error = await db.exists(this.name, { email: user.getEmail() })
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExistEmail));
         }
 
-        await db.exists(this.emails, { email: user.getEmail() })
-            .then(() => { error = true; }).catch(() => {});
+        error = await db.exists(this.emails, { email: user.getEmail() })
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExistEmail));
         }
@@ -108,7 +108,7 @@ class Users {
         await this.existsAttribs(user).catch(err => Promise.reject(err));
 
         await db.insert(this.name, user).catch(err => Promise.reject(err));
-        await db.select(this.name, { nickname: user.getNickname() }, ['id'])
+        await db.selectNonDel(this.name, { nickname: user.getNickname() }, ['id'])
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
 
@@ -117,7 +117,7 @@ class Users {
     }
 
     async update(nicknameUser, data) {
-        await db.select(this.name, { nickname: nicknameUser }, ['id'])
+        await db.selectNonDel(this.name, { nickname: nicknameUser }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
 
         const user = new User(data);
@@ -129,7 +129,7 @@ class Users {
     }
 
     async delete(nicknameUser) {
-        await db.select(this.name, { nickname: nicknameUser }, ['id'])
+        await db.selectNonDel(this.name, { nickname: nicknameUser }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
 
         await db.delete(this.name, { nickname: nicknameUser })

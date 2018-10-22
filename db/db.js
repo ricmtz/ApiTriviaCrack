@@ -3,7 +3,6 @@ const pgp = require('pg-promise')({
 });
 require('dotenv').config();
 
-const CHECK_DELETED_ENTRIES = true;
 const DEFAULT_LOG_OP = ' AND ';
 const DEFAULT_ORDER_BY_COLUMN = 'id';
 const REG_PER_PAGE = 10;
@@ -120,8 +119,7 @@ class DB {
             if (!tab) {
                 reject(new Error('Table name is undefined'));
             }
-            const conds = cond;
-            conds.deleted = CHECK_DELETED_ENTRIES;
+
             this.db.one(this.selectQuery({ table: tab, conditions: cond }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
@@ -130,8 +128,23 @@ class DB {
 
     async select(tab, cond, col) {
         return new Promise((resolve, reject) => {
-            const conds = cond;
-            conds.deleted = false;
+            this.db.many(this.selectQuery({
+                table: tab,
+                conditions: cond,
+                columns: col,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async selectNonDel(tab, cond, col) {
+        let conds = cond;
+        if (!conds) {
+            conds = { deleted: false };
+        }
+
+        return new Promise((resolve, reject) => {
             this.db.many(this.selectQuery({
                 table: tab,
                 conditions: conds,
@@ -145,9 +158,12 @@ class DB {
     async selectPaged(tab, cond, col, page = DEFAULT_PAGE) {
         await this.validatePage(tab, page).catch(err => Promise.reject(err));
 
+        let conds = cond;
+        if (!conds) {
+            conds = { deleted: false };
+        }
+
         return new Promise((resolve, reject) => {
-            const conds = cond;
-            conds.deleted = false;
             this.db.many(this.selectQuery({
                 table: tab,
                 conditions: conds,
