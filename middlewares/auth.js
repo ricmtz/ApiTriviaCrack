@@ -5,6 +5,9 @@ const { UsersORM, TokensORM } = require('../orm');
 class Auth {
     constructor() {
         this.register = this.register.bind(this);
+        this.hashString = this.hashString.bind(this);
+        this.genHash = this.genHash.bind(this);
+        this.genTokenData = this.genTokenData.bind(this);
         this.createToken = this.createToken.bind(this);
         this.login = this.login.bind(this);
         this.logout = this.logout.bind(this);
@@ -12,39 +15,66 @@ class Auth {
     }
 
     async register(req, res, next) {
-        const user = await UsersORM.create(req.body);
-        if (typeof (user) !== typeof (User)) next(user);
+        let user = null;
+        let token = null;
 
-        const token = await this.createToken(user);
-        if (typeof (token) !== typeof (Token)) next(token);
+        await UsersORM.create(req.body)
+            .then((usr) => { user = usr; })
+            .catch(err => next(err));
 
-        res.send({ data: { token: token.getToken() } }).status(201);
+        if (!user) {
+            return;
+        }
+
+        await this.createToken(user)
+            .then((tok) => { token = tok; })
+            .catch(err => next(err));
+
+        if (!token) {
+            return;
+        }
+
+        res.send({
+            data: user,
+            token: token.getToken(),
+        }).status(201);
         next();
     }
 
-    async createToken(user) {
-        let res = null;
-        let err = null;
+    async hashString(str) {
+        const hashS = await bcrypt.hash(str, Number(process.env.SALT_ROUNDS))
+            .catch(err => Promise.reject(err));
+        return hashS;
+    }
 
+    async genHash(user) {
+        const hash = await this.hashString(`${user.getNickname()}${(new Date()).getTime()}`)
+            .catch(err => Promise.reject(err));
+        return hash;
+    }
+
+    async genTokenData(user) {
         const currDate = new Date();
         const expireDate = new Date(currDate);
         expireDate.setHours(expireDate.getHours() + process.env.SESSION_TIME);
 
+        const hashToken = await this.genHash(user).catch(err => Promise.reject(err));
 
-        let cad = `${user.getNickname()}${(new Date()).getTime()}`;
-        res = await bcrypt.hash(cad, 10).then((hashRes) => {
-            return hashRes;
-        });
-
-        if (err) return err;
-        const resToken = await TokensORM.create({
-            token: res,
+        return {
+            token: hashToken,
             createdat: currDate.toISOString(),
             expires: expireDate.toISOString(),
             type: 's',
             status: '1',
             userid: user.getId(),
-        });
+        };
+    }
+
+    async createToken(user) {
+        const tokenData = await this.genTokenData(user)
+            .catch(err => Promise.reject(err));
+        const resToken = await TokensORM.create(tokenData)
+            .catch(err => Promise.reject(err));
         return resToken;
     }
 
