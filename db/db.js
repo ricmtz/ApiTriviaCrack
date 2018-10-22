@@ -142,6 +142,8 @@ class DB {
         let conds = cond;
         if (!conds) {
             conds = { deleted: false };
+        } else {
+            conds.deleted = false;
         }
 
         return new Promise((resolve, reject) => {
@@ -161,6 +163,8 @@ class DB {
         let conds = cond;
         if (!conds) {
             conds = { deleted: false };
+        } else {
+            conds.deleted = false;
         }
 
         return new Promise((resolve, reject) => {
