@@ -12,14 +12,18 @@ router.post('/', [rules.createGame, defaultValues.defaultGame], gamesCtrl.create
 router.get('/', gamesCtrl.getAll);
 
 // Get game by Id
+// FIXME Falta validar el param :gameId
 router.get('/:gameId', gamesCtrl.get);
 
 // Put game
+// FIXME Falta validar el param :gameId
 router.patch('/:gameId', rules.updateGame, gamesCtrl.update);
 
 // Delete game
+// FIXME Falta validar el param :gameId
 router.delete('/:gameId', gamesCtrl.delete);
 
+// FIXME Falta validar el param :gameId
 router.use('/:gameId/games_questions', gamesQuestionsRouter);
 
 module.exports = router;

@@ -1,5 +1,7 @@
 const { QuestionsORM } = require('../orm');
 
+// FIXME Todos los métodos deben estar documentados
+
 class QuestionsCtrl {
     constructor() {
         this.getAll = this.getAll.bind(this);
@@ -45,4 +47,4 @@ class QuestionsCtrl {
     }
 }
 
-module.exports = new QuestionsCtrl();
+module.exports = QuestionsCtrl;

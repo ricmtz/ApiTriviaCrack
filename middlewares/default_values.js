@@ -1,3 +1,9 @@
+// FIXME El nombre dle archivo debe ser camelCase
+// FIXME Este diseño centralizado puede afectar en sistemas muy grandes,
+// los valores default podrian definirse en el controlador o en el modelo para
+// hacerlo a nivel "dominio", o esta mal aqui, solo le veo el problema cuando el sistema crezca.
+// FIXME Todos los métodos deben estar documentados
+
 class DefaultValues {
     static defaultPage(req, res, next) {
         if (req.query) {
@@ -29,9 +35,10 @@ class DefaultValues {
         next();
     }
 
+
     static defaultGame(req, res, next) {
-        req.body.answersplayer1 = 0;
-        req.body.answersplayer2 = 0;
+        req.body.answersplayer1 = -1;
+        req.body.answersplayer2 = -1;
         req.body.createdate = new Date().toISOString();
         req.body.finished = false;
         req.body.deleted = false;
@@ -47,6 +54,7 @@ class DefaultValues {
     static defaultQuestion(req, res, next) {
         req.body.approved = true;
         req.body.deleted = false;
+        req.body.createdate = new Date().toISOString();
         next();
     }
 

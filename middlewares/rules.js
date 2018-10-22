@@ -1,5 +1,10 @@
 const validator = require('./validator');
 
+// FIXME Este diseño centralizado puede afectar en el mantenimiento, ya que al ver
+// una ruta no es claras su validaciones hasta que se viene hasta este archivo.
+// No es malo!!! solo una manera diferente.
+// FIXME Todos los métodos deben estar documentados
+
 class Rules {
     static getAllElements(req, res, next) {
         validator.validate(req, res, next, {
@@ -73,19 +78,17 @@ class Rules {
 
     static updateEmail(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                emailId: 'id,required',
-            },
             body: {
-                email: 'email,required',
+                newEmail: 'email,required',
+                oldEmail: 'email,required',
             },
         });
     }
 
     static paramsEmails(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                emailId: 'id,required',
+            body: {
+                email: 'email,required',
             },
         });
     }
@@ -110,10 +113,13 @@ class Rules {
 
     static createGameQuestion(req, res, next) {
         validator.validate(req, res, next, {
+            params: {
+                gameId: 'id,required',
+            },
             body: {
-                game: 'id,required',
                 question: 'id,required',
-                player: 'id,required',
+                player: 'text,required',
+                option: 'text,required',
             },
         });
     }
@@ -137,6 +143,7 @@ class Rules {
                 option1: 'text,required',
                 option2: 'text,required',
                 optioncorrect: 'text,required',
+                userid: 'id,required',
             },
         });
     }
