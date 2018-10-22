@@ -10,14 +10,14 @@ router.use('/:question', rules.paramsQuestions);
 // Get all question.
 router.get('/', questionsCtrl.getAll);
 
-// Get question.
-router.get('/:question', questionsCtrl.get);
+// FIXME Falta validar el param :question
+router.get('/:questionId', questionsCtrl.get);
 
 // Create question.
 router.post('/', rules.createQuestion, questionsCtrl.create);
 
-// Remove question.
-router.delete('/:question', questionsCtrl.delete);
+// FIXME Falta validar el param :question
+router.delete('/:questionId', questionsCtrl.delete);
 
 // Update question.
 router.patch('/:question', rules.updateQuestion, questionsCtrl.update);

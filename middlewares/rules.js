@@ -5,32 +5,20 @@ const validator = require('./validator');
 // No es malo!!! solo una manera diferente.
 
 class Rules {
-    /**
-     * Validator middleware that add the rules to validate
-     * categoryId parameter.
-     * @param {Object} req Express request object.
-     * @param {Object} res Express response object.
-     * @param {Function} next Express next middleware function
-     */
-    static paramsCategories(req, res, next) {
+    static getAllElements(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                categoryId: 'id,required',
+            query: {
+                page: 'positive,optional',
             },
         });
     }
 
-    /**
-     * Validator middleware that add the rules to validate
-     * the friendNickname parameter.
-     * @param {Object} req Express request object.
-     * @param {Object} res Express response object.
-     * @param {Function} next Express next middleware function
-     */
-    static paramsFriends(req, res, next) {
+    static createUser(req, res, next) {
         validator.validate(req, res, next, {
-            params: {
-                friendNickname: 'nickname,required',
+            body: {
+                nickname: 'nickname,required',
+                password: 'password,required',
+                email: 'email,required',
             },
         });
     }
@@ -50,14 +38,15 @@ class Rules {
         });
     }
 
-    /**
-     * Validator middleware that add the rules to validate
-     * gameId parameter.
-     * @param {Object} req Express request object.
-     * @param {Object} res Express response object.
-     * @param {Function} next Express next middleware function
-     */
-    static paramsGames(req, res, next) {
+    static paramsUser(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                nickname: 'nickname,required',
+            },
+        });
+    }
+
+    static createFriend(req, res, next) {
         validator.validate(req, res, next, {
             params: {
                 gameId: 'id,required',
@@ -322,6 +311,14 @@ class Rules {
                 name: 'text,optional',
                 color: 'text,optional',
                 icon: 'file,optional',
+            },
+        });
+    }
+
+    static paramsCategory(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                categoryId: 'id,required',
             },
         });
     }

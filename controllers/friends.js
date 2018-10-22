@@ -4,7 +4,7 @@ const { UsersORM } = require('../orm');
 
 class FriendsCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
-    static async getAll(req, res) {
+    async getAll(req, res) {
         const result = await UsersORM.getFriends(req.params.nickname);
         const json = {
             data: result,
@@ -14,8 +14,8 @@ class FriendsCtrl {
         res.send(json);
     }
 
-    static async create(req, res) {
-        const data = { nicknameFriend: req.body.nickname, date: new Date().toISOString() };
+    async create(req, res) {
+        const data = { nicknameFriend: req.body.nickname, date: req.body.friendshipdate };
         const result = await UsersORM.addFriend(req.params.nickname, data);
         const json = {
             data: result,
@@ -25,7 +25,7 @@ class FriendsCtrl {
         res.send(json);
     }
 
-    static async delete(req, res) {
+    async delete(req, res) {
         const data = {
             nicknameUser: req.params.nickname,
             nicknameFriend: req.params.friendNickname,
@@ -38,4 +38,4 @@ class FriendsCtrl {
     }
 }
 
-module.exports = FriendsCtrl;
+module.exports = new FriendsCtrl();

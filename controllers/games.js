@@ -4,7 +4,7 @@ const { GamesORM } = require('../orm');
 
 class GamesCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
-    static async getAll(req, res) {
+    async getAll(req, res) {
         const result = await GamesORM.getAll();
         const json = {
             data: result,
@@ -14,7 +14,7 @@ class GamesCtrl {
         res.send(json);
     }
 
-    static async get(req, res) {
+    async get(req, res) {
         const result = await GamesORM.get(req.params.gameId);
         const json = {
             data: result,
@@ -23,12 +23,7 @@ class GamesCtrl {
         res.send(json);
     }
 
-    static async create(req, res) {
-        req.body.answersplayer1 = -1;
-        req.body.answersplayer2 = -1;
-        req.body.createdate = new Date().toISOString();
-        req.body.finished = false;
-        req.body.deleted = false;
+    async create(req, res) {
         const result = await GamesORM.create(req.body);
         const json = {
             data: result,
@@ -38,7 +33,7 @@ class GamesCtrl {
         res.send(json);
     }
 
-    static async update(req, res) {
+    async update(req, res) {
         const result = await GamesORM.update(req.params.gameId, req.body);
         if ((typeof result) === 'string') {
             res.status(404);
@@ -46,7 +41,7 @@ class GamesCtrl {
         } else res.status(204).send();
     }
 
-    static async delete(req, res) {
+    async delete(req, res) {
         const result = await GamesORM.delete(req.params.gameId);
         if ((typeof result) === 'string') {
             res.status(404);
@@ -55,4 +50,4 @@ class GamesCtrl {
     }
 }
 
-module.exports = GamesCtrl;
+module.exports = new GamesCtrl();

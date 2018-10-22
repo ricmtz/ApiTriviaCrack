@@ -14,69 +14,81 @@ class Questions {
         this.msgNoUser = 'This user dont exist';
     }
 
+    async getAll({ page }) {
+        await db.selectPaged(this.name, null, [], page)
+            .then((res) => { this.processResult(res); })
+            .catch(err => Promise.reject(err));
+        return this.result;
+    }
+
+    async get({ questionId }) {
+        const data = { id: Number(questionId) };
+        await db.selectNonDel(this.name, data)
+            .then((res) => { this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
+        return this.result;
+    }
+
+    async getQuestion({ question }) {
+        const data = { question };
+        await db.selectNonDel(this.name, data)
+            .then((res) => { this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
+        return this.result;
+    }
+
     async create(data) {
         const question = new Question(data);
-        let result = await db.select(this.categories, ['id'], { id: data.category });
-        if (result.length === 0) return this.msgNoCategory;
-        result = await db.insert(this.name, question);
-        result = await db.select(this.name, ['id'], question); // FIXME El se obtiene directo al hacer insert, no es necesario hacer otro query
-        if (result.length === 0) return this.msgNoCreateQuestion;
-        question.setId(result[0].id);
-        return question;
+        await this.existsAttribs(question)
+            .catch(err => Promise.reject(err));
+        await db.insert(this.name, question)
+            .catch(err => Promise.reject(err));
+        await db.selectNonDel(this.name, { question: question.getQuestion() })
+            .then((res) => { this.processResult(res); })
+            .catch(err => Promise.reject(err));
+        return this.result;
     }
 
-    async addNicknameUser(question) {
-        const result = await db.select(this.users, ['nickname'], { id: question.getUserid() });
-        if (result.length === 0) return this.msgNoUser;
-        question.setUser(result[0].nickname);
-        return question;
-    }
 
-    async getAll() {
-        const result = await db.select(this.name, [], { deleted: false });
-        if (result.length === 0) return result;
-        const response = [];
-        result.forEach((row) => {
-            response.push(new Question(row));
-        });
-        return response;
-    }
-
-    async get(idQuestion) {
-        const data = { id: idQuestion, deleted: false };
-        const result = await db.select(this.name, [], data);
-        if (result.length === 0) return this.msgNoQuestion;
-        let question = new Question(result[0]);
-        question = await this.addNicknameUser(question);
-        return question;
-    }
-
-    async getQuestion(nameQuestion) {
-        const data = { question: nameQuestion, deleted: false };
-        const result = await db.select(this.name, [], data);
-        return result.length !== 0 ? new Question(result[0]) : this.msgNoQuestion;
-    }
-
-    async update(idQuestion, data) {
-        let result = await db.select(this.name, ['id'], { id: idQuestion, deleted: false });
-        if (result.length === 0) return this.msgNoQuestion;
+    async update({ questionId }, data) {
+        await db.selectNonDel(this.name, { id: questionId }, ['id'])
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
         const question = new Question(data);
-        if (data.category !== undefined) {
-            result = await db.select(this.categories, ['id'], { id: data.category });
-            if (result.length === 0) return this.msgNoCategory;
-        }
-        result = await db.update(this.name, question, { id: idQuestion });
-        result = await db.select(this.name, ['id'], data);  // FIXME Podrian construir el objeto con los datos que mandaron sin necesidad de hacer otro query
-        return result;
+        await this.existsAttribs(question)
+            .catch(err => Promise.reject(err));
+        await db.update(this.name, question, { id: questionId })
+            .catch(err => Promise.reject(err));
     }
 
-    async delete(idQuestion) {
-        let result = await db.select(this.name, ['id'], { id: idQuestion, deleted: false });
-        if (result.length === 0) return this.msgNoQuestion;
-        const data = { deleted: true };
-        result = await db.update(this.name, data, { id: idQuestion });
-        result = await db.select(this.name, ['id'], data); // FIXME Podrian construir el objeto con los datos que mandaron sin necesidad de hacer otro query
-        return result;
+    async delete({ questionId }) {
+        await db.selectNonDel(this.name, { id: questionId }, ['id'])
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
+        await db.delete(this.name, { id: questionId })
+            .catch(err => Promise, reject(err));
+    }
+
+    processResult(rows) {
+        this.result = null;
+        if (!rows) {
+            this.res = null;
+        }
+        if (!Array.isArray(rows) || rows.length === 1) {
+            this.result = new Question(rows);
+        }
+        this.result = [];
+        rows.forEach((row) => { this.result.push(new Question(row)); });
+    }
+
+    async existsAttribs(question) {
+        let error = null;
+
+        error = await db.exists(this.name, { question: question.getQuestion() })
+            .catch(() => { });
+        if (error) {
+            return Promise.reject(new Error(this.msgExistNickname));
+        }
+
+        return null;
     }
 }
 

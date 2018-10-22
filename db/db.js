@@ -1,6 +1,12 @@
-const pgp = require('pg-promise')();
+const pgp = require('pg-promise')({
+    capSQL: true,
+});
 require('dotenv').config();
 
+const DEFAULT_LOG_OP = ' AND ';
+const DEFAULT_ORDER_BY_COLUMN = 'id';
+const REG_PER_PAGE = 10;
+const DEFAULT_PAGE = 1;
 
 const cn = {
     host: process.env.DB_HOST,
@@ -14,134 +20,196 @@ const cn = {
 class DB {
     constructor() {
         this.db = pgp(cn);
-        this.test = this.test.bind(this);
-        this.select = this.select.bind(this);
     }
 
-    test() {
-        this.db.one('SELECT $1 AS value', 123)
-            .then((data) => {
-                console.log('DATA:', data.value);
-            })
-            .catch((error) => {
-                console.log('ERROR:', error);
-            });
-    }
-
-    getValuesAssing(data, extra) {
-        return new Promise((resolve) => {
-            const columnsArr = Object.keys(data);
-            const valuesArr = Object.values(data);
-            this.values = '';
-            for (let i = 0; i < valuesArr.length; i += 1) {
-                if (i !== 0) this.values += extra;
-                let valueAdd = '';
-                if (isNaN(valuesArr[i])) valueAdd = `'${valuesArr[i]}'`;
-                else valueAdd = `${valuesArr[i]}`;
-                this.values += ` ${columnsArr[i]} = ${valueAdd}`;
+    selectQuery(params) {
+        if (!params || !params.table) {
+            return '';
+        }
+        let query = pgp.as.format('SELECT $<cols^> FROM $<tab#>', {
+            cols: this.getColsQuery(params.columns),
+            tab: params.table,
+        });
+        if (params.conditions) {
+            let { logOp } = params;
+            if (!logOp) {
+                logOp = DEFAULT_LOG_OP;
             }
-            resolve(this.values);
+            query += pgp.as.format(' WHERE $<where^>', {
+                where: this.getWhere(params.conditions, logOp),
+            });
+        }
+        if (params.orderBy) {
+            query += pgp.as.format(' ORDER BY $<col#>', {
+                col: params.orderBy,
+            });
+        }
+        if (params.limit) {
+            query += pgp.as.format(' LIMIT $<lim#>', {
+                lim: params.limit,
+            });
+        }
+        if (params.offset) {
+            query += pgp.as.format(' OFFSET $<off#>', {
+                off: params.offset,
+            });
+        }
+        return query;
+    }
+
+    insertQuery(table, data, retCol) {
+        let query = pgp.helpers.insert(data, null, table);
+        if (retCol) {
+            query += pgp.as.format(' RETURNING $<col#>', { col: retCol });
+        }
+        return query;
+    }
+
+    updateQuery(table, data, conditions, logOp = DEFAULT_LOG_OP) {
+        return pgp.as.format('$<update^> WHERE $<where^>', {
+            update: pgp.helpers.update(data, null, table),
+            where: this.getWhere(conditions, logOp),
         });
     }
 
-    getValues(data) {
-        return new Promise((resolve) => {
-            const valuesArr = Object.values(data);
-            this.values = '';
-            for (let i = 0; i < valuesArr.length; i += 1) {
-                if (i !== 0) this.values += ', ';
-                if (isNaN(valuesArr[i])) this.values += `'${valuesArr[i]}'`;
-                else this.values += `${valuesArr[i]}`;
+    deleteQuery(table, conditions) {
+        return this.updateQuery(table, { deleted: true }, conditions);
+    }
+
+    getWhere(conditions, logOp) {
+        if (!conditions) {
+            return '';
+        }
+
+        return `${pgp.helpers.sets(conditions).replace(',', logOp)}`;
+    }
+
+    getColsQuery(cols) {
+        return (cols && cols.length) ? pgp.helpers.ColumnSet(cols).names : '*';
+    }
+
+    async countRegs(tab) {
+        return new Promise((resolve, reject) => {
+            this.db.one(pgp.as.format('SELECT count(*) FROM ($<query^>) AS x', {
+                query: this.selectQuery({
+                    table: tab,
+                    conditions: { deleted: false },
+                }),
+            })).then(res => resolve(Number(res.count)))
+                .catch(err => reject(err));
+        });
+    }
+
+    async validatePage(table, page) {
+        if (!page) {
+            return Promise.resolve();
+        }
+
+        let regsNum = null;
+
+        await this.countRegs(table)
+            .then((res) => { regsNum = res; })
+            .catch(err => Promise.reject(err));
+
+        if ((page - 1) * REG_PER_PAGE > regsNum) {
+            return Promise.reject(new Error('Page out of range'));
+        }
+
+        return Promise.resolve();
+    }
+
+    async exists(tab, cond) {
+        return new Promise((resolve, reject) => {
+            if (!tab) {
+                reject(new Error('Table name is undefined'));
             }
-            resolve(this.values);
-        });
-    }
 
-    getJoins(joins) {
-        return new Promise((resolve) => {
-            this.result = '';
-            joins.forEach((join) => {
-                this.result += ` ${join.type} ${join.table} AS ${join.as} ON ${join.condition}`;
-            });
-            resolve(this.result);
-        });
-    }
-
-    getColumns(columns) {
-        return new Promise((resolve) => {
-            this.result = '';
-            columns.forEach((column, i) => {
-                if (column.column === undefined) resolve(columns.toString());
-                if (i !== 0) this.result += ',';
-                this.result += ` ${column.column} `;
-                if (column.as !== undefined) this.result += `AS ${column.as}`;
-            });
-            resolve(this.result);
-        });
-    }
-
-    async select(table, columns = [], conditions = null, extra = ' AND ', join = [], distinct = false) {
-        if (table === undefined) return 'Error: table name is undefined';
-        let col = '*';
-        let dis = '';
-        let cond = '';
-        let joins = '';
-        if (columns.length !== 0) col = await this.getColumns(columns);
-        if (distinct) dis = 'DISTINCT';
-        if (conditions !== null) {
-            const where = await this.getValuesAssing(conditions, extra);
-            cond = `WHERE ${where}`;
-        }
-        if (join !== []) joins = await this.getJoins(join);
-        const query = `SELECT ${dis} ${col} FROM ${table} ${joins} ${cond} `;
-        this.values = '';
-        return new Promise((resolve, reject) => {
-            this.db.query(query)
+            this.db.many(this.selectQuery({ table: tab, conditions: cond }))
                 .then(res => resolve(res))
-                .catch(e => reject(e.stack));
+                .catch(err => reject(err));
         });
     }
 
-    async insert(table, data) {
-        const columns = Object.keys(data).toString();
-        const values = await this.getValues(data);
-        const query = `INSERT INTO ${table} (${columns}) VALUES (${values})`;
-        this.values = '';
+    async select(tab, cond, col) {
         return new Promise((resolve, reject) => {
-            this.db.query(query)
+            this.db.many(this.selectQuery({
+                table: tab,
+                conditions: cond,
+                columns: col,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async selectNonDel(tab, cond, col) {
+        let conds = cond;
+        if (!conds) {
+            conds = { deleted: false };
+        } else {
+            conds.deleted = false;
+        }
+
+        return new Promise((resolve, reject) => {
+            this.db.many(this.selectQuery({
+                table: tab,
+                conditions: conds,
+                columns: col,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async selectPaged(tab, cond, col, page = DEFAULT_PAGE) {
+        await this.validatePage(tab, page).catch(err => Promise.reject(err));
+
+        let conds = cond;
+        if (!conds) {
+            conds = { deleted: false };
+        } else {
+            conds.deleted = false;
+        }
+
+        return new Promise((resolve, reject) => {
+            this.db.many(this.selectQuery({
+                table: tab,
+                conditions: conds,
+                columns: col,
+                orderBy: DEFAULT_ORDER_BY_COLUMN,
+                limit: REG_PER_PAGE,
+                offset: (page - 1) * REG_PER_PAGE,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async insert(table, data, retCol) {
+        return new Promise((resolve, reject) => {
+            this.db.one(this.insertQuery(table, data, retCol))
+                .then(res => resolve(res[retCol]))
+                .catch(e => reject(e));
+        });
+    }
+
+    async update(table, data, conditions) {
+        return new Promise((resolve, reject) => {
+            this.db.none(this.updateQuery(table, data, conditions))
                 .then(res => resolve(res))
                 .catch(e => reject(e));
         });
     }
 
-    async update(table, data, conditions, extra = ' AND ') {
-        const values = await this.getValuesAssing(data, ', ');
-        let cond = '';
-        if (conditions !== null) {
-            const where = await this.getValuesAssing(conditions, extra);
-            cond = `WHERE ${where}`;
+    async delete(table, conditions) {
+        if (!conditions) {
+            return Promise.reject(new Error(`Deletion of all ${table} is not supported`));
         }
-        const query = `UPDATE ${table} SET ${values} ${cond}`;
-        this.values = '';
-        return new Promise((resolve, reject) => {
-            this.db.query(query)
-                .then(res => resolve(res))
-                .catch(e => reject(e));
-        });
-    }
 
-    async delete(table, conditions, extra = ' AND ') {
-        let cond = '';
-        if (conditions !== null) {
-            const where = await this.getValuesAssing(conditions, extra);
-            cond = `WHERE ${where}`;
-        }
-        const query = `DELETE FROM ${table} ${cond}`;
-        this.values = '';
         return new Promise((resolve, reject) => {
-            this.db.query(query)
+            this.db.none(this.deleteQuery(table, conditions))
                 .then(res => resolve(res))
-                .catch(e => reject(e));
+                .catch(err => reject(err));
         });
     }
 }

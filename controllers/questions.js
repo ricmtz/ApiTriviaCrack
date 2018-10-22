@@ -4,74 +4,47 @@ const { QuestionsORM } = require('../orm');
 
 class QuestionsCtrl {
     constructor() {
-        this.questions = [
-            {
-                id: 10,
-                category: 3,
-                question: '¿Cuál lenguaje de proramación no es orientado a objetos?',
-                option_1: 'c++',
-                option_2: 'java',
-                option_correct: 'c',
-            },
-            {
-                id: 45,
-                category: 2,
-                question: '¿Qué verbo no pertenece a los verbos de HTTP?',
-                option_1: 'POST',
-                option_2: 'DELETE',
-                option_correct: 'REMOVE',
-            },
-        ];
+        this.getAll = this.getAll.bind(this);
+        this.get = this.get.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
     }
 
-    // FIXME En los metodos getAll se debe permitir paginado y filtrado
-    static async getAll(req, res) {
-        const result = await QuestionsORM.getAll();
-        const json = {
-            data: result,
-            total: result.length,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+    async getAll(req, res) {
+        await QuestionsORM.getAll(req.query)
+            .then((quest) => {
+                res.status(200).send({
+                    data: quest,
+                    total: quest.length,
+                });
+            })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async get(req, res) {
-        const result = await QuestionsORM.get(req.params.question);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        res.send(json);
+    async get(req, res) {
+        await QuestionsORM.get(req.params)
+            .then((quest) => { res.status(200).send({ data: quest }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async create(req, res) {
-        req.body.approved = false;
-        req.body.deleted = false;
-        req.body.createdate = new Date().toISOString();
-        const result = await QuestionsORM.create(req.body);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        else res.status(201);
-        res.send(json);
+    async create(req, res) {
+        await QuestionsORM.create(req.body)
+            .then((quest) => { res.status(200).send({ data: quest }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async update(req, res) {
-        const result = await QuestionsORM.update(req.params.question, req.body);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+    async update(req, res) {
+        await QuestionsORM.update(req.params, req.body)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async delete(req, res) {
-        const result = await QuestionsORM.delete(req.params.question);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+    async delete(req, res) {
+        await QuestionsORM.delete(req.params)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 }
 
-module.exports = QuestionsCtrl;
+module.exports = new QuestionsCtrl();

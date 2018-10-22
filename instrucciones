@@ -1,0 +1,101 @@
+1.- Crear tabla para tokens en la BD.
+
+Campos:
+    - id num
+    - token varchar(255)
+    - created_at datetime
+    - expired datetime
+    - type char
+    - status char
+    - user_id int
+
+2.- Modelo para manejar los tokkens.
+
+    - created
+    - get
+
+    class Token{
+        constructor(token, created, duration, type, status, user){
+            this.token = token
+            this.expires = created + duration;
+        }
+
+        static get(token){
+            db.get('tokens', token, status=1){
+                return this
+            }
+        }
+    }
+
+3.- Middleware para todo Auth
+    Añanir Secret a .env
+    instalar: npm install bcrypt --save
+
+    cosnt bcrypt = requiere('bcrypt');
+
+    class Auth {
+        register(req, res, next){
+            user = User.create(req);
+            next(err);
+
+            // Crear el token
+            bcrypt.hast('asdasdasd', process.env.SECRET, (err, hash) => {
+                Token.create({
+                    token, 
+                    created_at, new Date(),
+                    expires: date + 12,
+                    type 's',
+                    active: 1,
+                    user_id: user.id,
+                });
+            });
+            res.send({
+                data: {
+                    hash
+                }
+            }).status(201);
+        }
+
+        login(req, res, next) {
+            User.get(req);
+            
+            // Validacion si ya hay token?
+
+            // Crear token
+        }
+
+        logout(token){
+            token.destroy(); //No se borra de la DB, solo se cambia el status.
+        }
+
+        session(toke){
+            // if(Token.active(token)) {
+            if (token == req.token()){
+                next();
+            } else {
+                return next({err});
+            }
+        }
+
+        sessionAtivate(toke){
+            // if(Token.active(token)) {
+            if (token == req.token()){
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        authentication(req, res, nexy){
+            if(sessionAtivate(req.token)){
+                next();
+            }else{
+                return next(err);
+            }
+        }
+    }
+
+4.- Agregar Rutas para logear.
+    router.post('/register', middleware.aut.resgister);
+    router.post('/login', middleware.aut.login);
+    router.get('/logout', middleware.aut.logout);
