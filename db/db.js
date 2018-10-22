@@ -120,7 +120,7 @@ class DB {
                 reject(new Error('Table name is undefined'));
             }
 
-            this.db.one(this.selectQuery({ table: tab, conditions: cond }))
+            this.db.many(this.selectQuery({ table: tab, conditions: cond }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
