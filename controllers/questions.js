@@ -2,25 +2,6 @@ const { QuestionsORM } = require('../orm');
 
 class QuestionsCtrl {
     constructor() {
-        this.questions = [
-            {
-                id: 10,
-                category: 3,
-                question: '¿Cuál lenguaje de proramación no es orientado a objetos?',
-                option_1: 'c++',
-                option_2: 'java',
-                option_correct: 'c',
-            },
-            {
-                id: 45,
-                category: 2,
-                question: '¿Qué verbo no pertenece a los verbos de HTTP?',
-                option_1: 'POST',
-                option_2: 'DELETE',
-                option_correct: 'REMOVE',
-            },
-        ];
-
         this.getAll = this.getAll.bind(this);
         this.get = this.get.bind(this);
         this.create = this.create.bind(this);
@@ -29,53 +10,38 @@ class QuestionsCtrl {
     }
 
     async getAll(req, res) {
-        const result = await QuestionsORM.getAll();
-        const json = {
-            data: result,
-            total: result.length,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await QuestionsORM.getAll(req.query)
+            .then((quest) => {
+                res.status(200).send({
+                    data: quest,
+                    total: quest.length,
+                });
+            })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async get(req, res) {
-        const result = await QuestionsORM.get(req.params.question);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await QuestionsORM.get(req.params)
+            .then((quest) => { res.status(200).send({ data: quest }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async create(req, res) {
-        const result = await QuestionsORM.create(req.body);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) res.status(404);
-        res.status(200).send(json);
+        await QuestionsORM.create(req.body)
+            .then((quest) => { res.status(200).send({ data: quest }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async update(req, res) {
-        const result = await QuestionsORM.update(req.params.question, req.body);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) {
-            res.status(404);
-        } else {
-            res.status(204);
-        }
-        res.send(json);
+        await QuestionsORM.update(req.params, req.body)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async delete(req, res) {
-        const result = await QuestionsORM.delete(req.params.question);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await QuestionsORM.delete(req.params)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 }
 
