@@ -28,20 +28,15 @@ class GamesCtrl {
     }
 
     async update(req, res) {
-        const result = await GamesORM.update(req.params.gameId, req.body);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+        await GamesORM.update(req.params.gameId, req.body)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async delete(req, res) {
-        const result = await GamesORM.delete(req.params.gameId);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await GamesORM.delete(req.params.gameId)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 }
 
