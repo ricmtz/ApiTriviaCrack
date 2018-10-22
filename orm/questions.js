@@ -10,63 +10,81 @@ class Questions {
         this.msgNoQuestion = 'This question dont exist';
     }
 
+    async getAll({ page }) {
+        await db.selectPaged(this.name, null, [], page)
+            .then((res) => { this.processResult(res); })
+            .catch(err => Promise.reject(err));
+        return this.result;
+    }
+
+    async get({ questionId }) {
+        const data = { id: Number(questionId) };
+        await db.selectNonDel(this.name, data)
+            .then((res) => { this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
+        return this.result;
+    }
+
+    async getQuestion({ question }) {
+        const data = { question };
+        await db.selectNonDel(this.name, data)
+            .then((res) => { this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
+        return this.result;
+    }
+
     async create(data) {
         const question = new Question(data);
-        let result = await db.select(this.categories, ['id'], { name: data.category });
-        if (result.length === 0) return this.msgNoCategory;
-        question.setCategory(result[0].id);
-        result = await db.insert(this.name, question);
-        result = await db.select(this.name, ['id'], question);
-        if (result.length !== 0) {
-            question.setId(result[0].id);
-            return question;
-        }
-        return this.msgNoCreateQuestion;
+        await this.existsAttribs(question)
+            .catch(err => Promise.reject(err));
+        await db.insert(this.name, question)
+            .catch(err => Promise.reject(err));
+        await db.selectNonDel(this.name, { question: question.getQuestion() })
+            .then((res) => { this.processResult(res); })
+            .catch(err => Promise.reject(err));
+        return this.result;
     }
 
-    async getAll() {
-        const result = await db.select(this.name, [], { deleted: false });
-        if (result.length === 0) return result;
-        const response = [];
-        result.forEach((row) => {
-            response.push(new Question(row));
-        });
-        return response;
-    }
 
-    async get(idQuestion) {
-        const data = { id: Number(idQuestion), deleted: false };
-        const result = await db.select(this.name, [], data);
-        return result.length !== 0 ? new Question(result[0]) : this.msgNoQuestion;
-    }
-
-    async getQuestion(nameQuestion) {
-        const data = { question: nameQuestion, deleted: false };
-        const result = await db.select(this.name, [], data);
-        return result.length !== 0 ? new Question(result[0]) : this.msgNoQuestion;
-    }
-
-    async update(idQuestion, data) {
-        console.log(data);
+    async update({ questionId }, data) {
+        await db.selectNonDel(this.name, { id: questionId }, ['id'])
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
         const question = new Question(data);
-        console.log(question);
-        if (data.category !== undefined) {
-            const result = await db.select(this.categories, ['id'], { name: data.category });
-            if (result.length === 0) return this.msgNoCategory;
-            question.setCategory(result[0].id);
-        }
-        console.log(question);
-        let result = await db.update(this.name, question, { id: idQuestion });
-        result = await db.select(this.name, ['id'], data);
-        console.log(result);
-        return result;
+        await this.existsAttribs(question)
+            .catch(err => Promise.reject(err));
+        await db.update(this.name, question, { id: questionId })
+            .catch(err => Promise.reject(err));
     }
 
-    async delete(idQuestion) {
-        const data = { deleted: true };
-        let result = await db.update(this.name, data, { id: idQuestion });
-        result = await db.select(this.name, ['id'], data);
-        return result;
+    async delete({ questionId }) {
+        await db.selectNonDel(this.name, { id: questionId }, ['id'])
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
+        await db.delete(this.name, { id: questionId })
+            .catch(err => Promise, reject(err));
+    }
+
+    processResult(rows) {
+        this.result = null;
+        if (!rows) {
+            this.res = null;
+        }
+        if (!Array.isArray(rows) || rows.length === 1) {
+            this.result = new Question(rows);
+        }
+        this.result = [];
+        rows.forEach((row) => { this.result.push(new Question(row)); });
+    }
+
+    async existsAttribs(question) {
+        let error = null;
+
+        error = await db.exists(this.name, { question: question.getQuestion() })
+            .catch(() => { });
+        if (error) {
+            return Promise.reject(new Error(this.msgExistNickname));
+        }
+
+        return null;
     }
 }
 

@@ -6,11 +6,11 @@ const router = Router();
 
 router.get('/', questionsCtrl.getAll);
 
-router.get('/:question', questionsCtrl.get);
+router.get('/:questionId', questionsCtrl.get);
 
 router.post('/', [rules.createQuestion, defaultValues.defaultQuestion], questionsCtrl.create);
 
-router.delete('/:question', questionsCtrl.delete);
+router.delete('/:questionId', questionsCtrl.delete);
 
 router.patch('/:questionId', rules.updateQuestion, questionsCtrl.update);
 
