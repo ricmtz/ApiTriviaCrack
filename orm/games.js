@@ -16,6 +16,7 @@ class Games {
         this.msgNoUpdate = 'Dont update this data';
         this.msgMaxQuestions = 'You answered your 10 questions';
         this.msgNoExistOption = 'Option does not exist';
+        this.msgNoExistAnsware = 'This answare not exist';
     }
 
     async getOponent() {
@@ -89,6 +90,22 @@ class Games {
             .catch(err => Promise.reject(err));
     }
 
+    async getAllGamesQuestions(gameId) {
+        let result = null;
+        await db.select(this.answers, { game: gameId }, [])
+            .then((res) => { result = this.processResultAnsw(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoExistGame)));
+        return result;
+    }
+
+    async getGameQuestion(gameId, questionId) {
+        let result = null;
+        await db.select(this.answers, { game: gameId, id: questionId }, [])
+            .then((res) => { result = this.processResultAnsw(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
+        return result;
+    }
+
     async addAnswer(data) {
         const answer = new Answer(data);
         await this.existsAttribsAnsw(answer)
@@ -113,9 +130,31 @@ class Games {
 
     async finishGame(data) {
         const answer = new Answer(data);
-        let result = await db.select(this.users, ['id'], { nickname: answer.getPlayer() });
-        if (result.lenght === 0) return this.msgNoUser;
-        answer.setPlayer(result[0].id);
+        await db.selectNonDel(this.users, { nickname: answer.getPlayer() }, ['id'])
+            .then((res) => { answer.setPlayer(res.getId()); })
+            .catch((err) => { Promise.reject(err); });
+        let result = await db.select(this.answers, {
+            game: answer.getGame(), player: answer.getPlayer(),
+        }, ['count(*)'])
+            .catch(err => Promise.reject(err));
+        if (result[0].count >= 10) {
+            result = await db.select(this.answers, {
+                game: answer.getGame(),
+                player: answer.getPlayer(),
+                correct: true,
+            }, ['count(*)'])
+                .catch(err => Promise.reject(err));
+            const posUsr = await this.getPosPlayer(answer.getGame(), answer.getPlayer());
+            let conditions = null;
+            if (posUsr === 1) {
+                conditions = { scoreplayer1: result[0].count };
+            }
+            if (posUsr === 2) {
+                conditions = { scoreplayer2: result[0].count };
+            }
+            await this.update(answer.getGame(), conditions)
+                .catch((err) => { Promise.reject(err); });
+        }
         let conditions = { game: answer.getGame(), player: answer.getPlayer() };
         result = await db.select(this.answers, ['count(*)'], conditions);
         if (result[0].count >= 10) {
@@ -138,6 +177,14 @@ class Games {
         return false;
     }
 
+    async updateGameQuestion(gameId, questionId) {
+        // FIXME
+    }
+
+    async deleteGameQuestion(gameId, questionId) {
+        // FIXME
+    }
+
     processResult(rows) {
         if (!rows) {
             return null;
@@ -150,6 +197,21 @@ class Games {
         }
         const categoriesList = [];
         rows.forEach((row) => { categoriesList.push(new Game(row)); });
+        return categoriesList;
+    }
+
+    processResultAnsw(rows) {
+        if (!rows) {
+            return null;
+        }
+        if (!Array.isArray(rows)) {
+            return new Answer(rows);
+        }
+        if (rows.length === 1) {
+            return new Answer(rows[0]);
+        }
+        const categoriesList = [];
+        rows.forEach((row) => { categoriesList.push(new Answer(row)); });
         return categoriesList;
     }
 
@@ -200,6 +262,20 @@ class Games {
             return Promise.reject(new Error(this.msgNoUser));
         }
         return null;
+    }
+
+    async getPosPlayer(gameId, userId) {
+        const p1 = await db.exists(this.name, { id: gameId, player1: userId })
+            .catch(() => { });
+        const p2 = await db.exists(this.name, { id: gameId, player2: userId })
+            .catch(() => { });
+        if (p1) {
+            return 1;
+        }
+        if (p2) {
+            return 2;
+        }
+        return 0;
     }
 }
 
