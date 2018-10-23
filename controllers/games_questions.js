@@ -5,22 +5,20 @@ const { GamesORM } = require('../orm');
 class GamesQuestionsCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
     async getAll(req, res) {
-        const result = await GamesORM.getAllGamesQuestions(req.params.gameId);
-        const json = {
-            data: result,
-            total: result.length,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await GamesORM.getAllGamesQuestions(req.params.gameId)
+            .then((ans) => {
+                res.status(200).send({
+                    data: ans,
+                    total: ans.length,
+                });
+            })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async get(req, res) {
-        const result = await GamesORM.getGameQuestion(req.params.gameId, req.params.questionId);
-        const json = {
-            data: result,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+        await GamesORM.getGameQuestion(req.params.gameId, req.params.questionId)
+            .then((ans) => { res.status(200).send({ data: ans }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async create(req, res) {
