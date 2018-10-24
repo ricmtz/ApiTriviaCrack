@@ -81,7 +81,7 @@ class DB {
             return '';
         }
 
-        return `${pgp.helpers.sets(conditions).replace(',', logOp)}`;
+        return pgp.helpers.sets(conditions).replace(new RegExp(',', 'g'), logOp);
     }
 
     getColsQuery(cols) {
