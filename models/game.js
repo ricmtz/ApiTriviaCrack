@@ -39,6 +39,14 @@ class Game {
         return this.scoreplayer1 > this.scoreplayer2 ? this.player2 : this.player1;
     }
 
+    getScoreplayer1() {
+        return this.scoreplayer1;
+    }
+
+    getScoreplayer2() {
+        return this.scoreplayer2;
+    }
+
     getCreatedate() {
         return this.createdate;
     }
