@@ -29,6 +29,9 @@ class QuestionsCtrl {
     }
 
     async create(req, res) {
+        req.body.approved = false;
+        req.body.deleted = false;
+        req.body.createdate = new Date().toISOString();
         await QuestionsORM.create(req.body)
             .then((quest) => { res.status(200).send({ data: quest }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });

@@ -1,20 +1,25 @@
 const { Router } = require('express');
 const { questionsCtrl } = require('../controllers');
-const { rules, defaultValues } = require('../middlewares');
+const { rules } = require('../middlewares');
 
 const router = Router();
 
+// Validation param question
+router.use('/:question', rules.paramsQuestions);
+
+// Get all question.
 router.get('/', questionsCtrl.getAll);
 
-// FIXME Falta validar el param :question
-router.get('/:questionId', questionsCtrl.get);
+// Get question.
+router.get('/:question', questionsCtrl.get);
 
-router.post('/', [rules.createQuestion, defaultValues.defaultQuestion], questionsCtrl.create);
+// Create question.
+router.post('/', rules.createQuestion, questionsCtrl.create);
 
-// FIXME Falta validar el param :question
-router.delete('/:questionId', questionsCtrl.delete);
+// Remove question.
+router.delete('/:question', questionsCtrl.delete);
 
-// FIXME Falta validar el param :question
+// Update question.
 router.patch('/:question', rules.updateQuestion, questionsCtrl.update);
 
 module.exports = router;

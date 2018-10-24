@@ -15,7 +15,7 @@ class FriendsCtrl {
     }
 
     async create(req, res) {
-        const data = { nicknameFriend: req.body.nickname, date: req.body.friendshipdate };
+        const data = { nicknameFriend: req.body.nickname, date: new Date().toISOString() };
         const result = await UsersORM.addFriend(req.params.nickname, data);
         const json = {
             data: result,

@@ -22,6 +22,11 @@ class GamesCtrl {
     }
 
     async create(req, res) {
+        req.body.answersplayer1 = -1;
+        req.body.answersplayer2 = -1;
+        req.body.createdate = new Date().toISOString();
+        req.body.finished = false;
+        req.body.deleted = false;
         await GamesORM.create(req.body)
             .then((game) => { res.status(200).send({ data: game }); })
             .catch((err) => { res.status(404).send({ data: err.message }); })
