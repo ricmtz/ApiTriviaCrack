@@ -43,6 +43,11 @@ class DB {
             query += pgp.as.format(' ORDER BY $<col#>', {
                 col: params.orderBy,
             });
+            if (params.order) {
+                query += pgp.as.format(' $<ord^>', {
+                    ord: params.order,
+                });
+            }
         }
         if (params.limit) {
             query += pgp.as.format(' LIMIT $<lim#>', {
@@ -182,6 +187,21 @@ class DB {
                 orderBy: DEFAULT_ORDER_BY_COLUMN,
                 limit: REG_PER_PAGE,
                 offset: (page - 1) * REG_PER_PAGE,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async selectLast(tab, cond, col, colOrd) {
+        return new Promise((resolve, reject) => {
+            this.db.one(this.selectQuery({
+                table: tab,
+                conditions: cond,
+                columns: col,
+                orderBy: colOrd,
+                order: 'DESC',
+                limit: 1,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));

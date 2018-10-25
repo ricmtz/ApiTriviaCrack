@@ -32,7 +32,7 @@ class Token {
     }
 
     getStatus() {
-        return this.type;
+        return this.status;
     }
 
     getUserId() {
@@ -65,6 +65,15 @@ class Token {
 
     setUserId(userid) {
         this.userid = userid;
+    }
+
+    isActive() {
+        if (this.getStatus() === '0') {
+            return false;
+        }
+        const now = new Date();
+        const expires = new Date(this.getExpires());
+        return expires - now > 0;
     }
 }
 
