@@ -1,5 +1,7 @@
 const { db } = require('../db');
 const { Question } = require('../models');
+const CategoriesORM = require('./categories');
+const UsersORM = require('./users');
 
 // FIXME En los metodos getAll se debe permitir paginado y filtrado
 
@@ -20,6 +22,8 @@ class Questions {
         await db.selectPaged(this.name, null, [], page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
+        await this.appendValues(result)
+            .catch(err => Promise.reject(err));
         return result;
     }
 
@@ -27,7 +31,9 @@ class Questions {
         let result = null;
         await db.selectNonDel(this.name, { id: Number(questionId) })
             .then((res) => { result = this.processResult(res); })
-            .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
+            .catch(() => Promise.reject(new Error(this.msgNoQuestion + questionId)));
+        await this.appendValue(result)
+            .catch(err => Promise.reject(err));
         return result;
     }
 
@@ -95,6 +101,31 @@ class Questions {
         }
 
         return null;
+    }
+
+    async appendValue(question) {
+        await CategoriesORM.get(question.getCategory())
+            .then((res) => { question.setCategory(res.getName()); })
+            .catch(err => Promise.reject(err));
+        await UsersORM.get(question.getUserid())
+            .then((res) => { question.setUserid(res.getNickname()) })
+            .catch(err => Promise.reject(err));
+        question.user = question.getUserid();
+        delete question.userid;
+    }
+
+    async appendValues(questions) {
+        if (!Array.isArray(questions)) {
+            await this.appendValue(questions)
+                .catch(err => Promise.reject(err));
+        } else {
+            const promises = [];
+            for (let i = 0; i < questions.length; i += 1) {
+                promises.push(this.appendValue(questions[i]));
+            }
+            await Promise.all(promises)
+                .catch(err => Promise.reject(err));
+        }
     }
 }
 
