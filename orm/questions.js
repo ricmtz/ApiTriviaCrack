@@ -46,16 +46,12 @@ class Questions {
     }
 
     async create(data) {
-        let result = null;
         const question = new Question(data);
         await this.existsAttribs(question)
             .catch(err => Promise.reject(err));
-        await db.insert(this.name, question)
+        await db.insert(this.name, question, 'id')
+            .then((res) => { question.setId(res); })
             .catch((err) => { Promise.reject(err); });
-        await db.selectNonDel(this.name, { question: question.getQuestion() }, ['id'])
-            .then((res) => { result = this.processResult(res); })
-            .catch((err) => { Promise.reject(err); });
-        question.setId(result.getId());
         return question;
     }
 
@@ -86,7 +82,7 @@ class Questions {
         if (rows.length === 1) {
             return new Question(rows[0]);
         }
-        let questionList = [];
+        const questionList = [];
         rows.forEach((row) => { questionList.push(new Question(row)); });
         return questionList;
     }
@@ -95,7 +91,7 @@ class Questions {
         let error = null;
 
         error = await db.exists(this.name, { question: question.getQuestion() })
-            .catch(() => { });
+            .catch(() => {});
         if (error) {
             return Promise.reject(new Error(this.msgExisQuestion));
         }
@@ -108,7 +104,7 @@ class Questions {
             .then((res) => { question.setCategory(res.getName()); })
             .catch(err => Promise.reject(err));
         await UsersORM.get(question.getUserid())
-            .then((res) => { question.setUserid(res.getNickname()) })
+            .then((res) => { question.setUserid(res.getNickname()); })
             .catch(err => Promise.reject(err));
         question.user = question.getUserid();
         delete question.userid;
