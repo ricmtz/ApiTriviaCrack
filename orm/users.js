@@ -169,13 +169,15 @@ class Users {
         return null;
     }
 
-    async getFriends(nickname, page) {
+    async getFriends(nickname) {
         const user = await this.getByNickname(nickname)
             .catch(err => Promise.reject(err));
-        const conditions = { user1: user.getId(), user2: user.getId() };
         let result = null;
-        await db.select(this.friends, conditions, [], ' OR ')
+        await db.selectNonDel(this.friends, { user1: user.getId() }, [])
             .then((res) => { result = res; })
+            .catch(err => Promise.reject(err));
+        await db.selectNonDel(this.friends, { user2: user.getId() }, [])
+            .then((res) => { result.push(...res); })
             .catch(err => Promise.reject(err));
         return result;
     }

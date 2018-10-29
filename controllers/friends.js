@@ -5,7 +5,7 @@ const { UsersORM } = require('../orm');
 class FriendsCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
     async getAll(req, res) {
-        await UsersORM.getFriends(req.params.nickname, req.query.page)
+        await UsersORM.getFriends(req.params.nickname)
             .then((friend) => {
                 res.status(200).send({
                     data: friend,
