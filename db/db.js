@@ -171,7 +171,7 @@ class DB {
         });
     }
 
-    async selectPaged(tab, cond, col, page = DEFAULT_PAGE) {
+    async selectPaged(tab, cond, col, page = DEFAULT_PAGE, opr = DEFAULT_LOG_OP) {
         await this.validatePage(tab, page, cond).catch(err => Promise.reject(err));
 
         let conds = cond;
@@ -186,6 +186,7 @@ class DB {
                 table: tab,
                 conditions: conds,
                 columns: col,
+                logOp: opr,
                 orderBy: DEFAULT_ORDER_BY_COLUMN,
                 limit: REG_PER_PAGE,
                 offset: (page - 1) * REG_PER_PAGE,
