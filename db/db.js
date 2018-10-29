@@ -101,8 +101,8 @@ class DB {
                     conditions: {
                         deleted: false,
                         ...cond,
-                        logOp: opr,
                     },
+                    logOp: opr,
                 }),
             })).then(res => resolve(Number(res.count)))
                 .catch(err => reject(err));
