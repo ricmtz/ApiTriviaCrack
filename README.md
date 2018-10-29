@@ -68,7 +68,7 @@ $ node index.js
 ```
 
 ### Setting up the .env file
-To run this app is needed a .env file, this file must have the structure similar to this example.
+To run this app is needed a .env file, this file must have the following structure:
 ```env
 DB_HOST=localhost
 DB_NAME=namedbapi
