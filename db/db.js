@@ -85,7 +85,7 @@ class DB {
         if (!conditions) {
             return '';
         }
-
+        
         return pgp.helpers.sets(conditions).replace(new RegExp(',', 'g'), logOp);
     }
 
@@ -93,7 +93,7 @@ class DB {
         return (cols && cols.length) ? pgp.helpers.ColumnSet(cols).names : '*';
     }
 
-    async countRegs(tab, cond, opr = DEFAULT_LOG_OP) {
+    async countRegs(tab, cond) {
         return new Promise((resolve, reject) => {
             this.db.one(pgp.as.format('SELECT count(*) FROM ($<query^>) AS x', {
                 query: this.selectQuery({
@@ -102,21 +102,20 @@ class DB {
                         deleted: false,
                         ...cond,
                     },
-                    logOp: opr,
                 }),
             })).then(res => resolve(Number(res.count)))
                 .catch(err => reject(err));
         });
     }
 
-    async validatePage(table, page, cond = {}, opr = DEFAULT_LOG_OP) {
+    async validatePage(table, page, cond = {}) {
         if (!page) {
             return Promise.resolve();
         }
 
         let regsNum = null;
 
-        await this.countRegs(table, cond, opr)
+        await this.countRegs(table, cond)
             .then((res) => { regsNum = res; })
             .catch(err => Promise.reject(err));
 
@@ -139,20 +138,19 @@ class DB {
         });
     }
 
-    async select(tab, cond, col, opr = DEFAULT_LOG_OP) {
+    async select(tab, cond, col) {
         return new Promise((resolve, reject) => {
             this.db.many(this.selectQuery({
                 table: tab,
                 conditions: cond,
                 columns: col,
-                logOp: opr,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     }
 
-    async selectNonDel(tab, cond, col, opr = DEFAULT_LOG_OP) {
+    async selectNonDel(tab, cond, col) {
         let conds = cond;
         if (!conds) {
             conds = { deleted: false };
@@ -165,15 +163,14 @@ class DB {
                 table: tab,
                 conditions: conds,
                 columns: col,
-                logOp: opr,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     }
 
-    async selectPaged(tab, cond, col, page = DEFAULT_PAGE, opr = DEFAULT_LOG_OP) {
-        await this.validatePage(tab, page, cond, opr).catch(err => Promise.reject(err));
+    async selectPaged(tab, cond, col, page = DEFAULT_PAGE) {
+        await this.validatePage(tab, page, cond).catch(err => Promise.reject(err));
 
         let conds = cond;
         if (!conds) {
@@ -187,7 +184,6 @@ class DB {
                 table: tab,
                 conditions: conds,
                 columns: col,
-                logOp: opr,
                 orderBy: DEFAULT_ORDER_BY_COLUMN,
                 limit: REG_PER_PAGE,
                 offset: (page - 1) * REG_PER_PAGE,
