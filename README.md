@@ -67,6 +67,28 @@ $ npm install
 $ node index.js
 ```
 
+## Data base creation
+The following scripts describe the estructure of all the data base tables.
+
+### Users table.
+```sql
+CREATE TABLE users
+(
+    id SERIAL,
+    nickname TEXT NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT NOT NULL,
+    score INTEGER DEFAULT 0,
+    avatar TEXT DEFAULT ''::TEXT,
+    lastlogin TIMESTAMP,
+    deleted BOOLEAN DEFAULT false,
+    admin BOOLEAN DEFAULT false,
+    CONSTRAINT users_pkey PRIMARY KEY (id),
+    CONSTRAINT users_nickname_key UNIQUE (nickname),
+    CONSTRAINT users_principal_email_key UNIQUE (email)
+);
+```
+
 ## Demo URL
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/e4e893d5230a0a4cac35#?env%5Bapi%5D=W3sia2V5IjoiaG9zdCIsInZhbHVlIjoiaHR0cHM6Ly9hcGktdHJpdmlhLWNyYWNrLmhlcm9rdWFwcC5jb20iLCJkZXNjcmlwdGlvbiI6IiIsImVuYWJsZWQiOnRydWV9XQ==)
