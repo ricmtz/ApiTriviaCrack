@@ -85,7 +85,7 @@ class DB {
         if (!conditions) {
             return '';
         }
-        
+
         return pgp.helpers.sets(conditions).replace(new RegExp(',', 'g'), logOp);
     }
 
@@ -138,19 +138,20 @@ class DB {
         });
     }
 
-    async select(tab, cond, col) {
+    async select(tab, cond, col, opr = DEFAULT_LOG_OP) {
         return new Promise((resolve, reject) => {
             this.db.many(this.selectQuery({
                 table: tab,
                 conditions: cond,
                 columns: col,
+                logOp: opr,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     }
 
-    async selectNonDel(tab, cond, col) {
+    async selectNonDel(tab, cond, col, opr = DEFAULT_LOG_OP) {
         let conds = cond;
         if (!conds) {
             conds = { deleted: false };
@@ -163,6 +164,7 @@ class DB {
                 table: tab,
                 conditions: conds,
                 columns: col,
+                logOp: opr,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
