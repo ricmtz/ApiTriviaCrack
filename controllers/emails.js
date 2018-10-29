@@ -3,43 +3,41 @@ const { UsersORM } = require('../orm');
 // FIXME Todos los métodos deben estar documentados
 
 class EmailsCtrl {
-    // FIXME En los metodos getAll se debe permitir paginado y filtrado
     async getAll(req, res) {
-        const result = await UsersORM.getEmails(req.params.nickname);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
+        await UsersORM.getEmails(req.params.nickname)
+            .then((usr) => {
+                res.status(200).send({
+                    data: usr,
+                });
+            })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
         res.send(json);
     }
 
     async create(req, res) {
-        const data = { nicknameUser: req.params.nickname, emailUser: req.body.email };
-        const result = await UsersORM.addEmail(data);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        else res.status(201);
-        res.send(json);
+        await UsersORM.addEmail(
+            { nicknameUser: req.params.nickname, emailUser: req.body.email }
+        )
+            .then((usr) => { res.status(200).send({ data: usr }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async update(req, res) {
-        const data = { nicknameUser: req.params.nickname, emailUser: req.body.oldEmail };
-        const result = await UsersORM.updateEmail(data, req.body.newEmail);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+        const data = {
+            nicknameUser: req.params.nickname,
+            emailUser: req.body.oldEmail,
+            newEmail: req.body.newEmail,
+        };
+        await UsersORM.updateEmail(data)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async delete(req, res) {
         const data = { nicknameUser: req.params.nickname, emailUser: req.body.email };
-        const result = await UsersORM.deleteEmail(data);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+        await UsersORM.deleteEmail(data)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 }
 

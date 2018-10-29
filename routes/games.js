@@ -6,7 +6,7 @@ const { rules } = require('../middlewares');
 const router = Router();
 
 // Validation param gameId
-router.use('/:gameId', rules.paramsGames);
+//router.use('/:gameId', rules.paramsGames);
 
 // Post game
 router.post('/', rules.createGame, gamesCtrl.create);

@@ -64,7 +64,7 @@ class Questions {
         await db.selectNonDel(this.name, { id: questionId }, ['id'])
             .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
         await db.delete(this.name, { id: questionId })
-            .catch(err => Promise, reject(err));
+            .catch(err => Promise.reject(err));
     }
 
     processResult(rows) {

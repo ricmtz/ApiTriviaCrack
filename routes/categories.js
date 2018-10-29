@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { categoriesCtrl } = require('../controllers');
-const { rules } = require('../middlewares');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = Router();
 

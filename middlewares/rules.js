@@ -46,7 +46,7 @@ class Rules {
         });
     }
 
-    static createFriend(req, res, next) {
+    static paramsFriend(req, res, next) {
         validator.validate(req, res, next, {
             params: {
                 gameId: 'id,required',
