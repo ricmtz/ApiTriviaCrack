@@ -6,7 +6,7 @@ const { rules, auth } = require('../middlewares');
 
 const router = express.Router();
 
-// router.use(auth.session);
+router.use(auth.session);
 
 // Validation param nickname
 router.use('/:nickname', rules.paramsUser);

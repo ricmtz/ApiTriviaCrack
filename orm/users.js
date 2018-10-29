@@ -103,15 +103,7 @@ class Users {
         }
         error = await db.exists(this.emails, { email: emailUser })
             .catch(() => { });
-        error = await db.exists(this.name, { email: user.getEmail() })
-            .catch(() => { });
         if (error) {
-            return Promise.reject(new Error(this.msgExistEmail));
-        }
-        error = await db.exists(this.emails, { email: user.getEmail() })
-            .catch(() => { });
-        if (error) {
-            console.log('emails');
             return Promise.reject(new Error(this.msgExistEmail));
         }
         return null;
@@ -124,6 +116,8 @@ class Users {
         await db.selectPaged(this.emails, { userid: user.getId() }, [], page)
             .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
+        await this.appendValuesEmails(result)
+            .catch(err => Promise.reject(err));
         return result;
     }
 
@@ -135,6 +129,8 @@ class Users {
         const newEmail = { userid: user.getId(), email };
         await db.insert(this.emails, newEmail, 'id')
             .then((res) => { newEmail.id = res; })
+            .catch(err => Promise.reject(err));
+        await this.appendValuesEmail(newEmail)
             .catch(err => Promise.reject(err));
         return newEmail;
     }
@@ -169,6 +165,27 @@ class Users {
         return null;
     }
 
+    async appendValuesEmail(email) {
+        await this.get(email.userid)
+            .then((res) => { email.user = res.getNickname(); })
+            .catch(err => Promise.reject(err));
+        delete email.userid;
+    }
+
+    async appendValuesEmails(emails) {
+        if (!Array.isArray(emails)) {
+            await this.appendValuesEmail(emails)
+                .catch(err => Promise.reject(err));
+        } else {
+            const promises = [];
+            for (let i = 0; i < emails.length; i += 1) {
+                promises.push(this.appendValuesEmail(emails[i]));
+            }
+            await Promise.all(promises)
+                .catch(err => Promise.reject(err));
+        }
+    }
+
     async getFriends(nickname) {
         const user = await this.getByNickname(nickname)
             .catch(err => Promise.reject(err));
@@ -178,6 +195,10 @@ class Users {
             .catch(err => Promise.reject(err));
         await db.selectNonDel(this.friends, { user2: user.getId() }, [])
             .then((res) => { result.push(...res); })
+            .catch(err => Promise.reject(err));
+        await this.appendValuesFriends(result)
+            .catch(err => Promise.reject(err));
+        await this.appendValuesFriend(result)
             .catch(err => Promise.reject(err));
         return result;
     }
@@ -226,6 +247,29 @@ class Users {
             return Promise.reject(new Error(this.msgNoFriendExist));
         }
         return null;
+    }
+
+    async appendValuesFriend(friend) {
+        await this.get(friend.user1)
+            .then((res) => { friend.user1 = res.getNickname(); })
+            .catch(err => Promise.reject(err));
+        await this.get(friend.user2)
+            .then((res) => { friend.user2 = res.getNickname(); })
+            .catch(err => Promise.reject(err));
+    }
+
+    async appendValuesFriends(friends) {
+        if (!Array.isArray(friends)) {
+            await this.appendValuesFriend(friends)
+                .catch(err => Promise.reject(err));
+        } else {
+            const promises = [];
+            for (let i = 0; i < friends.length; i += 1) {
+                promises.push(this.appendValuesFriend(friends[i]));
+            }
+            await Promise.all(promises)
+                .catch(err => Promise.reject(err));
+        }
     }
 }
 
