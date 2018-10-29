@@ -21,6 +21,14 @@ class UsersCtrl {
     }
 
     async create(req, res) {
+<<<<<<< HEAD
+=======
+        req.body.admin = false;
+        req.body.score = 0;
+        req.body.avatar = 'default.png';
+        req.body.lastlogin = new Date().toISOString();
+        req.body.deleted = false;
+>>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
         await UsersORM.create(req.body)
             .then((usr) => { res.status(200).send({ data: usr }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });

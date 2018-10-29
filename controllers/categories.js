@@ -19,6 +19,11 @@ class CategoriesCtrl {
     }
 
     async create(req, res) {
+<<<<<<< HEAD
+=======
+        req.body.icon = 'default.png';
+        req.body.deleted = false;
+>>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
         await CategoriesORM.create(req.body)
             .then((categ) => { res.status(200).send({ data: categ }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });

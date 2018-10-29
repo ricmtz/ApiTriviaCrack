@@ -6,35 +6,38 @@ class Tokens {
         this.name = 'tokens';
         this.msgNoToken = 'Token not found';
         this.msgNoCreateToken = 'Could not create token';
-
-        this.active = this.active.bind(this);
-        this.get = this.get.bind(this);
-        this.existData = this.existData.bind(this);
-        this.create = this.create.bind(this);
-        this.delete = this.delete.bind(this);
-    }
-
-    async active(searchToken) {
-        const exist = await this.existData(this.name, { token: searchToken });
-        if (exist) return this.msgExistToken;
-
-        const tokenObj = await db.select(this.name, [], { token: searchToken });
-        if (tokenObj.getExpires() - new Date() < 0) {
-            await db.update(this.name, { status: '0' }, { token: tokenObj.getToken() });
-            return false;
-        }
-        return true;
     }
 
     async get(searchToken) {
-        const data = { token: searchToken };
-        const result = await db.select(this.name, [], data);
-        return result.length !== 0 ? new Token(result[0]) : this.msgNoToken;
+        let result = null;
+        await db.select(this.name, { token: searchToken, status: '1' })
+            .then((res) => { result = this.processResult(res); })
+            .catch(err => Promise.reject(err));
+        return result;
     }
 
-    async existData(table, condition) {
-        const result = await db.select(table, ['count(*)'], condition);
-        return (result[0].count != 0);
+    async getLastByUserId(userId) {
+        let result = null;
+        await db.selectLast(this.name, { userid: userId }, [], 'createdat')
+            .then((res) => { result = this.processResult(res); })
+            .catch(err => Promise.reject(err));
+        return result;
+    }
+
+    async create(data) {
+        const tokenObj = new Token(data);
+        await db.insert(this.name, tokenObj, 'id')
+            .then((res) => { tokenObj.setId(res); })
+            .catch(err => Promise.reject(err));
+        return tokenObj;
+    }
+
+    async updateStatus(idToken, newStatus) {
+        await db.select(this.name, { id: idToken }, ['id'])
+            .catch(() => Promise.reject(new Error(this.msgNoUser)));
+        await db.update(this.name, { status: newStatus }, { id: idToken })
+            .catch(err => Promise.reject(err));
+        return true;
     }
 
     processResult(rows) {
@@ -50,37 +53,9 @@ class Tokens {
             return new Token(rows[0]);
         }
 
-        const usersList = [];
-        rows.forEach((row) => { usersList.push(new Token(row)); });
-        return usersList;
-    }
-
-    async create(data) {
-        let result = null;
-        const tokenObj = new Token(data);
-
-        await db.insert(this.name, tokenObj).catch(err => Promise.reject(err));
-        await db.select(this.name, { token: tokenObj.getToken() }, ['id'])
-            .then((res) => { result = this.processResult(res); })
-            .catch(err => Promise.reject(err));
-
-        if (result) {
-            tokenObj.setId(result.getId());
-            return tokenObj;
-        }
-
-        return Promise.reject(this.msgNoCreateToken);
-    }
-
-    async delete(searchToken) {
-        let res = await db.select(this.name, ['id'], { token: searchToken });
-        if (res.length === 0) return this.msgNoToken;
-
-        const data = { status: '0' };
-        res = await db.update(this.name, data, { token: searchToken });
-
-        res = await db.select(this.name, ['id'], data);
-        return res;
+        const tokensList = [];
+        rows.forEach((row) => { tokensList.push(new Token(row)); });
+        return tokensList;
     }
 }
 

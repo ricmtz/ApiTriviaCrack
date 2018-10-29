@@ -85,10 +85,11 @@ class Users {
     async existsAttribs(user) {
         let error = null;
         error = await db.exists(this.name, { nickname: user.getNickname() })
-            .catch(() => {});
+            .catch(() => { });
         if (error) {
             return Promise.reject(new Error(this.msgExistNickname));
         }
+<<<<<<< HEAD
         await this.existsEmail(user.getEmail())
             .catch(err => Promise.reject(err));
         return null;
@@ -103,6 +104,15 @@ class Users {
         }
         error = await db.exists(this.emails, { email: emailUser })
             .catch(() => {});
+=======
+        error = await db.exists(this.name, { email: user.getEmail() })
+            .catch(() => { });
+        if (error) {
+            return Promise.reject(new Error(this.msgExistEmail));
+        }
+        error = await db.exists(this.emails, { email: user.getEmail() })
+            .catch(() => { });
+>>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
         if (error) {
             console.log('emails');
             return Promise.reject(new Error(this.msgExistEmail));
@@ -110,6 +120,7 @@ class Users {
         return null;
     }
 
+<<<<<<< HEAD
     async getEmails(nicknameUser) {
         let user = null;
         await this.getByNickname(nicknameUser)
@@ -152,6 +163,58 @@ class Users {
             .catch(() => Promise.reject(new Error(this.msgNoUser)));
         await db.delete(this.emails, { email: emailUser })
             .catch(err => Promise.reject(err));
+=======
+    async getEmails(nicknameUser, page) {
+        const user = await this.getByNickname(nicknameUser)
+            .catch(err => Promise.reject(err));
+        let result = null;
+        await db.selectPaged(this.emails, { userid: user.getId() }, [], page)
+            .then((res) => { result = res; })
+            .catch(err => Promise.reject(err));
+        return result;
+    }
+
+    async addEmail(nickname, email) {
+        const user = await this.getByNickname(nickname)
+            .catch(err => Promise.reject(err));
+        await this.existsAttribsEmail(email)
+            .catch(err => Promise.reject(err));
+        const newEmail = { userid: user.getId(), email };
+        await db.insert(this.emails, newEmail, 'id')
+            .then((res) => { newEmail.id = res; })
+            .catch(err => Promise.reject(err));
+        return newEmail;
+    }
+
+    async updateEmail(nickname, oldEmail, newEmail) {
+        const user = await this.getByNickname(nickname)
+            .catch(err => Promise.reject(err));
+        await this.existsAttribsEmail(newEmail)
+            .catch(err => Promise.reject(err));
+        const conditions = { userid: user.getId(), email: oldEmail };
+        await db.update(this.emails, { email: newEmail }, conditions)
+            .catch(err => Promise.reject(err));
+    }
+
+    async deleteEmail(nickname, email) {
+        const user = await this.getByNickname(nickname)
+            .catch(err => Promise.reject(err));
+        await db.exists(this.emails, { email })
+            .catch(() => Promise.reject(new Error(this.msgNoExistEmail)));
+        await db.delete(this.emails, { userid: user.getId(), email })
+            .catch(err => Promise.reject(err));
+    }
+
+    async existsAttribsEmail(email) {
+        const duplicateMail = await db.exists(this.emails, { email })
+            .catch(() => { });
+        const duplicateMailUsr = await db.exists(this.name, { email })
+            .catch(() => { });
+        if (duplicateMail || duplicateMailUsr) {
+            return Promise.reject(new Error(this.msgExistEmail));
+        }
+        return null;
+>>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
     }
 
     async getFriends(nicknameUser) {

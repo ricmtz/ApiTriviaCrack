@@ -12,7 +12,7 @@ class QuestionsCtrl {
     }
 
     async getAll(req, res) {
-        await QuestionsORM.getAll(req.query)
+        await QuestionsORM.getAll(req.query.page)
             .then((quest) => {
                 res.status(200).send({
                     data: quest,
@@ -23,25 +23,31 @@ class QuestionsCtrl {
     }
 
     async get(req, res) {
-        await QuestionsORM.get(req.params)
+        await QuestionsORM.get(req.params.question)
             .then((quest) => { res.status(200).send({ data: quest }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async create(req, res) {
+<<<<<<< HEAD
+=======
+        req.body.approved = false;
+        req.body.deleted = false;
+        req.body.createdate = new Date().toISOString();
+>>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
         await QuestionsORM.create(req.body)
             .then((quest) => { res.status(200).send({ data: quest }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async update(req, res) {
-        await QuestionsORM.update(req.params, req.body)
+        await QuestionsORM.update(req.params.question, req.body)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async delete(req, res) {
-        await QuestionsORM.delete(req.params)
+        await QuestionsORM.delete(req.params.question)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }

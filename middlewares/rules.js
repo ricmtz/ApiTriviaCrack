@@ -9,16 +9,48 @@ class Rules {
         validator.validate(req, res, next, {
             query: {
                 page: 'positive,optional',
+<<<<<<< HEAD
+=======
             },
         });
     }
 
+    /**
+     * Validator middleware that add the rules to validate
+     * categoryId parameter.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Function} next Express next middleware function
+     */
+    static paramsCategories(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                categoryId: 'id,required',
+>>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
+            },
+        });
+    }
+
+<<<<<<< HEAD
     static createUser(req, res, next) {
         validator.validate(req, res, next, {
             body: {
                 nickname: 'nickname,required',
                 password: 'password,required',
                 email: 'email,required',
+=======
+    /**
+     * Validator middleware that add the rules to validate
+     * the friendNickname parameter.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Function} next Express next middleware function
+     */
+    static paramsFriends(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                friendNickname: 'nickname,required',
+>>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
             },
         });
     }
@@ -38,6 +70,7 @@ class Rules {
         });
     }
 
+<<<<<<< HEAD
     static paramsUser(req, res, next) {
         validator.validate(req, res, next, {
             params: {
@@ -47,6 +80,16 @@ class Rules {
     }
 
     static paramsFriend(req, res, next) {
+=======
+    /**
+     * Validator middleware that add the rules to validate
+     * gameId parameter.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Function} next Express next middleware function
+     */
+    static paramsGames(req, res, next) {
+>>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
         validator.validate(req, res, next, {
             params: {
                 gameId: 'id,required',

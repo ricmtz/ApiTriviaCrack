@@ -43,6 +43,11 @@ class DB {
             query += pgp.as.format(' ORDER BY $<col#>', {
                 col: params.orderBy,
             });
+            if (params.order) {
+                query += pgp.as.format(' $<ord^>', {
+                    ord: params.order,
+                });
+            }
         }
         if (params.limit) {
             query += pgp.as.format(' LIMIT $<lim#>', {
@@ -81,37 +86,41 @@ class DB {
             return '';
         }
 
-        return `${pgp.helpers.sets(conditions).replace(',', logOp)}`;
+        return pgp.helpers.sets(conditions).replace(new RegExp(',', 'g'), logOp);
     }
 
     getColsQuery(cols) {
         return (cols && cols.length) ? pgp.helpers.ColumnSet(cols).names : '*';
     }
 
-    async countRegs(tab) {
+    async countRegs(tab, cond, opr = DEFAULT_LOG_OP) {
         return new Promise((resolve, reject) => {
             this.db.one(pgp.as.format('SELECT count(*) FROM ($<query^>) AS x', {
                 query: this.selectQuery({
                     table: tab,
-                    conditions: { deleted: false },
+                    conditions: {
+                        deleted: false,
+                        ...cond,
+                    },
+                    logOp: opr,
                 }),
             })).then(res => resolve(Number(res.count)))
                 .catch(err => reject(err));
         });
     }
 
-    async validatePage(table, page) {
+    async validatePage(table, page, cond = {}, opr = DEFAULT_LOG_OP) {
         if (!page) {
             return Promise.resolve();
         }
 
         let regsNum = null;
 
-        await this.countRegs(table)
+        await this.countRegs(table, cond, opr)
             .then((res) => { regsNum = res; })
             .catch(err => Promise.reject(err));
 
-        if ((page - 1) * REG_PER_PAGE > regsNum) {
+        if ((page - 1) * REG_PER_PAGE >= regsNum) {
             return Promise.reject(new Error('Page out of range'));
         }
 
@@ -130,19 +139,20 @@ class DB {
         });
     }
 
-    async select(tab, cond, col) {
+    async select(tab, cond, col, opr = DEFAULT_LOG_OP) {
         return new Promise((resolve, reject) => {
             this.db.many(this.selectQuery({
                 table: tab,
                 conditions: cond,
                 columns: col,
+                logOp: opr,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     }
 
-    async selectNonDel(tab, cond, col) {
+    async selectNonDel(tab, cond, col, opr = DEFAULT_LOG_OP) {
         let conds = cond;
         if (!conds) {
             conds = { deleted: false };
@@ -155,14 +165,15 @@ class DB {
                 table: tab,
                 conditions: conds,
                 columns: col,
+                logOp: opr,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
         });
     }
 
-    async selectPaged(tab, cond, col, page = DEFAULT_PAGE) {
-        await this.validatePage(tab, page).catch(err => Promise.reject(err));
+    async selectPaged(tab, cond, col, page = DEFAULT_PAGE, opr = DEFAULT_LOG_OP) {
+        await this.validatePage(tab, page, cond).catch(err => Promise.reject(err));
 
         let conds = cond;
         if (!conds) {
@@ -176,9 +187,25 @@ class DB {
                 table: tab,
                 conditions: conds,
                 columns: col,
+                logOp: opr,
                 orderBy: DEFAULT_ORDER_BY_COLUMN,
                 limit: REG_PER_PAGE,
                 offset: (page - 1) * REG_PER_PAGE,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async selectLast(tab, cond, col, colOrd) {
+        return new Promise((resolve, reject) => {
+            this.db.one(this.selectQuery({
+                table: tab,
+                conditions: cond,
+                columns: col,
+                orderBy: colOrd,
+                order: 'DESC',
+                limit: 1,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
