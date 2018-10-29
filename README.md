@@ -62,11 +62,6 @@ $ git clone https://github.com/ricmtz/ApiTriviaCrack.git
 $ npm install
 ```
 
-### Run the app:
-```sh
-$ node index.js
-```
-
 ### Setting up the .env file
 To run this app is needed a .env file, this file must have the following structure:
 ```env
@@ -83,6 +78,11 @@ MAIL_HOST=smtp.ethereal.email
 MAIL_PORT=587
 MAIL_USER=sampleaccount@ethereal.email
 MAIL_PASS=samplepasswordetheral
+```
+
+### Run the app:
+```sh
+$ node index.js
 ```
 
 ## Data base creation
