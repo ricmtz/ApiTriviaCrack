@@ -32,6 +32,23 @@ class Mailer {
             return true;
         });
     }
+
+
+    sendConfirmation(email, token) {
+        this.sendMail({
+            to: email,
+            subject: 'Trivia Crack account confirmation',
+            text: token,
+        });
+    }
+
+    sendRestoration(email, token) {
+        this.sendMail({
+            to: email,
+            subject: 'Trivia Crack password restoration',
+            text: token,
+        });
+    }
 }
 
 module.exports = new Mailer();

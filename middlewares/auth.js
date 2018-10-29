@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const { UsersORM, TokensORM } = require('../orm');
+const { mailer } = require('../mail');
 
 
 class Auth {
@@ -36,6 +37,7 @@ class Auth {
             data: user,
             token: token.getToken(),
         }).status(201);
+        mailer.sendConfirmation(user.getEmail(), token.getToken());
         next();
     }
 
