@@ -93,7 +93,7 @@ class DB {
         return (cols && cols.length) ? pgp.helpers.ColumnSet(cols).names : '*';
     }
 
-    async countRegs(tab, cond) {
+    async countRegs(tab, cond, opr = DEFAULT_LOG_OP) {
         return new Promise((resolve, reject) => {
             this.db.one(pgp.as.format('SELECT count(*) FROM ($<query^>) AS x', {
                 query: this.selectQuery({
@@ -101,6 +101,7 @@ class DB {
                     conditions: {
                         deleted: false,
                         ...cond,
+                        logOp: opr,
                     },
                 }),
             })).then(res => resolve(Number(res.count)))
@@ -108,14 +109,14 @@ class DB {
         });
     }
 
-    async validatePage(table, page, cond = {}) {
+    async validatePage(table, page, cond = {}, opr = DEFAULT_LOG_OP) {
         if (!page) {
             return Promise.resolve();
         }
 
         let regsNum = null;
 
-        await this.countRegs(table, cond)
+        await this.countRegs(table, cond, opr)
             .then((res) => { regsNum = res; })
             .catch(err => Promise.reject(err));
 
