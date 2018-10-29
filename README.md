@@ -67,7 +67,25 @@ $ npm install
 $ node index.js
 ```
 
+### Setting up the .env file
+```env
+DB_HOST=localhost
+DB_NAME=namedbapi
+DB_USER=userdbapi
+DB_PORT=7777
+DB_PASSWORD=sampledbpassword
+PORT=3000
+SESSION_TIME=5
+SALT_ROUNDS=15
+SECRET=sampleSecret
+MAIL_HOST=smtp.ethereal.email
+MAIL_PORT=587
+MAIL_USER=sampleaccount@ethereal.email
+MAIL_PASS=samplepasswordetheral
+```
+
 ## Data base creation
+This application has a data base implementation based on [PostgreSQL](https://www.postgresql.org/).
 The following scripts describe the estructure of all the data base tables.
 
 ### Users table.
