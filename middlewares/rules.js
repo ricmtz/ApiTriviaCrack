@@ -9,8 +9,6 @@ class Rules {
         validator.validate(req, res, next, {
             query: {
                 page: 'positive,optional',
-<<<<<<< HEAD
-=======
             },
         });
     }
@@ -26,19 +24,10 @@ class Rules {
         validator.validate(req, res, next, {
             params: {
                 categoryId: 'id,required',
->>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
             },
         });
     }
 
-<<<<<<< HEAD
-    static createUser(req, res, next) {
-        validator.validate(req, res, next, {
-            body: {
-                nickname: 'nickname,required',
-                password: 'password,required',
-                email: 'email,required',
-=======
     /**
      * Validator middleware that add the rules to validate
      * the friendNickname parameter.
@@ -50,7 +39,6 @@ class Rules {
         validator.validate(req, res, next, {
             params: {
                 friendNickname: 'nickname,required',
->>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
             },
         });
     }
@@ -70,17 +58,6 @@ class Rules {
         });
     }
 
-<<<<<<< HEAD
-    static paramsUser(req, res, next) {
-        validator.validate(req, res, next, {
-            params: {
-                nickname: 'nickname,required',
-            },
-        });
-    }
-
-    static paramsFriend(req, res, next) {
-=======
     /**
      * Validator middleware that add the rules to validate
      * gameId parameter.
@@ -89,7 +66,6 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static paramsGames(req, res, next) {
->>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
         validator.validate(req, res, next, {
             params: {
                 gameId: 'id,required',
