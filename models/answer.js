@@ -2,13 +2,13 @@
 
 class Answer {
     constructor({
-        id, game, question, player, selectedoption, correct,
+        id, game, question, player, option, correct,
     }) {
         this.setId(id);
         this.setGame(game);
         this.setPlayer(player);
         this.setQuestion(question);
-        this.setOption(selectedoption);
+        this.setOption(option);
         this.setCorrect(correct);
     }
 

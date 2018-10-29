@@ -2,15 +2,17 @@ const express = require('express');
 const emailsRouter = require('./emails');
 const friendsRouter = require('./friends');
 const { usersCtrl } = require('../controllers');
-const { rules } = require('../middlewares');
+const { rules, auth } = require('../middlewares');
 
 const router = express.Router();
+
+router.use(auth.session);
 
 // Validation param nickname
 router.use('/:nickname', rules.paramsUser);
 
 // List all users.
-router.get('/', usersCtrl.getAll);
+router.get('/', rules.getAllElements, usersCtrl.getAll);
 
 // Find users.
 router.get('/:nickname', usersCtrl.get);

@@ -5,6 +5,14 @@ const validator = require('./validator');
 // No es malo!!! solo una manera diferente.
 
 class Rules {
+    static getAllElements(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                page: 'positive,optional',
+            },
+        });
+    }
+
     /**
      * Validator middleware that add the rules to validate
      * categoryId parameter.
@@ -322,6 +330,14 @@ class Rules {
                 name: 'text,optional',
                 color: 'text,optional',
                 icon: 'file,optional',
+            },
+        });
+    }
+
+    static paramsCategory(req, res, next) {
+        validator.validate(req, res, next, {
+            params: {
+                categoryId: 'id,required',
             },
         });
     }

@@ -19,6 +19,14 @@ class Game {
         return this.id;
     }
 
+    getPlayer1() {
+        return this.player1;
+    }
+
+    getPlayer2() {
+        return this.player2;
+    }
+
     getPlayers() {
         return [this.player1, this.player2];
     }
@@ -29,6 +37,14 @@ class Game {
 
     getLoser() {
         return this.scoreplayer1 > this.scoreplayer2 ? this.player2 : this.player1;
+    }
+
+    getScoreplayer1() {
+        return this.scoreplayer1;
+    }
+
+    getScoreplayer2() {
+        return this.scoreplayer2;
     }
 
     getCreatedate() {
@@ -60,7 +76,7 @@ class Game {
     }
 
     setScoreplayer2(count) {
-        if (count !== undefined) this.scorePlayer2 = count;
+        if (count !== undefined) this.scoreplayer2 = count;
     }
 
     setCreatedate(date) {

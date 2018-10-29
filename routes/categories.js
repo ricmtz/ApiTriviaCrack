@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { categoriesCtrl } = require('../controllers');
-const { rules } = require('../middlewares');
+const { rules, defaultValues } = require('../middlewares');
 
 const router = Router();
 
@@ -11,7 +11,7 @@ router.use('/:categoryId', rules.paramsCategories);
 router.post('/', rules.createCategory, categoriesCtrl.create);
 
 // Get all categories
-router.get('/', categoriesCtrl.getAll);
+router.get('/', rules.getAllElements, categoriesCtrl.getAll);
 
 // Get category
 router.get('/:categoryId', categoriesCtrl.get);
