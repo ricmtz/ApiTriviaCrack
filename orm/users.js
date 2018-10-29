@@ -97,12 +97,12 @@ class Users {
     async existsEmail(emailUser) {
         let error = null;
         error = await db.exists(this.name, { email: emailUser })
-            .catch(() => {});
+            .catch(() => { });
         if (error) {
             return Promise.reject(new Error(this.msgExistEmail));
         }
         error = await db.exists(this.emails, { email: emailUser })
-            .catch(() => {});
+            .catch(() => { });
         error = await db.exists(this.name, { email: user.getEmail() })
             .catch(() => { });
         if (error) {
@@ -181,7 +181,6 @@ class Users {
     }
 
     async addFriend(nicknameUser, nicknameFriend, date) {
-        console.log(nicknameUser, nicknameFriend, 'aqui');
         const user1 = await this.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
         const user2 = await this.getByNickname(nicknameFriend)
@@ -189,7 +188,7 @@ class Users {
         if (user1.getId() === user2.getId()) {
             return Promise.reject(new Error(this.msgSameUser));
         }
-        await this.existFriendship(user1.getId(), user2.getId())
+        await this.notExistFriendship(user1.getId(), user2.getId())
             .catch(err => Promise.reject(err));
         const friendship = { user1: user1.getId(), user2: user2.getId(), friendshipdate: date };
         await db.insert(this.friends, friendship, 'id')
@@ -198,7 +197,7 @@ class Users {
         return friendship;
     }
 
-    async deleteFriend({ nicknameUser, nicknameFriend }) {
+    async deleteFriend(nicknameUser, nicknameFriend) {
         const user1 = await this.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
         const user2 = await this.getByNickname(nicknameFriend)
@@ -209,11 +208,20 @@ class Users {
             .catch(err => Promise.reject(err));
     }
 
-    async existFriendship(user1, user2) {
+    async notExistFriendship(user1, user2) {
         const exist = await db.exists(this.friends, { user1, user2 })
             .catch(() => { });
         if (exist) {
             return Promise.reject(new Error(this.msgFriendExist));
+        }
+        return null;
+    }
+
+    async existFriendship(user1, user2) {
+        const exist = await db.exists(this.friends, { user1, user2, deleted: false })
+            .catch(() => { });
+        if (!exist) {
+            return Promise.reject(new Error(this.msgNoFriendExist));
         }
         return null;
     }

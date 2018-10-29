@@ -22,6 +22,7 @@ class FriendsCtrl {
     }
 
     async delete(req, res) {
+        console.log('controller', req.params);
         await UsersORM.deleteFriend(req.params.nickname, req.params.friendNickname)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
