@@ -68,7 +68,7 @@ $ node index.js
 ```
 
 ### Setting up the .env file
-To run this app is needed a .env file, i.e.g:
+To run this app is needed a .env file, this file must have the structure similar to this example.
 ```env
 DB_HOST=localhost
 DB_NAME=namedbapi
@@ -84,7 +84,6 @@ MAIL_PORT=587
 MAIL_USER=sampleaccount@ethereal.email
 MAIL_PASS=samplepasswordetheral
 ```
-As we see, the .env faile must have the variables that we see en this example.
 
 ## Data base creation
 This application has a data base implementation based on [PostgreSQL](https://www.postgresql.org/).
