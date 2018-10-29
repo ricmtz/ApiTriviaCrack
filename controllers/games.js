@@ -22,15 +22,6 @@ class GamesCtrl {
     }
 
     async create(req, res) {
-<<<<<<< HEAD
-        const result = await GamesORM.create(req.body);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        else res.status(201);
-        res.send(json);
-=======
         req.body.answersplayer1 = -1;
         req.body.answersplayer2 = -1;
         req.body.createdate = new Date().toISOString();
@@ -39,7 +30,6 @@ class GamesCtrl {
         await GamesORM.create(req.body)
             .then((game) => { res.status(200).send({ data: game }); })
             .catch((err) => { res.status(404).send({ data: err.message }); })
->>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
     }
 
     async update(req, res) {

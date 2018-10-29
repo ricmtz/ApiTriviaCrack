@@ -89,7 +89,6 @@ class Users {
         if (error) {
             return Promise.reject(new Error(this.msgExistNickname));
         }
-<<<<<<< HEAD
         await this.existsEmail(user.getEmail())
             .catch(err => Promise.reject(err));
         return null;
@@ -104,7 +103,6 @@ class Users {
         }
         error = await db.exists(this.emails, { email: emailUser })
             .catch(() => {});
-=======
         error = await db.exists(this.name, { email: user.getEmail() })
             .catch(() => { });
         if (error) {
@@ -112,7 +110,6 @@ class Users {
         }
         error = await db.exists(this.emails, { email: user.getEmail() })
             .catch(() => { });
->>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
         if (error) {
             console.log('emails');
             return Promise.reject(new Error(this.msgExistEmail));
@@ -120,50 +117,6 @@ class Users {
         return null;
     }
 
-<<<<<<< HEAD
-    async getEmails(nicknameUser) {
-        let user = null;
-        await this.getByNickname(nicknameUser)
-            .then((usr) => { user = usr; })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        const conditions = { userid: user.getId(), deleted: false };
-        await db.selectNonDel(this.emails, conditions, ['email'])
-            .then((res) => { user.setEmails(res); })
-            .catch(err => Promise.reject(err));
-        return user;
-    }
-
-    async addEmail({ nicknameUser, emailUser }) {
-        let user = null;
-        await this.getByNickname(nicknameUser)
-            .then((usr) => { user = usr; })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        await this.existsEmail(emailUser)
-            .catch(err => Promise.reject(err));
-        let idEmail = null;
-        await db.insert(this.emails,
-            { userid: user.getId(), email: emailUser }, 'id')
-            .then((res) => { idEmail = res; })
-            .catch(err => Promise.reject(err));
-        return idEmail;
-    }
-
-    async updateEmail({ nicknameUser, emailUser, newEmail }) {
-        await this.getByNickname(nicknameUser)
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        await this.existsEmail(newEmail)
-            .catch(err => Promise.reject(err));
-        await db.update(this.emails, { email: newEmail },
-            { email: emailUser, deleted: false })
-            .catch(err => Promise.reject(err));
-    }
-
-    async deleteEmail({ nicknameUser, emailUser }) {
-        await this.getByNickname(nicknameUser)
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        await db.delete(this.emails, { email: emailUser })
-            .catch(err => Promise.reject(err));
-=======
     async getEmails(nicknameUser, page) {
         const user = await this.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
@@ -214,111 +167,55 @@ class Users {
             return Promise.reject(new Error(this.msgExistEmail));
         }
         return null;
->>>>>>> 7475df73fd8ec6668b15e7d525e4c0b5d23789a7
     }
 
-    async getFriends(nicknameUser) {
-        let friends = [];
-        let user = null;
-        await this.getByNickname(nicknameUser)
-            .then((usr) => { user = usr; })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        friends = await this.getFriendsPartial(1, user.getId(), friends);
-        friends = await this.getFriendsPartial(2, user.getId(), friends);
-        user.setFriends(friends);
-        return user;
+    async getFriends(nickname, page) {
+        const user = await this.getByNickname(nickname)
+            .catch(err => Promise.reject(err));
+        const conditions = { user1: user.getId(), user2: user.getId() };
+        let result = null;
+        await db.select(this.friends, conditions, [], ' OR ')
+            .then((res) => { result = res; })
+            .catch(err => Promise.reject(err));
+        return result;
     }
 
-    async getFriendsPartial(user, idUser, friends) {
-        let cond = { user1: idUser, deleted: false };
-        let col = ['user2', 'friendshipdate'];
-        if (user === 2) {
-            cond = { user2: idUser, deleted: false };
-            col = ['user1', 'friendshipdate'];
+    async addFriend(nicknameUser, nicknameFriend, date) {
+        console.log(nicknameUser, nicknameFriend, 'aqui');
+        const user1 = await this.getByNickname(nicknameUser)
+            .catch(err => Promise.reject(err));
+        const user2 = await this.getByNickname(nicknameFriend)
+            .catch(err => Promise.reject(err));
+        if (user1.getId() === user2.getId()) {
+            return Promise.reject(new Error(this.msgSameUser));
         }
-        await db.select(this.friends, cond, col)
-            .then(async (res) => {
-                for (let i = 0; i < res.length; i += 1) {
-                    let nicknameFr = null;
-                    let us = null;
-                    if (user === 1) {
-                        us = res[i].user2;
-                    } else {
-                        us = res[i].user1;
-                    }
-                    await db.select(this.name, { id: us }, ['nickname'])
-                        .then((fr) => {  nicknameFr = fr[0].nickname; })
-                        .catch(() => {});
-                    if (nicknameFr !== null) {
-                        friends.push({
-                            nickname: nicknameFr,
-                            date: res[i].friendshipdate,
-                        });
-                    }
-                }
-            })
-            .catch(() => {});
-        return friends;
-    }
-
-    async existFriendship(userid1, userid2) {
-        let error = null;
-        let data = { user1: userid1, user2: userid2 };
-        error = await db.exists(this.friends, data)
-            .catch(() => {});
-        if (error) {
-            return error;
-        }
-        data = { user1: userid2, user2: userid1 };
-        error = await db.exists(this.friends, data)
-            .catch(() => {});
-        if (error) {
-            return error;
-        }
-        return null;
-    }
-
-    async addFriend({ nicknameUser, nicknameFriend, date }) {
-        let user1 = null;
-        await this.getByNickname(nicknameUser)
-            .then((usr) => { user1 = usr; })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        let user2 = null;
-        await this.getByNickname(nicknameFriend)
-            .then((usr) => { user2 = usr; })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        const friend = await this.existFriendship(user1.getId(), user2.getId())
-            .catch(() => {});
-        if (friend !== null) {
-            if (!friend[0].deleted) {
-                return Promise.reject(new Error(this.msgFriendExist));
-            }
-            await db.update(this.friends, { deleted: false }, { id: friend[0].id })
-                .catch(err => Promise.reject(err));
-            return friend[0].id;
-        } else {
-            let idFriends = null;
-            await db.insert(this.friends,
-                { user1: user1.getId(), user2: user2.getId(), friendshipdate: date }, 'id')
-                .then((res) => { idFriends = res; })
-                .catch(err => Promise.reject(err));
-            return idFriends;
-        }
+        await this.existFriendship(user1.getId(), user2.getId())
+            .catch(err => Promise.reject(err));
+        const friendship = { user1: user1.getId(), user2: user2.getId(), friendshipdate: date };
+        await db.insert(this.friends, friendship, 'id')
+            .then((res) => { friendship.id = res; })
+            .catch(err => Promise.reject(err));
+        return friendship;
     }
 
     async deleteFriend({ nicknameUser, nicknameFriend }) {
-        let user1 = null;
-        await this.getByNickname(nicknameUser)
-            .then((usr) => { user1 = usr; })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        let user2 = null;
-        await this.getByNickname(nicknameFriend)
-            .then((usr) => { user2 = usr; })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
-        await db.delete(this.friends, { user1: user1.getId(), user2: user2.getId() })
-            .catch(() => {});
-        await db.delete(this.friends, { user1: user2.getId(), user2: user1.getId() })
+        const user1 = await this.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
+        const user2 = await this.getByNickname(nicknameFriend)
+            .catch(err => Promise.reject(err));
+        await this.existFriendship(user1.getId(), user2.getId())
+            .catch(err => Promise.reject(err));
+        await db.delete(this.friends, { user1: user1.getId(), user2: user2.getId() })
+            .catch(err => Promise.reject(err));
+    }
+
+    async existFriendship(user1, user2) {
+        const exist = await db.exists(this.friends, { user1, user2 })
+            .catch(() => { });
+        if (exist) {
+            return Promise.reject(new Error(this.msgFriendExist));
+        }
+        return null;
     }
 }
 

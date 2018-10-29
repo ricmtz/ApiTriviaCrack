@@ -173,7 +173,7 @@ class DB {
     }
 
     async selectPaged(tab, cond, col, page = DEFAULT_PAGE, opr = DEFAULT_LOG_OP) {
-        await this.validatePage(tab, page, cond).catch(err => Promise.reject(err));
+        await this.validatePage(tab, page, cond, opr).catch(err => Promise.reject(err));
 
         let conds = cond;
         if (!conds) {

@@ -5,32 +5,24 @@ const { UsersORM } = require('../orm');
 class FriendsCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
     async getAll(req, res) {
-        await UsersORM.getFriends(req.params.nickname)
-            .then((usr) => {
+        await UsersORM.getFriends(req.params.nickname, req.query.page)
+            .then((friend) => {
                 res.status(200).send({
-                    data: usr,
+                    data: friend,
+                    total: friend.length,
                 });
             })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async create(req, res) {
-        const data = { nicknameFriend: req.body.nickname, date: new Date().toISOString() };
-        const result = await UsersORM.addFriend(req.params.nickname, data);
-        const json = {
-            data: result,
-        };
-        await UsersORM.addFriend(data)
-            .then((usr) => { res.status(200).send({ data: usr }); })
+        await UsersORM.addFriend(req.params.nickname, req.body.nickname, new Date().toISOString())
+            .then((friend) => { res.status(200).send({ data: friend }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async delete(req, res) {
-        const data = {
-            nicknameUser: req.params.nickname,
-            nicknameFriend: req.params.friendNickname,
-        };
-        await UsersORM.deleteFriend(data)
+        await UsersORM.deleteFriend(req.params.nickname, req.params.friendNickname)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
