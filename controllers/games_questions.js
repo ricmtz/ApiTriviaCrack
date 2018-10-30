@@ -41,16 +41,15 @@ class GamesQuestionsCtrl {
             player: req.body.player,
             option: req.body.selectedoption,
         };
-        console.log(data);
         await GamesORM.updateGameQuestion(req.params.gameId, req.params.questionId, data)
-            .then((ans) => { res.status(204).send() })
+            .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
     async delete(req, res) {
         await GamesORM.deleteGameQuestion(req.params.gameId, req.params.questionId)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }) });
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 }
 

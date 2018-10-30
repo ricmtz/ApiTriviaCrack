@@ -1,6 +1,10 @@
 const { CategoriesORM } = require('../orm');
 
 class CategoriesCtrl {
+    constructor() {
+        this.create = this.create.bind(this);
+    }
+
     async getAll(req, res) {
         await CategoriesORM.getAll(req.query.page)
             .then((categ) => {
@@ -19,8 +23,7 @@ class CategoriesCtrl {
     }
 
     async create(req, res) {
-        req.body.icon = 'default.png';
-        req.body.deleted = false;
+        this.setDefaultValues(req);
         await CategoriesORM.create(req.body)
             .then((categ) => { res.status(200).send({ data: categ }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
@@ -36,6 +39,11 @@ class CategoriesCtrl {
         await CategoriesORM.delete(req.params.categoryId)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
+    }
+
+    setDefaultValues(req) {
+        req.body.icon = 'default.png';
+        req.body.deleted = false;
     }
 }
 

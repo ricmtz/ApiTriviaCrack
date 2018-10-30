@@ -1,27 +1,29 @@
 const { Router } = require('express');
 const { gamesCtrl } = require('../controllers');
 const gamesQuestionsRouter = require('./games_questions');
-const { rules } = require('../middlewares');
+const { rules, auth } = require('../middlewares');
 
 const router = Router();
+
+router.use(auth.session);
 
 // Validation param gameId
 router.use('/:gameId', rules.paramsGames);
 
 // Post game
-router.post('/', rules.createGame, gamesCtrl.create);
+router.post('/', [rules.createGame, auth.havePermissions], gamesCtrl.create);
 
 // Get all games
-router.get('/', gamesCtrl.getAll);
+router.get('/', auth.havePermissions, gamesCtrl.getAll);
 
 // Get game by Id
-router.get('/:gameId', gamesCtrl.get);
+router.get('/:gameId', auth.havePermissions, gamesCtrl.get);
 
 // Put game
-router.patch('/:gameId', rules.updateGame, gamesCtrl.update);
+router.patch('/:gameId', auth.havePermissions, rules.updateGame, gamesCtrl.update);
 
 // Delete game
-router.delete('/:gameId', gamesCtrl.delete);
+router.delete('/:gameId', auth.havePermissions, gamesCtrl.delete);
 
 router.use('/:gameId/games_questions', gamesQuestionsRouter);
 

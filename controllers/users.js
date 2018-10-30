@@ -3,6 +3,10 @@ const { UsersORM } = require('../orm');
 // FIXME Todos los métodos deben estar documentados
 
 class UsersCtrl {
+    constructor() {
+        this.create = this.create.bind(this);
+    }
+
     async getAll(req, res) {
         await UsersORM.getAll(req.query.page)
             .then((usrs) => {
@@ -21,11 +25,7 @@ class UsersCtrl {
     }
 
     async create(req, res) {
-        req.body.admin = false;
-        req.body.score = 0;
-        req.body.avatar = 'default.png';
-        req.body.lastlogin = new Date().toISOString();
-        req.body.deleted = false;
+        this.setDefaultValues(req);
         await UsersORM.create(req.body)
             .then((usr) => { res.status(200).send({ data: usr }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
@@ -41,6 +41,14 @@ class UsersCtrl {
         await UsersORM.delete(req.params.nickname)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
+    }
+
+    setDefaultValues(req) {
+        req.body.admin = false;
+        req.body.score = 0;
+        req.body.avatar = 'default.png';
+        req.body.lastlogin = new Date().toISOString();
+        req.body.deleted = false;
     }
 }
 

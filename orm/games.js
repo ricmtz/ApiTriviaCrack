@@ -1,6 +1,7 @@
 const { db } = require('../db');
 const { Game, Answer } = require('../models');
 const UsersORM = require('./users');
+const QuestionsORM = require('./questions');
 
 class Games {
     constructor() {
@@ -31,6 +32,8 @@ class Games {
         await db.selectPaged(this.name, {}, [], page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
+        await this.appendValuesGames(result)
+            .catch(err => Promise.reject(err));
         return result;
     }
 
@@ -39,6 +42,8 @@ class Games {
         await db.selectNonDel(this.name, { id: gameId }, [])
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoExistGame)));
+        await this.appendValuesGame(result)
+            .catch(err => Promise.reject(err));
         return result;
     }
 
@@ -94,6 +99,8 @@ class Games {
         await db.selectPaged(this.answers, { game: gameId }, [], page)
             .then((res) => { result = this.processResultAnsw(res); })
             .catch(err => Promise.reject(err));
+        await this.appendValuesAnswers(result)
+            .catch(err => Promise.reject(err));
         return result;
     }
 
@@ -102,6 +109,8 @@ class Games {
         await db.select(this.answers, { game: gameId, id: questionId }, [])
             .then((res) => { result = this.processResultAnsw(res); })
             .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
+        await this.appendValuesAnswer(result)
+            .catch(err => Promise.reject(err));
         return result;
     }
 
@@ -270,6 +279,52 @@ class Games {
             return 'scoreplayer2';
         }
         return null;
+    }
+
+    async appendValuesGame(game) {
+        await UsersORM.get(game.getPlayer1())
+            .then((res) => { game.setPlayer1(res.getNickname()); })
+            .catch(err => Promise.reject(err));
+        await UsersORM.get(game.getPlayer2())
+            .then((res) => { game.setPlayer2(res.getNickname()); })
+            .catch(err => Promise.reject(err));
+    }
+
+    async appendValuesGames(games) {
+        if (!Array.isArray(games)) {
+            await this.appendValuesGame(games)
+                .catch(err => Promise.reject(err));
+        } else {
+            const promises = [];
+            for (let i = 0; i < games.length; i += 1) {
+                promises.push(this.appendValuesGame(games[i]));
+            }
+            await Promise.all(promises)
+                .catch(err => Promise.reject(err));
+        }
+    }
+
+    async appendValuesAnswer(answer) {
+        await UsersORM.get(answer.getPlayer())
+            .then((res) => { answer.setPlayer(res.getNickname()); })
+            .catch(err => Promise.reject(err));
+        await QuestionsORM.get(answer.getQuestion())
+            .then((res) => { answer.setQuestion(res.getQuestion()); })
+            .catch(() => { answer.setQuestion('Question deleted'); });
+    }
+
+    async appendValuesAnswers(answers) {
+        if (!Array.isArray(answers)) {
+            await this.appendValuesAnswer(answers)
+                .catch(err => Promise.reject(err));
+        } else {
+            const promises = [];
+            for (let i = 0; i < answers.length; i += 1) {
+                promises.push(this.appendValuesAnswer(answers[i]));
+            }
+            await Promise.all(promises)
+                .catch(err => Promise.reject(err));
+        }
     }
 }
 

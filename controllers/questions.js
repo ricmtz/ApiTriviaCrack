@@ -4,11 +4,7 @@ const { QuestionsORM } = require('../orm');
 
 class QuestionsCtrl {
     constructor() {
-        this.getAll = this.getAll.bind(this);
-        this.get = this.get.bind(this);
         this.create = this.create.bind(this);
-        this.update = this.update.bind(this);
-        this.delete = this.delete.bind(this);
     }
 
     async getAll(req, res) {
@@ -29,9 +25,7 @@ class QuestionsCtrl {
     }
 
     async create(req, res) {
-        req.body.approved = false;
-        req.body.deleted = false;
-        req.body.createdate = new Date().toISOString();
+        this.setDefaultValues(req);
         await QuestionsORM.create(req.body)
             .then((quest) => { res.status(200).send({ data: quest }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
@@ -47,6 +41,12 @@ class QuestionsCtrl {
         await QuestionsORM.delete(req.params.question)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
+    }
+
+    setDefaultValues(req) {
+        req.body.approved = false;
+        req.body.deleted = false;
+        req.body.createdate = new Date().toISOString();
     }
 }
 
