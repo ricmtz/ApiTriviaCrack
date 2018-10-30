@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+const { usersCtrl } = require('../controllers');
 const { UsersORM, TokensORM } = require('../orm');
 const Authorization = require('../orm/authorizations');
 
@@ -23,6 +24,7 @@ class Auth {
         if (!req.body.password) {
             return;
         }
+        usersCtrl.setDefaultValues(req);
         user = await UsersORM.create(req.body)
             .catch(err => next(err));
         if (!user) {
@@ -164,7 +166,7 @@ class Auth {
         next();
     }
 
-    async  havePermissions(req, res, next) {
+    async havePermissions(req, res, next) {
         const tokenObj = await TokensORM.get(req.get('token'))
             .catch(() => next(new Error('Not valid token')));
         if (!tokenObj) {
