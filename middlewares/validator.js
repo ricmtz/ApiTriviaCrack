@@ -160,15 +160,6 @@ class Validator {
                             error.details[field] = [`The field ${field} should be a valid ${v}`];
                         }
                     }
-                } else {
-                    const temp = req[part][field];
-                    if (v === 'id' || v === 'positive') {
-                        req[part][field] = Number(temp);
-                    } else if (v === 'boolean') {
-                        req[part][field] = Boolean(temp);
-                    } else {
-                        req[part][field] = String(temp);
-                    }
                 }
             });
         });

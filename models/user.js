@@ -35,8 +35,8 @@ class User {
         return this.email;
     }
 
-    getAmdin() {
-        return this.userType;
+    getAdmin() {
+        return this.admin;
     }
 
     getScore() {
