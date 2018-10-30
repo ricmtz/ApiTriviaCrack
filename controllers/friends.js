@@ -1,7 +1,5 @@
 const { UsersORM } = require('../orm');
 
-// FIXME Todos los métodos deben estar documentados
-
 class FriendsCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
     /**
