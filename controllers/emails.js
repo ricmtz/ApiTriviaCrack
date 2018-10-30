@@ -7,7 +7,7 @@ class EmailsCtrl {
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
      * @param {String} req.params.nickname User nickname.
-     * @param {Integer} req.query.page Page number.
+     * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
         await UsersORM.getEmails(req.params.nickname, req.query.page)
