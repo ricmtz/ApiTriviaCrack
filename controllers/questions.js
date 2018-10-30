@@ -59,7 +59,7 @@ class QuestionsCtrl {
     }
 
     /**
-     * This function request to the data base an update of}
+     * This function request to the data base an update of
      * a certain question, replacing the data with the given data.
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
