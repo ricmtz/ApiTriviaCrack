@@ -1,17 +1,27 @@
 const { Router } = require('express');
 const { questionsCtrl } = require('../controllers');
-const { rules, defaultValues } = require('../middlewares');
+const { rules, auth } = require('../middlewares');
 
 const router = Router();
 
-router.get('/', questionsCtrl.getAll);
+router.use(auth.session);
 
-router.get('/:question', questionsCtrl.get);
+// Validation param question
+router.use('/:question', rules.paramsQuestions);
 
-router.post('/', [rules.createQuestion, defaultValues.defaultQuestion], questionsCtrl.create);
+// Get all question.
+router.get('/', auth.havePermissions, questionsCtrl.getAll);
 
-router.delete('/:question', questionsCtrl.delete);
+// Get question.
+router.get('/:question', auth.havePermissions, questionsCtrl.get);
 
-router.patch('/:question', rules.updateQuestion, questionsCtrl.update);
+// Create question.
+router.post('/', [rules.createQuestion, auth.havePermissions], questionsCtrl.create);
+
+// Remove question.
+router.delete('/:question', auth.havePermissions, questionsCtrl.delete);
+
+// Update question.
+router.patch('/:question', [rules.updateQuestion, auth.havePermissions], questionsCtrl.update);
 
 module.exports = router;

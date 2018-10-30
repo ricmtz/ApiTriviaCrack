@@ -1,3 +1,5 @@
+// FIXME Todos los métodos deben estar documentados
+
 class Questions {
     constructor({
         id, category, question, option1, option2,

@@ -1,3 +1,5 @@
+// FIXME Todos los métodos deben estar documentados
+
 class User {
     constructor({
         id, nickname, password, email, admin,
@@ -33,8 +35,8 @@ class User {
         return this.email;
     }
 
-    getAmdin() {
-        return this.userType;
+    getAdmin() {
+        return this.admin;
     }
 
     getScore() {

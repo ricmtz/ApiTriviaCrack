@@ -1,71 +1,105 @@
 const { QuestionsORM } = require('../orm');
 
 class QuestionsCtrl {
+    /**
+     * Constructor function to QuestionCtrl.
+     */
     constructor() {
-        this.questions = [
-            {
-                id: 10,
-                category: 3,
-                question: '¿Cuál lenguaje de proramación no es orientado a objetos?',
-                option_1: 'c++',
-                option_2: 'java',
-                option_correct: 'c',
-            },
-            {
-                id: 45,
-                category: 2,
-                question: '¿Qué verbo no pertenece a los verbos de HTTP?',
-                option_1: 'POST',
-                option_2: 'DELETE',
-                option_correct: 'REMOVE',
-            },
-        ];
+        this.create = this.create.bind(this);
     }
 
-    static async getAll(req, res) {
-        const result = await QuestionsORM.getAll();
-        const json = {
-            data: result,
-            total: result.length,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+    /**
+     * This function request to the data base all the
+     * questions stored.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.query.page Page number.
+     */
+    async getAll(req, res) {
+        await QuestionsORM.getAll(req.query.page)
+            .then((quest) => {
+                res.status(200).send({
+                    data: quest,
+                    total: quest.length,
+                });
+            })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async get(req, res) {
-        const result = await QuestionsORM.get(req.params.question);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        res.send(json);
+    /**
+     * This function request to the data base all the
+     * information associated with a certain question.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.params.question Question id.
+     */
+    async get(req, res) {
+        await QuestionsORM.get(req.params.question)
+            .then((quest) => { res.status(200).send({ data: quest }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async create(req, res) {
-        const result = await QuestionsORM.create(req.body);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        else res.status(201);
-        res.send(json);
+    /**
+     * This function requesto to the data base create a
+     * questions with the given data.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.body.category Category id.
+     * @param {String} req.body.question Question.
+     * @param {String} req.body.option1 First option.
+     * @param {String} req.body.option2 Second option.
+     * @param {String} req.body.optioncorrect Correct option.
+     * @param {Number} req.body.userid User id.
+     */
+    async create(req, res) {
+        this.setDefaultValues(req);
+        await QuestionsORM.create(req.body)
+            .then((quest) => { res.status(200).send({ data: quest }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async update(req, res) {
-        const result = await QuestionsORM.update(req.params.question, req.body);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+    /**
+     * This function request to the data base an update of
+     * a certain question, replacing the data with the given data.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.params.question Question id.
+     * @param {Number} req.body.category Category id.
+     * @param {String} req.body.question Question.
+     * @param {String} req.body.option1 First option.
+     * @param {String} req.body.option2 Second option.
+     * @param {String} req.body.optioncorrect Correct option.
+     * @param {String} req.body.approved Approved status.
+     */
+    async update(req, res) {
+        await QuestionsORM.update(req.params.question, req.body)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async delete(req, res) {
-        const result = await QuestionsORM.delete(req.params.question);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+    /**
+     * This function request to the data base delete a
+     * certain question.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.params.question Question id.
+     */
+    async delete(req, res) {
+        await QuestionsORM.delete(req.params.question)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
+    }
+
+    /**
+     * This function set the default values for approved,
+     * delted and createdate for a question.
+     * @param {Object} req Express request object.
+     */
+    setDefaultValues(req) {
+        req.body.approved = false;
+        req.body.deleted = false;
+        req.body.createdate = new Date().toISOString();
     }
 }
 
-module.exports = QuestionsCtrl;
+module.exports = new QuestionsCtrl();

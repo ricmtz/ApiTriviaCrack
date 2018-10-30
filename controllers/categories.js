@@ -1,50 +1,102 @@
 const { CategoriesORM } = require('../orm');
 
 class CategoriesCtrl {
-    static async getAll(req, res) {
-        const result = await CategoriesORM.getAll();
-        const json = {
-            data: result,
-            total: result.length,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+    /**
+     * Cosntructor of CategoriesCtrl
+     */
+    constructor() {
+        this.create = this.create.bind(this);
     }
 
-    static async get(req, res) {
-        const result = await CategoriesORM.get(req.params.categoryId);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        res.send(json);
+    /**
+     * This function request to the data base all the
+     * categories stored.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.query.page Page number.
+     */
+    async getAll(req, res) {
+        await CategoriesORM.getAll(req.query.page)
+            .then((categ) => {
+                res.status(200).send({
+                    data: categ,
+                    total: categ.length,
+                });
+            })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async create(req, res) {
-        const result = await CategoriesORM.create(req.body);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        else res.status(201);
-        res.send(json);
+    /**
+     * This function request to the data base all the information
+     * associated with a certaint category id.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.params.categoryId Category id.
+     */
+    async get(req, res) {
+        await CategoriesORM.get(req.params.categoryId)
+            .then((categ) => { res.status(200).send({ data: categ }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async update(req, res) {
-        const result = await CategoriesORM.update(req.params.categoryId, req.body);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+    /**
+     * This method request to the data base create a category
+     * with the given data.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Object} req.body Data to created the category.
+     * @param {String} req.body.name Name category.
+     * @param {String} req.body.color Color category.
+     */
+    async create(req, res) {
+        this.setDefaultValues(req);
+        await CategoriesORM.create(req.body)
+            .then((categ) => { res.status(200).send({ data: categ }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async delete(req, res) {
-        const result = await CategoriesORM.delete(req.params.categoryId);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+    /**
+     * This function request to the data base an update of a
+     * certain category, replacing the data with the given data.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.params.categoryId Category id
+     * @param {Object} req.body Category data to update.
+     * @param {String} req.body.name Name category.
+     * @param {String} req.body.color Color category.
+     * @param {String} req.body.icon Category icon.
+     * @param {Boolean} req.body.deleted Category deleted property.
+     */
+    async update(req, res) {
+        await CategoriesORM.update(req.params.categoryId, req.body)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
+    }
+
+    /**
+     * This method request to the data base delete a
+     * certain category.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.params.categoryId Category id.
+     */
+    async delete(req, res) {
+        await CategoriesORM.delete(req.params.categoryId)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
+    }
+
+    /**
+     * This function setup the default values to
+     * the icon and deleted property of the category.
+     * @param {Object} req Express request object.
+     * @param {String} req.body.icon Category icon.
+     * @param {Boolean} req.body.deleted Category deleted property.
+     */
+    setDefaultValues(req) {
+        req.body.icon = 'default.png';
+        req.body.deleted = false;
     }
 }
 
-module.exports = CategoriesCtrl;
+module.exports = new CategoriesCtrl();

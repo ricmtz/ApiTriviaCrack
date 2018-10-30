@@ -1,50 +1,103 @@
 const { UsersORM } = require('../orm');
 
 class UsersCtrl {
-    static async getAll(req, res) {
-        const result = await UsersORM.getAll();
-        const json = {
-            data: result,
-            total: result.length,
-        };
-        if (result.length === 0) res.status(404);
-        res.send(json);
+    /**
+     * Constructor function to UsersCtrl.
+     */
+    constructor() {
+        this.create = this.create.bind(this);
     }
 
-    static async get(req, res) {
-        const result = await UsersORM.getNickname(req.params.nickname);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        res.send(json);
+    /**
+     * This function request to the data base all the
+     * users stored.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.query.page Page number.
+     */
+    async getAll(req, res) {
+        await UsersORM.getAll(req.query.page)
+            .then((usrs) => {
+                res.status(200).send({
+                    data: usrs,
+                    total: usrs.length,
+                });
+            })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async create(req, res) {
-        const result = await UsersORM.create(req.body);
-        const json = {
-            data: result,
-        };
-        if ((typeof result) === 'string') res.status(404);
-        else res.status(201);
-        res.send(json);
+    /**
+     * This function request to the data base all the
+     * information associate with a certain user.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {Number} req.params.nickname
+     */
+    async get(req, res) {
+        await UsersORM.getByNickname(req.params.nickname)
+            .then((usr) => { res.status(200).send({ data: usr }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async update(req, res) {
-        const result = await UsersORM.update(req.params.nickname, req.body);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+    /**
+     * This function request to the data base create an
+     * user with the given data.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {String} req.body.nickname User nickname.
+     * @param {String} req.body.password User password.
+     * @param {String} req.body.email User email.
+     */
+    async create(req, res) {
+        this.setDefaultValues(req);
+        await UsersORM.create(req.body)
+            .then((usr) => { res.status(200).send({ data: usr }); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 
-    static async delete(req, res) {
-        const result = await UsersORM.delete(req.params.nickname);
-        if ((typeof result) === 'string') {
-            res.status(404);
-            res.send({ data: result });
-        } else res.status(204).send();
+    /**
+     * This function request to the data base update a
+     * certain user, replacing the data with the given data.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {String} req.params.nickname User nickname.
+     * @param {String} req.body.nickname User nickname.
+     * @param {String} req.body.password User password.
+     * @param {String} req.body.email User email.
+     * @param {String} req.body.avatar File name of the avatar.
+     * @param {Boolean} req.body.admin Admin privileges.
+     */
+    async update(req, res) {
+        await UsersORM.update(req.params.nickname, req.body)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
+    }
+
+    /**
+     * This function request to the data base delete a
+     * certain user.
+     * @param {Object} req Express request object.
+     * @param {Object} res Express response object.
+     * @param {String} req.params.nickname User nickname.
+     */
+    async delete(req, res) {
+        await UsersORM.delete(req.params.nickname)
+            .then(() => { res.status(204).send(); })
+            .catch((err) => { res.status(404).send({ data: err.message }); });
+    }
+
+    /**
+     * This function set the default valuest to the attribs
+     * admin, score, avatar, lastlogin and deleted for a user.
+     * @param {Object} req Express request object.
+     */
+    setDefaultValues(req) {
+        req.body.admin = false;
+        req.body.score = 0;
+        req.body.avatar = 'default.png';
+        req.body.lastlogin = new Date().toISOString();
+        req.body.deleted = false;
     }
 }
 
-module.exports = UsersCtrl;
+module.exports = new UsersCtrl();

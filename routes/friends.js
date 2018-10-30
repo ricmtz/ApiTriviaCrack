@@ -1,16 +1,21 @@
 const { Router } = require('express');
 const { friendsCtrl } = require('../controllers');
-const { rules, defaultValues } = require('../middlewares');
+const { rules, auth } = require('../middlewares');
 
 const router = Router({ mergeParams: true });
 
+router.use(auth.session);
+
+// Validation param friendNickname
+router.use('/:friendNickname', rules.paramsFriends);
+
 // Get all friends.
-router.get('/', rules.paramsUser, friendsCtrl.getAll);
+router.get('/', [rules.paramsUser, auth.havePermissions], friendsCtrl.getAll);
 
 // Add friend
-router.post('/', [rules.createFriend, defaultValues.defaultFriend], friendsCtrl.create);
+router.post('/', [rules.createFriend, auth.havePermissions], friendsCtrl.create);
 
 // Remove friend
-router.delete('/:friendNickname', rules.paramsFriends, friendsCtrl.delete);
+router.delete('/:friendNickname', auth.havePermissions, friendsCtrl.delete);
 
 module.exports = router;
