@@ -35,7 +35,7 @@ class User {
         return this.email;
     }
 
-    getAmdin() {
+    getAdmin() {
         return this.admin;
     }
 
