@@ -1,5 +1,7 @@
 const bcrypt = require('bcrypt');
+const { usersCtrl } = require('../controllers');
 const { UsersORM, TokensORM } = require('../orm');
+const Authorization = require('../orm/authorizations');
 
 
 class Auth {
@@ -22,6 +24,7 @@ class Auth {
         if (!req.body.password) {
             return;
         }
+        usersCtrl.setDefaultValues(req);
         user = await UsersORM.create(req.body)
             .catch(err => next(err));
         if (!user) {
@@ -147,7 +150,7 @@ class Auth {
             return;
         }
         const tokenObj = await TokensORM.get(req.get('token'))
-            .catch(err => next(new Error('Not valid token')));
+            .catch(() => next(new Error('Not valid token')));
         if (!tokenObj) {
             return;
         }
@@ -162,7 +165,25 @@ class Auth {
         }
         next();
     }
-}
 
+    async havePermissions(req, res, next) {
+        const tokenObj = await TokensORM.get(req.get('token'))
+            .catch(() => next(new Error('Not valid token')));
+        if (!tokenObj) {
+            return;
+        }
+        const user = await UsersORM.get(tokenObj.getUserId())
+            .catch(err => next(err));
+        let rol = 'user';
+        if (user.getAdmin()) {
+            rol = 'admin';
+        }
+        if (Authorization.canDo(rol, user.getNickname(), req)) {
+            next();
+        } else {
+            next(new Error('Dont have Authorization'));
+        }
+    }
+}
 
 module.exports = new Auth();

@@ -85,7 +85,7 @@ class DB {
         if (!conditions) {
             return '';
         }
-        
+
         return pgp.helpers.sets(conditions).replace(new RegExp(',', 'g'), logOp);
     }
 
@@ -118,6 +118,10 @@ class DB {
         await this.countRegs(table, cond)
             .then((res) => { regsNum = res; })
             .catch(err => Promise.reject(err));
+
+        if (regsNum === 0 && page === 1) {
+            return Promise.resolve();
+        }
 
         if ((page - 1) * REG_PER_PAGE >= regsNum) {
             return Promise.reject(new Error('Page out of range'));
@@ -180,7 +184,7 @@ class DB {
         }
 
         return new Promise((resolve, reject) => {
-            this.db.many(this.selectQuery({
+            this.db.any(this.selectQuery({
                 table: tab,
                 conditions: conds,
                 columns: col,
