@@ -36,7 +36,7 @@ class User {
     }
 
     getAmdin() {
-        return this.userType;
+        return this.admin;
     }
 
     getScore() {

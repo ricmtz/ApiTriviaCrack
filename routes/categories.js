@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { categoriesCtrl } = require('../controllers');
-const { rules, defaultValues } = require('../middlewares');
+const { rules, auth } = require('../middlewares');
 
 const router = Router();
 
@@ -8,18 +8,18 @@ const router = Router();
 router.use('/:categoryId', rules.paramsCategories);
 
 // Create category
-router.post('/', rules.createCategory, categoriesCtrl.create);
+router.post('/', [rules.createCategory, auth.havePermissions], categoriesCtrl.create);
 
 // Get all categories
-router.get('/', rules.getAllElements, categoriesCtrl.getAll);
+router.get('/', [rules.getAllElements, auth.havePermissions], categoriesCtrl.getAll);
 
 // Get category
-router.get('/:categoryId', categoriesCtrl.get);
+router.get('/:categoryId', auth.havePermissions, categoriesCtrl.get);
 
 // Put category
-router.patch('/:categoryId', rules.updateCategory, categoriesCtrl.update);
+router.patch('/:categoryId', [rules.updateCategory, auth.havePermissions], categoriesCtrl.update);
 
 // Delete category
-router.delete('/:categoryId', categoriesCtrl.delete);
+router.delete('/:categoryId', auth.havePermissions, categoriesCtrl.delete);
 
 module.exports = router;

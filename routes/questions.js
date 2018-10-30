@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { questionsCtrl } = require('../controllers');
-const { rules } = require('../middlewares');
+const { rules, auth } = require('../middlewares');
 
 const router = Router();
 
@@ -8,18 +8,18 @@ const router = Router();
 router.use('/:question', rules.paramsQuestions);
 
 // Get all question.
-router.get('/', questionsCtrl.getAll);
+router.get('/', auth.havePermissions, questionsCtrl.getAll);
 
 // Get question.
-router.get('/:question', questionsCtrl.get);
+router.get('/:question', auth.havePermissions, questionsCtrl.get);
 
 // Create question.
-router.post('/', rules.createQuestion, questionsCtrl.create);
+router.post('/', [rules.createQuestion, auth.havePermissions], questionsCtrl.create);
 
 // Remove question.
-router.delete('/:question', questionsCtrl.delete);
+router.delete('/:question', auth.havePermissions, questionsCtrl.delete);
 
 // Update question.
-router.patch('/:question', rules.updateQuestion, questionsCtrl.update);
+router.patch('/:question', [rules.updateQuestion, auth.havePermissions], questionsCtrl.update);
 
 module.exports = router;
