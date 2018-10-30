@@ -4,6 +4,8 @@ const { rules, auth } = require('../middlewares');
 
 const router = express.Router({ mergeParams: true });
 
+router.use(auth.session);
+
 // Get all emails
 router.get('/', auth.havePermissions, emailsCtrl.getAll);
 

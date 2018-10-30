@@ -4,6 +4,8 @@ const { rules, auth } = require('../middlewares');
 
 const router = Router({ mergeParams: true });
 
+router.use(auth.session);
+
 // Validation param questionId
 router.use('/:questionId', rules.paramsGamesQuestions);
 

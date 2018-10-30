@@ -4,6 +4,8 @@ const { rules, auth } = require('../middlewares');
 
 const router = Router({ mergeParams: true });
 
+router.use(auth.session);
+
 // Validation param friendNickname
 router.use('/:friendNickname', rules.paramsFriends);
 

@@ -4,6 +4,8 @@ const { rules, auth } = require('../middlewares');
 
 const router = Router();
 
+router.use(auth.session);
+
 // Validation param question
 router.use('/:question', rules.paramsQuestions);
 

@@ -5,6 +5,8 @@ const { rules, auth } = require('../middlewares');
 
 const router = Router();
 
+router.use(auth.session);
+
 // Validation param gameId
 router.use('/:gameId', rules.paramsGames);
 

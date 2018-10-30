@@ -4,6 +4,8 @@ const { rules, auth } = require('../middlewares');
 
 const router = Router();
 
+router.use(auth.session);
+
 // Validation param categoryId
 router.use('/:categoryId', rules.paramsCategories);
 
