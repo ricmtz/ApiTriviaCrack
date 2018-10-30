@@ -1,4 +1,3 @@
-// FIXME Todos los métodos deben estar documentados
 
 class Answer {
     /**
