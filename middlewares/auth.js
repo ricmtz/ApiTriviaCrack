@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const { usersCtrl } = require('../controllers');
 const { UsersORM, TokensORM } = require('../orm');
 const Authorization = require('../orm/authorizations');
@@ -15,6 +15,7 @@ class Auth {
         this.login = this.login.bind(this);
         this.logout = this.logout.bind(this);
         this.session = this.session.bind(this);
+        this.restore = this.restore.bind(this);
     }
 
     async register(req, res, next) {
@@ -166,6 +167,92 @@ class Auth {
             return;
         }
         next();
+    }
+
+    async genRestoreTokenData(user) {
+        const hashToken = await this.hash(user.getNickname())
+            .catch(err => Promise.reject(err));
+        const currDate = new Date();
+        const expireDate = new Date(currDate);
+        expireDate.setMinutes(expireDate.getMinutes() + Number(process.env.RESTORE_TIME));
+        return {
+            token: hashToken,
+            createdat: currDate.toISOString(),
+            expires: expireDate.toISOString(),
+            type: 'r',
+            status: '1',
+            userid: user.getId(),
+        };
+    }
+
+    async genRestorationToken(req, res, next) {
+        if (!req.body.nickname) {
+            next(new Error('Missing user nickname'));
+            return;
+        }
+        const user = await UsersORM.getByNickname(req.body.nickname)
+            .catch(err => next(err));
+        if (!user) {
+            return;
+        }
+        const tokenData = await this.genRestoreTokenData(user)
+            .catch(err => next(err));
+        if (!tokenData) {
+            return;
+        }
+        const resToken = await TokensORM.create(tokenData)
+            .catch(err => next(err));
+        if (!resToken) {
+            return;
+        }
+        mailer.sendRestoration(user.getEmail(), resToken.getToken());
+        res.send({
+            token: resToken.getToken(),
+        }).status(201);
+    }
+
+    async restorePass(req, res, next) {
+        if (!req.body.password) {
+            next(new Error('Missing user password'));
+            return;
+        }
+        const tokenObj = await TokensORM.get(req.query.token, false)
+            .catch(() => next(new Error('Invalid token')));
+        if (!tokenObj) {
+            return;
+        }
+        if (!tokenObj.isActive()) {
+            const updated = await TokensORM.updateStatus(tokenObj.getId(), '0')
+                .catch(err => next(err));
+            if (!updated) {
+                return;
+            }
+            next(new Error('The token has expired'));
+            return;
+        }
+        const user = await UsersORM.get(tokenObj.getUserId())
+            .catch(err => next(err));
+        if (!user) {
+            return;
+        }
+        const hashedPass = await this.hash(req.body.password)
+            .catch(err => next(err));
+        if (!hashedPass) {
+            return;
+        }
+        await UsersORM.update(user.getNickname(), { password: hashedPass })
+            .catch(err => next(err));
+        await TokensORM.updateStatus(tokenObj.getId(), '0')
+            .catch(err => next(err));
+        res.status(204).send();
+    }
+
+    async restore(req, res, next) {
+        if (!req.query.token) {
+            await this.genRestorationToken(req, res, next);
+        } else {
+            await this.restorePass(req, res, next);
+        }
     }
 
     async havePermissions(req, res, next) {
