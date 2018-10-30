@@ -73,7 +73,7 @@ class GamesCtrl {
     }
 
     /**
-     * This function request to the data base delete a 
+     * This function request to the data base delete a
      * certain game.
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
