@@ -6,6 +6,6 @@ const router = Router({ mergeParams: true });
 router.post('/register', rules.createUser, auth.register);
 router.post('/login', auth.login);
 router.get('/logout', auth.logout);
-
+router.post('/restore', auth.restore);
 
 module.exports = router;

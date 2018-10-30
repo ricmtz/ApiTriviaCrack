@@ -8,9 +8,9 @@ class Tokens {
         this.msgNoCreateToken = 'Could not create token';
     }
 
-    async get(searchToken) {
+    async get(searchToken, session = true) {
         let result = null;
-        await db.select(this.name, { token: searchToken, status: '1' })
+        await db.select(this.name, { token: searchToken, type: session ? 's' : 'r', status: '1' })
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         return result;
