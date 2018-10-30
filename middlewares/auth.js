@@ -165,10 +165,6 @@ class Auth {
     }
 
     async  havePermissions(req, res, next) {
-        if (!req.get('token')) {
-            next(new Error('Missing token'));
-            return;
-        }
         const tokenObj = await TokensORM.get(req.get('token'))
             .catch(() => next(new Error('Not valid token')));
         if (!tokenObj) {
