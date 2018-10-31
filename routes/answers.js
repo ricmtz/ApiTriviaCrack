@@ -1,27 +1,27 @@
 const { Router } = require('express');
-const { gamesQuestionsCtrl } = require('../controllers');
+const { AnswersCtrl } = require('../controllers');
 const { rules, auth } = require('../middlewares');
 
 const router = Router({ mergeParams: true });
 
 router.use(auth.session);
 
-// Validation param questionId
-router.use('/:questionId', rules.paramsGamesQuestions);
+// Validation param answerId
+router.use('/:answerId', rules.paramsAnswers);
 
-// Get all games_questions
-router.get('/', auth.havePermissions, gamesQuestionsCtrl.getAll);
+// Get all answers
+router.get('/', auth.havePermissions, AnswersCtrl.getAll);
 
-// Get question of game
-router.get('/:questionId', auth.havePermissions, gamesQuestionsCtrl.get);
+// Get answer of game
+router.get('/:answerId', auth.havePermissions, AnswersCtrl.get);
 
-// Create questions
-router.post('/', [rules.createGameQuestion, auth.havePermissions], gamesQuestionsCtrl.create);
+// Create answer
+router.post('/', [rules.createGameQuestion, auth.havePermissions], AnswersCtrl.create);
 
-// Delete question
-router.delete('/:questionId', auth.havePermissions, gamesQuestionsCtrl.delete);
+// Delete answer
+router.delete('/:answerId', auth.havePermissions, AnswersCtrl.delete);
 
-// Update question
-router.patch('/:questionId', [rules.updateGameQuestion, auth.havePermissions], gamesQuestionsCtrl.update);
+// Update answer
+router.patch('/:answerId', [rules.updateGameQuestion, auth.havePermissions], AnswersCtrl.update);
 
 module.exports = router;
