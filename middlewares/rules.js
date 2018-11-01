@@ -45,15 +45,15 @@ class Rules {
 
     /**
      * Validator middleware that add the rules to validate
-     * questionId parameter.
+     * answerId parameter.
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
      * @param {Function} next Express next middleware function
      */
-    static paramsGamesQuestions(req, res, next) {
+    static paramsAnswers(req, res, next) {
         validator.validate(req, res, next, {
             params: {
-                questionId: 'id,required',
+                answerId: 'id,required',
             },
         });
     }

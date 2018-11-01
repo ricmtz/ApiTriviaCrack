@@ -1,6 +1,6 @@
 const { GamesORM } = require('../orm');
 
-class GamesQuestionsCtrl {
+class AnswersCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
     /**
      * This function request to the data base all the answers
@@ -27,10 +27,10 @@ class GamesQuestionsCtrl {
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
      * @param {Number} req.params.gameId Game id.
-     * @param {Number} req.params.questionId Question id.
+     * @param {Number} req.params.answerId Question id.
      */
     async get(req, res) {
-        await GamesORM.getGameQuestion(req.params.gameId, req.params.questionId)
+        await GamesORM.getGameQuestion(req.params.gameId, req.params.answerId)
             .then((ans) => { res.status(200).send({ data: ans }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -41,7 +41,7 @@ class GamesQuestionsCtrl {
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
      * @param {Number} req.params.gameId Game id.
-     * @param {Number} req.params.questionId Question id.
+     * @param {Number} req.params.answerId Question id.
      * @param {Number} req.body.player User id.
      * @param {String} req.body.option Option selected.
      * @param {Boolean} req.body.correct Evaluation answer.
@@ -49,7 +49,7 @@ class GamesQuestionsCtrl {
     async create(req, res) {
         const data = {
             game: req.params.gameId,
-            question: req.params.questionId,
+            question: req.params.answerId,
             player: req.body.player,
             option: req.body.option,
             correct: req.body.correct,
@@ -65,7 +65,7 @@ class GamesQuestionsCtrl {
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
      * @param {Number} req.params.gameId Game id.
-     * @param {Number} req.params.questionId Question id.
+     * @param {Number} req.params.answerId Question id.
      * @param {Number} req.body.player User id.
      * @param {String} req.body.option Option selected.
      * @param {Boolean} req.body.correct Evaluation answer.
@@ -73,11 +73,11 @@ class GamesQuestionsCtrl {
     async update(req, res) {
         const data = {
             game: req.params.gameId,
-            question: req.params.questionId,
+            question: req.params.answerId,
             player: req.body.player,
             option: req.body.selectedoption,
         };
-        await GamesORM.updateGameQuestion(req.params.gameId, req.params.questionId, data)
+        await GamesORM.updateGameQuestion(req.params.gameId, req.params.answerId, data)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -89,13 +89,13 @@ class GamesQuestionsCtrl {
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
      * @param {Number} req.params.gameId Game id.
-     * @param {Number} req.params.questionId Question id
+     * @param {Number} req.params.answerId Question id
      */
     async delete(req, res) {
-        await GamesORM.deleteGameQuestion(req.params.gameId, req.params.questionId)
+        await GamesORM.deleteGameQuestion(req.params.gameId, req.params.answerId)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
 }
 
-module.exports = new GamesQuestionsCtrl();
+module.exports = new AnswersCtrl();

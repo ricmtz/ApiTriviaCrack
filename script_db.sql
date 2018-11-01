@@ -8,6 +8,7 @@ CREATE TABLE users
     score INTEGER DEFAULT 0,
     avatar TEXT DEFAULT ''::TEXT,
     lastlogin TIMESTAMP,
+    verified BOOLEAN DEFAULT false,
     deleted BOOLEAN DEFAULT false,
     admin BOOLEAN DEFAULT false,
     CONSTRAINT users_pkey PRIMARY KEY (id),
