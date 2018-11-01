@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { gamesCtrl } = require('../controllers');
-const gamesQuestionsRouter = require('./games_questions');
+const answersRouter = require('./answers');
 const { rules, auth } = require('../middlewares');
 
 const router = Router();
@@ -25,6 +25,6 @@ router.patch('/:gameId', auth.havePermissions, rules.updateGame, gamesCtrl.updat
 // Delete game
 router.delete('/:gameId', auth.havePermissions, gamesCtrl.delete);
 
-router.use('/:gameId/games_questions', gamesQuestionsRouter);
+router.use('/:gameId/answers', answersRouter);
 
 module.exports = router;

@@ -88,7 +88,8 @@ class UsersCtrl {
 
     /**
      * This function set the default valuest to the attribs
-     * admin, score, avatar, lastlogin and deleted for a user.
+     * admin, score, avatar, lastlogin, deleted and verified
+     * for a user.
      * @param {Object} req Express request object.
      */
     setDefaultValues(req) {
@@ -97,6 +98,7 @@ class UsersCtrl {
         req.body.avatar = 'default.png';
         req.body.lastlogin = new Date().toISOString();
         req.body.deleted = false;
+        req.body.verified = false;
     }
 }
 

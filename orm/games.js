@@ -7,7 +7,7 @@ class Games {
     constructor() {
         this.name = 'games';
         this.users = 'users';
-        this.answers = 'games_questions';
+        this.answers = 'answers';
         this.questions = 'questions';
         this.msgNoUser = 'This user not exist';
         this.msgNoCreateGame = 'Dont create game';

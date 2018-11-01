@@ -4,7 +4,7 @@ class User {
     constructor({
         id, nickname, password, email, admin,
         score, avatar, emails, friends,
-        deleted, lastlogin,
+        deleted, lastlogin, verified,
     }) {
         this.setId(id);
         this.setNickname(nickname);
@@ -17,6 +17,7 @@ class User {
         this.setFriends(friends);
         this.setDeleted(deleted);
         this.setLastlogin(lastlogin);
+        this.setVerified(verified);
     }
 
     getId() {
@@ -55,40 +56,62 @@ class User {
         return this.lastlogin;
     }
 
+    getVerified() {
+        return this.verified;
+    }
+
     setId(id) {
-        if (id !== undefined) this.id = id;
+        if (id !== undefined) {
+            this.id = id;
+        }
     }
 
     setNickname(nickname) {
-        if (nickname !== undefined) this.nickname = nickname;
+        if (nickname !== undefined) {
+            this.nickname = nickname;
+        }
     }
 
     setPassword(password) {
-        if (password !== undefined) this.password = password;
+        if (password !== undefined) {
+            this.password = password;
+        }
     }
 
     setEmail(email) {
-        if (email !== undefined) this.email = email;
+        if (email !== undefined) {
+            this.email = email;
+        }
     }
 
     setAdmin(admin) {
-        if (admin !== undefined) this.admin = admin;
+        if (admin !== undefined) {
+            this.admin = admin;
+        }
     }
 
     setScore(score) {
-        if (score !== undefined) this.score = score;
+        if (score !== undefined) {
+            this.score = score;
+        }
     }
 
     setAvatar(avatar) {
-        if (avatar !== undefined) this.avatar = avatar;
+        if (avatar !== undefined) {
+            this.avatar = avatar;
+        }
     }
 
     setDeleted(deleted) {
-        if (deleted !== undefined) this.deleted = deleted;
+        if (deleted !== undefined) {
+            this.deleted = deleted;
+        }
     }
 
     setLastlogin(lastlogin) {
-        if (lastlogin !== undefined) this.lastlogin = lastlogin;
+        if (lastlogin !== undefined) {
+            this.lastlogin = lastlogin;
+        }
     }
 
     setEmails(emails) {
@@ -100,6 +123,12 @@ class User {
     setFriends(friends) {
         if (this.id !== undefined) {
             this.friends = friends;
+        }
+    }
+
+    setVerified(verified) {
+        if (verified !== undefined) {
+            this.verified = verified;
         }
     }
 }
