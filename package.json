@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/nodemon index.js",
-    "start": "node index.js"
+    "test": "./node_modules/.bin/nodemon index.js",
+    "start": "node index.js",
+    "db-start": "node ./factory/init_db.js"
   },
   "repository": {
     "type": "git",
