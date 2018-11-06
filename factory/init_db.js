@@ -45,6 +45,15 @@ async function createCategories() {
     return categoriesDB;
 }
 
+async function createToken(users) {
+    const promises = [];
+    for (let i = 0; i < users.length; i += 1) {
+        promises.push(auth.createToken(users[i]));
+    }
+    Promise.all(promises)
+        .catch(err => console.log(err.message));
+}
+
 async function createAdminUsers() {
     const password = await auth.hash('admin')
         .catch(err => console.log(err.message));
@@ -68,8 +77,11 @@ async function createAdminUsers() {
         deleted: false,
         verified: true,
     });
+    let admindb = null;
     await insertData([admin1, admin2], 'users')
-        .catch(err => console.log(err));
+        .then((res) => { admindb = res; })
+        .catch(err => console.log(err.message));
+    return admindb;
 }
 
 async function createUsers() {
@@ -181,9 +193,11 @@ async function generateDB() {
     console.log('Creating categories');
     const categories = await createCategories();
     console.log('Creating admin users');
-    await createAdminUsers();
+    const admins = await createAdminUsers();
+    await createToken(admins);
     console.log('Creating users');
     const users = await createUsers();
+    await createToken(users);
     console.log('Creating friends');
     await createFriends(users);
     console.log('Creating emails');
