@@ -38,6 +38,8 @@ class Friends {
         await db.insert(this.name, friendship, 'id')
             .then((res) => { friendship.id = res; })
             .catch(err => Promise.reject(err));
+        await this.appendValuesFriend(friendship)
+            .catch(err => Promise.reject(err));
         return friendship;
     }
 
@@ -71,10 +73,10 @@ class Friends {
     }
 
     async appendValuesFriend(friend) {
-        await this.get(friend.user1)
+        await UsersORM.get(friend.user1)
             .then((res) => { friend.user1 = res.getNickname(); })
             .catch(err => Promise.reject(err));
-        await this.get(friend.user2)
+        await UsersORM.get(friend.user2)
             .then((res) => { friend.user2 = res.getNickname(); })
             .catch(err => Promise.reject(err));
     }
