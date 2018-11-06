@@ -65,7 +65,7 @@ class Emails {
     }
 
     async appendValuesEmail(email) {
-        await this.get(email.userid)
+        await UsersORM.get(email.userid)
             .then((res) => { email.user = res.getNickname(); })
             .catch(err => Promise.reject(err));
         delete email.userid;
