@@ -1,4 +1,4 @@
-const { GamesORM } = require('../orm');
+const { AnswersORM } = require('../orm');
 
 class AnswersCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
@@ -11,7 +11,7 @@ class AnswersCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await GamesORM.getAllGamesQuestions(req.params.gameId, req.query.page)
+        await AnswersORM.getAllAnswers(req.params.gameId, req.query.page)
             .then((ans) => {
                 res.status(200).send({
                     data: ans,
@@ -30,7 +30,7 @@ class AnswersCtrl {
      * @param {Number} req.params.answerId Question id.
      */
     async get(req, res) {
-        await GamesORM.getGameQuestion(req.params.gameId, req.params.answerId)
+        await AnswersORM.getAnswer(req.params.gameId, req.params.answerId)
             .then((ans) => { res.status(200).send({ data: ans }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -54,7 +54,7 @@ class AnswersCtrl {
             option: req.body.option,
             correct: req.body.correct,
         };
-        await GamesORM.addAnswer(data)
+        await AnswersORM.addAnswer(data)
             .then((ans) => { res.status(200).send({ data: ans }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -77,7 +77,7 @@ class AnswersCtrl {
             player: req.body.player,
             option: req.body.selectedoption,
         };
-        await GamesORM.updateGameQuestion(req.params.gameId, req.params.answerId, data)
+        await AnswersORM.updateAnswer(req.params.gameId, req.params.answerId, data)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -92,7 +92,7 @@ class AnswersCtrl {
      * @param {Number} req.params.answerId Question id
      */
     async delete(req, res) {
-        await GamesORM.deleteGameQuestion(req.params.gameId, req.params.answerId)
+        await AnswersORM.deleteAnswer(req.params.gameId, req.params.answerId)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
