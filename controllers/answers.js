@@ -11,7 +11,7 @@ class AnswersCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await AnswersORM.getAllAnswers(req.params.gameId, req.query.page)
+        await AnswersORM.getAll(req.params.gameId, req.query.page)
             .then((ans) => {
                 res.status(200).send({
                     data: ans,
@@ -30,7 +30,7 @@ class AnswersCtrl {
      * @param {Number} req.params.answerId Question id.
      */
     async get(req, res) {
-        await AnswersORM.getAnswer(req.params.gameId, req.params.answerId)
+        await AnswersORM.get(req.params.gameId, req.params.answerId)
             .then((ans) => { res.status(200).send({ data: ans }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -54,7 +54,7 @@ class AnswersCtrl {
             option: req.body.option,
             correct: req.body.correct,
         };
-        await AnswersORM.addAnswer(data)
+        await AnswersORM.create(data)
             .then((ans) => { res.status(200).send({ data: ans }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -77,7 +77,7 @@ class AnswersCtrl {
             player: req.body.player,
             option: req.body.selectedoption,
         };
-        await AnswersORM.updateAnswer(req.params.gameId, req.params.answerId, data)
+        await AnswersORM.update(req.params.gameId, req.params.answerId, data)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -92,7 +92,7 @@ class AnswersCtrl {
      * @param {Number} req.params.answerId Question id
      */
     async delete(req, res) {
-        await AnswersORM.deleteAnswer(req.params.gameId, req.params.answerId)
+        await AnswersORM.delete(req.params.gameId, req.params.answerId)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }

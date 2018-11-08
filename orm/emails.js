@@ -8,7 +8,7 @@ class Emails {
         this.msgNoExistEmail = 'This email not exists';
     }
 
-    async getEmails(nicknameUser, page) {
+    async getAll(nicknameUser, page) {
         const user = await UsersORM.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
         let result = null;
@@ -20,7 +20,7 @@ class Emails {
         return result;
     }
 
-    async addEmail(nickname, email) {
+    async create(nickname, email) {
         const user = await UsersORM.getByNickname(nickname)
             .catch(err => Promise.reject(err));
         await this.existsAttribsEmail(email)
@@ -34,7 +34,7 @@ class Emails {
         return newEmail;
     }
 
-    async updateEmail(nickname, oldEmail, newEmail) {
+    async update(nickname, oldEmail, newEmail) {
         const user = await UsersORM.getByNickname(nickname)
             .catch(err => Promise.reject(err));
         await this.existsAttribsEmail(newEmail)
@@ -44,7 +44,7 @@ class Emails {
             .catch(err => Promise.reject(err));
     }
 
-    async deleteEmail(nickname, email) {
+    async delete(nickname, email) {
         const user = await UsersORM.getByNickname(nickname)
             .catch(err => Promise.reject(err));
         await db.exists(this.name, { email })

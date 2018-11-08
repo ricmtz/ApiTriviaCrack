@@ -10,7 +10,7 @@ class EmailsCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await EmailsORM.getEmails(req.params.nickname, req.query.page)
+        await EmailsORM.getAll(req.params.nickname, req.query.page)
             .then((email) => {
                 res.status(200).send({
                     data: email,
@@ -29,7 +29,7 @@ class EmailsCtrl {
      * @param {String} req.body.email Email that would be added.
      */
     async create(req, res) {
-        await EmailsORM.addEmail(req.params.nickname, req.body.email)
+        await EmailsORM.create(req.params.nickname, req.body.email)
             .then((email) => { res.status(200).send({ data: email }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -44,7 +44,7 @@ class EmailsCtrl {
      * @param {String} req.body.newEmail New user email.
      */
     async update(req, res) {
-        await EmailsORM.updateEmail(req.params.nickname, req.body.oldEmail, req.body.newEmail)
+        await EmailsORM.update(req.params.nickname, req.body.oldEmail, req.body.newEmail)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -58,7 +58,7 @@ class EmailsCtrl {
      * @param {String} req.body.email User email that would be deleted.
      */
     async delete(req, res) {
-        await EmailsORM.deleteEmail(req.params.nickname, req.body.email)
+        await EmailsORM.delete(req.params.nickname, req.body.email)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }

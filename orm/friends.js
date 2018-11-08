@@ -9,7 +9,7 @@ class Friends {
         this.msgNoFriendExist = 'This friendship not exists';
     }
 
-    async getFriends(nickname) {
+    async getAll(nickname) {
         const user = await UsersORM.getByNickname(nickname)
             .catch(err => Promise.reject(err));
         let result = null;
@@ -24,7 +24,7 @@ class Friends {
         return result;
     }
 
-    async addFriend(nicknameUser, nicknameFriend, date) {
+    async create(nicknameUser, nicknameFriend, date) {
         const user1 = await UsersORM.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
         const user2 = await UsersORM.getByNickname(nicknameFriend)
@@ -43,7 +43,7 @@ class Friends {
         return friendship;
     }
 
-    async deleteFriend(nicknameUser, nicknameFriend) {
+    async delete(nicknameUser, nicknameFriend) {
         const user1 = await UsersORM.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
         const user2 = await UsersORM.getByNickname(nicknameFriend)

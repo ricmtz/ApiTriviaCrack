@@ -10,7 +10,7 @@ class FriendsCtrl {
      * @param {String} req.params.nickname User nickname.
      */
     async getAll(req, res) {
-        await FriendsORM.getFriends(req.params.nickname)
+        await FriendsORM.getAll(req.params.nickname)
             .then((friend) => {
                 res.status(200).send({
                     data: friend,
@@ -29,7 +29,7 @@ class FriendsCtrl {
      * @param {String} req.body.nickname Friend nickname.
      */
     async create(req, res) {
-        await FriendsORM.addFriend(req.params.nickname, req.body.nickname, new Date().toISOString())
+        await FriendsORM.create(req.params.nickname, req.body.nickname, new Date().toISOString())
             .then((friend) => { res.status(200).send({ data: friend }); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }
@@ -43,7 +43,7 @@ class FriendsCtrl {
      * * @param {String} req.body.nickname Friend nickname.
      */
     async delete(req, res) {
-        await FriendsORM.deleteFriend(req.params.nickname, req.params.friendNickname)
+        await FriendsORM.delete(req.params.nickname, req.params.friendNickname)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ data: err.message }); });
     }

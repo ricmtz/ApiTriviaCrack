@@ -17,7 +17,7 @@ class AnswersORM {
         this.msgNoExistAnsware = 'This answare not exist';
     }
 
-    async getAllAnswers(gameId, page) {
+    async getAll(gameId, page) {
         let result = null;
         await db.selectPaged(this.name, { game: gameId }, [], page)
             .then((res) => { result = this.processResultAnsw(res); })
@@ -27,7 +27,7 @@ class AnswersORM {
         return result;
     }
 
-    async getAnswer(gameId, questionId) {
+    async get(gameId, questionId) {
         let result = null;
         await db.select(this.name, { game: gameId, id: questionId }, [])
             .then((res) => { result = this.processResultAnsw(res); })
@@ -37,7 +37,7 @@ class AnswersORM {
         return result;
     }
 
-    async addAnswer(data) {
+    async create(data) {
         const answer = new Answer(data);
         await UsersORM.getByNickname(answer.getPlayer())
             .then((res) => { answer.setPlayer(res.getId()); })
@@ -87,7 +87,7 @@ class AnswersORM {
         }
     }
 
-    async updateAnswer(gameId, questionId, data) {
+    async update(gameId, questionId, data) {
         await db.exists(this.name, { game: gameId, question: questionId })
             .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
         const answer = new Answer(data);
@@ -97,7 +97,7 @@ class AnswersORM {
             .catch(err => Promise.reject(err));
     }
 
-    async deleteAnswer(gameId, questionId) {
+    async delete(gameId, questionId) {
         await db.exists(this.name, { game: gameId, question: questionId })
             .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
         await db.delete(this.name, { game: gameId, question: questionId })
