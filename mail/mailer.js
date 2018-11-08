@@ -9,10 +9,13 @@ class Mailer {
                 user: process.env.MAIL_USER,
                 pass: process.env.MAIL_PASS,
             },
+            tls: {
+                rejectUnauthorized: false,
+            },
         });
 
         this.mailOptions = {
-            from: '"Trivia Crack App" <triviacrack@example.com>',
+            from: `"Trivia Crack App" <${process.env.MAIL_USER}>`,
         };
 
         this.sendMail = this.sendMail.bind(this);
@@ -37,7 +40,7 @@ class Mailer {
         this.sendMail({
             to: email,
             subject: 'Trivia Crack account confirmation',
-            text: token,
+            text: `${process.env.HOST}/confirm?token=${token}`,
         });
     }
 
@@ -45,7 +48,7 @@ class Mailer {
         this.sendMail({
             to: email,
             subject: 'Trivia Crack password restoration',
-            text: token,
+            text: `${process.env.HOST}/restore?token=${token}`,
         });
     }
 }
