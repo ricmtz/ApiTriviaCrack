@@ -7,7 +7,7 @@ CREATE TABLE users
     email TEXT NOT NULL,
     score INTEGER DEFAULT 0,
     avatar TEXT DEFAULT ''::TEXT,
-    lastlogin TIMESTAMP,
+    lastlogin TIMESTAMP WITH TIME ZONE,
     verified BOOLEAN DEFAULT false,
     deleted BOOLEAN DEFAULT false,
     admin BOOLEAN DEFAULT false,
@@ -34,7 +34,7 @@ CREATE TABLE friends
     id SERIAL,
     user1 INTEGER NOT NULL,
     user2 INTEGER NOT NULL,
-    friendshipdate TIMESTAMP NOT NULL,
+    friendshipdate TIMESTAMP WITH TIME ZONE NOT NULL,
     deleted BOOLEAN DEFAULT false,
     CONSTRAINT friends_pkey PRIMARY KEY (id),
     CONSTRAINT friends_id_user_1_fkey FOREIGN KEY (user1)
@@ -54,7 +54,7 @@ CREATE TABLE games
     player2 INTEGER,
     scoreplayer1 INTEGER DEFAULT '-1'::INTEGER,
     scoreplayer2 INTEGER DEFAULT '-1'::INTEGER,
-    createdate TIMESTAMP NOT NULL,
+    createdate TIMESTAMP WITH TIME ZONE NOT NULL,
     finished BOOLEAN DEFAULT false,
     deleted BOOLEAN DEFAULT false,
     CONSTRAINT games_pkey PRIMARY KEY (id),
@@ -89,8 +89,8 @@ CREATE TABLE questions
     approved BOOLEAN DEFAULT false,
     deleted BOOLEAN DEFAULT false,
     userid INTEGER,
-    createdate TIMESTAMP NOT NULL,
-    approveddate TIMESTAMP,
+    createdate TIMESTAMP WITH TIME ZONE NOT NULL,
+    approveddate TIMESTAMP WITH TIME ZONE,
     CONSTRAINT questions_pkey PRIMARY KEY (id),
     CONSTRAINT questions_category_fkey FOREIGN KEY (category)
         REFERENCES categories (id) MATCH SIMPLE
@@ -130,8 +130,8 @@ CREATE TABLE tokens
 (
     id SERIAL,
     token TEXT NOT NULL,
-    createdat TIMESTAMP NOT NULL,
-    expires TIMESTAMP NOT NULL,
+    createdat TIMESTAMP WITH TIME ZONE NOT NULL,
+    expires TIMESTAMP WITH TIME ZONE NOT NULL,
     type CHARACTER(1) NOT NULL,
     status CHARACTER(1) NOT NULL,
     userid INTEGER NOT NULL,
