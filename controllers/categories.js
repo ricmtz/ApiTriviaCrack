@@ -36,7 +36,7 @@ class CategoriesCtrl {
     async get(req, res) {
         await CategoriesORM.get(req.params.categoryId)
             .then((categ) => { res.status(200).send({ data: categ }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -52,7 +52,7 @@ class CategoriesCtrl {
         this.setDefaultValues(req);
         await CategoriesORM.create(req.body)
             .then((categ) => { res.status(200).send({ data: categ }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -70,7 +70,7 @@ class CategoriesCtrl {
     async update(req, res) {
         await CategoriesORM.update(req.params.categoryId, req.body)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -83,7 +83,7 @@ class CategoriesCtrl {
     async delete(req, res) {
         await CategoriesORM.delete(req.params.categoryId)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**

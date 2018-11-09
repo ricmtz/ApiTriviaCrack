@@ -23,7 +23,7 @@ class QuestionsCtrl {
                     total: quest.length,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -36,7 +36,7 @@ class QuestionsCtrl {
     async get(req, res) {
         await QuestionsORM.get(req.params.question)
             .then((quest) => { res.status(200).send({ data: quest }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -55,7 +55,7 @@ class QuestionsCtrl {
         this.setDefaultValues(req);
         await QuestionsORM.create(req.body)
             .then((quest) => { res.status(200).send({ data: quest }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -74,7 +74,7 @@ class QuestionsCtrl {
     async update(req, res) {
         await QuestionsORM.update(req.params.question, req.body)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -87,7 +87,7 @@ class QuestionsCtrl {
     async delete(req, res) {
         await QuestionsORM.delete(req.params.question)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**

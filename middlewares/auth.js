@@ -3,6 +3,7 @@ const { usersCtrl } = require('../controllers');
 const { UsersORM, TokensORM } = require('../orm');
 const Authorization = require('../orm/authorizations');
 const { mailer } = require('../mail');
+const { Codes } = require('../resCodes');
 
 
 class Auth {
@@ -22,7 +23,7 @@ class Auth {
         let user = null;
         let token = null;
         req.body.password = await this.hash(req.body.password)
-            .catch(err => next(err));
+            .catch(err => next(Codes.resServerErr(err.message)));
         if (!req.body.password) {
             return;
         }
@@ -88,7 +89,7 @@ class Auth {
     async login(req, res, next) {
         // Check if user exists
         req.body.user = await UsersORM.getByNickname(req.body.nickname)
-            .catch(err => next(err));
+            .catch(err => next(Codes.resNotFound(err.message)));
         if (!req.body.user) {
             return;
         }
@@ -101,7 +102,7 @@ class Auth {
         }
         // Check if password is correct
         if (correctPass === false) {
-            next(new Error('User/password combination is not valid'));
+            next(Codes.resUnauthorized('User/password combination is not valid'));
             return;
         }
         // Check last active token associated to the user
@@ -134,7 +135,7 @@ class Auth {
 
     async logout(req, res, next) {
         const tokenObj = await TokensORM.get(req.get('token'))
-            .catch(err => next(err));
+            .catch(err => next(Codes.resNotFound(err.message)));
         if (!tokenObj) {
             return;
         }
@@ -187,11 +188,11 @@ class Auth {
 
     async genRestorationToken(req, res, next) {
         if (!req.body.nickname) {
-            next(new Error('Missing user nickname'));
+            next(Codes.resBadRequest('Missing user nickname'));
             return;
         }
         const user = await UsersORM.getByNickname(req.body.nickname)
-            .catch(err => next(err));
+            .catch(err => next(Codes.resNotFound(err.message)));
         if (!user) {
             return;
         }
@@ -213,11 +214,11 @@ class Auth {
 
     async restorePass(req, res, next) {
         if (!req.body.password) {
-            next(new Error('Missing user password'));
+            next(Codes.resBadRequest('Missing user password'));
             return;
         }
         const tokenObj = await TokensORM.get(req.query.token, false)
-            .catch(() => next(new Error('Invalid token')));
+            .catch(() => next(Codes.resUnauthorized('Invalid token')));
         if (!tokenObj) {
             return;
         }
@@ -227,7 +228,7 @@ class Auth {
             if (!updated) {
                 return;
             }
-            next(new Error('The token has expired'));
+            next(Codes.resUnauthorized('The token has expired'));
             return;
         }
         const user = await UsersORM.get(tokenObj.getUserId())
@@ -257,7 +258,7 @@ class Auth {
 
     async havePermissions(req, res, next) {
         const tokenObj = await TokensORM.get(req.get('token'))
-            .catch(() => next(new Error('Not valid token')));
+            .catch(() => next(Codes.resUnauthorized('Not valid token')));
         if (!tokenObj) {
             return;
         }
@@ -270,7 +271,7 @@ class Auth {
         if (Authorization.canDo(rol, user.getNickname(), req)) {
             next();
         } else {
-            next(new Error('Dont have Authorization'));
+            next(Codes.resUnauthorized('Dont have Authorization'));
         }
     }
 }
