@@ -1,3 +1,10 @@
+exports.resBadRequest = function resBadRequest(msg) {
+    return {
+        code: 400,
+        message: msg,
+    };
+};
+
 exports.resUnauthorized = function resUnauthorized(msg) {
     return {
         code: 401,
@@ -22,6 +29,13 @@ exports.resNotFound = function resNotFound(msg) {
 exports.resConflic = function resConflic(msg) {
     return {
         code: 409,
+        message: msg,
+    };
+};
+
+exports.resServerErr = function resServerErr(msg) {
+    return {
+        code: 500,
         message: msg,
     };
 };
