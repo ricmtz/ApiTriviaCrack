@@ -18,7 +18,7 @@ class AnswersCtrl {
                     total: ans.length,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -32,7 +32,7 @@ class AnswersCtrl {
     async get(req, res) {
         await AnswersORM.get(req.params.gameId, req.params.answerId)
             .then((ans) => { res.status(200).send({ data: ans }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -56,7 +56,7 @@ class AnswersCtrl {
         };
         await AnswersORM.create(data)
             .then((ans) => { res.status(200).send({ data: ans }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -79,7 +79,7 @@ class AnswersCtrl {
         };
         await AnswersORM.update(req.params.gameId, req.params.answerId, data)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -94,7 +94,7 @@ class AnswersCtrl {
     async delete(req, res) {
         await AnswersORM.delete(req.params.gameId, req.params.answerId)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 }
 

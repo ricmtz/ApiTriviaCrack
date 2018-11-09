@@ -17,7 +17,7 @@ class EmailsCtrl {
                     total: email.length,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -31,7 +31,7 @@ class EmailsCtrl {
     async create(req, res) {
         await EmailsORM.create(req.params.nickname, req.body.email)
             .then((email) => { res.status(200).send({ data: email }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -46,7 +46,7 @@ class EmailsCtrl {
     async update(req, res) {
         await EmailsORM.update(req.params.nickname, req.body.oldEmail, req.body.newEmail)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -60,7 +60,7 @@ class EmailsCtrl {
     async delete(req, res) {
         await EmailsORM.delete(req.params.nickname, req.body.email)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 }
 
