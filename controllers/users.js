@@ -23,7 +23,7 @@ class UsersCtrl {
                     total: usrs.length,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(err.code).send({ data: err.message }); });
     }
 
     /**

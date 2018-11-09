@@ -1,5 +1,6 @@
 const { db } = require('../db');
 const { User } = require('../models');
+const { Codes } = require('../res_codes');
 
 class Users {
     constructor() {
@@ -20,7 +21,7 @@ class Users {
         let result = null;
         await db.selectPaged(this.name, {}, [], pageNum)
             .then((res) => { result = this.processResult(res); })
-            .catch(err => Promise.reject(err));
+            .catch(err => Promise.reject(Codes.resNotFound(err.message)));
         return result;
     }
 
@@ -28,7 +29,7 @@ class Users {
         let result = null;
         await db.selectNonDel(this.name, { id: idUser })
             .then((res) => { result = this.processResult(res); })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
+            .catch(() => Promise.reject(Codes.resNotFound(this.msgNoUser)));
         return result;
     }
 
