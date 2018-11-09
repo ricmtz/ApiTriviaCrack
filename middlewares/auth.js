@@ -3,7 +3,7 @@ const { usersCtrl } = require('../controllers');
 const { UsersORM, TokensORM } = require('../orm');
 const Authorization = require('../orm/authorizations');
 const { mailer } = require('../mail');
-const { Codes } = require('../res_codes');
+const { Codes } = require('../resCodes');
 
 
 class Auth {

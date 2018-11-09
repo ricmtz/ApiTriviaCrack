@@ -1,6 +1,6 @@
 const { db } = require('../db');
 const { User } = require('../models');
-const { Codes } = require('../res_codes');
+const { Codes } = require('../resCodes');
 
 class Users {
     constructor() {
