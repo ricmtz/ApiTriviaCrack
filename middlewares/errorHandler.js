@@ -7,7 +7,7 @@ const errorHandler = (err, req, res, next) => {
         });
     }
     if (err) {
-        res.status(err.code || 409).send({ data: err.message });
+        res.status(err.code || 409).send({ data: err });
     } else {
         res.status(500).send();
     }
