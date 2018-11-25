@@ -8,17 +8,17 @@ class Tokens {
         this.msgNoCreateToken = 'Could not create token';
     }
 
-    async get(searchToken, session = true) {
+    async get(searchToken, tokenType = 's') {
         let result = null;
-        await db.select(this.name, { token: searchToken, type: session ? 's' : 'r', status: '1' })
+        await db.select(this.name, { token: searchToken, type: tokenType, status: '1' })
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         return result;
     }
 
-    async getLastByUserId(userId) {
+    async getLastByUserId(userId, tokenType = 's') {
         let result = null;
-        await db.selectLast(this.name, { userid: userId }, [], 'createdat')
+        await db.selectLast(this.name, { userid: userId, type: tokenType }, [], 'createdat')
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         return result;
