@@ -17,7 +17,7 @@ class FriendsCtrl {
                     total: friend.length,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -31,7 +31,7 @@ class FriendsCtrl {
     async create(req, res) {
         await FriendsORM.create(req.params.nickname, req.body.nickname, new Date().toISOString())
             .then((friend) => { res.status(200).send({ data: friend }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -45,7 +45,7 @@ class FriendsCtrl {
     async delete(req, res) {
         await FriendsORM.delete(req.params.nickname, req.params.friendNickname)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 }
 
