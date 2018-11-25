@@ -36,11 +36,11 @@ class Mailer {
     }
 
 
-    sendConfirmation(email, token) {
+    sendVerification(email, token) {
         this.sendMail({
             to: email,
-            subject: 'Trivia Crack account confirmation',
-            text: `${process.env.HOST}/confirm?token=${token}`,
+            subject: 'Trivia Crack account verification',
+            text: `${process.env.HOST}/verify?token=${token}`,
         });
     }
 

@@ -16,6 +16,7 @@ class Auth {
         this.logout = this.logout.bind(this);
         this.session = this.session.bind(this);
         this.restore = this.restore.bind(this);
+        this.verify = this.verify.bind(this);
     }
 
     async register(req, res, next) {
@@ -37,11 +38,12 @@ class Auth {
         if (!token) {
             return;
         }
+        await this.genVerificationToken(req)
+            .catch(err => next(err));
         res.send({
             data: user,
             token: token.getToken(),
         }).status(201);
-        mailer.sendConfirmation(user.getEmail(), token.getToken());
         next();
     }
 
@@ -216,7 +218,7 @@ class Auth {
             next(new Error('Missing user password'));
             return;
         }
-        const tokenObj = await TokensORM.get(req.query.token, false)
+        const tokenObj = await TokensORM.get(req.query.token, 'r')
             .catch(() => next(new Error('Invalid token')));
         if (!tokenObj) {
             return;
@@ -272,6 +274,58 @@ class Auth {
         } else {
             next(new Error('Dont have Authorization'));
         }
+    }
+
+    async genVerificationTokenData(user) {
+        const hashToken = await this.hash(user.getNickname())
+            .catch(err => Promise.reject(err));
+        const currDate = new Date();
+        const expireDate = new Date(currDate);
+        expireDate.setHours(expireDate.getHours() + Number(process.env.VERIFICATION_TIME));
+        return {
+            token: hashToken,
+            createdat: currDate.toISOString(),
+            expires: expireDate.toISOString(),
+            type: 'v',
+            status: '1',
+            userid: user.getId(),
+        };
+    }
+
+    async genVerificationToken(req) {
+        if (!req.body.nickname) {
+            return Promise.reject(new Error('Missing user nickname'));
+        }
+        const user = await UsersORM.getByNickname(req.body.nickname)
+            .catch(err => Promise.reject(err));
+        const tokenData = await this.genVerificationTokenData(user)
+            .catch(err => Promise.reject(err));
+        const resToken = await TokensORM.create(tokenData)
+            .catch(err => Promise.reject(err));
+
+        mailer.sendVerification(user.getEmail(), resToken.getToken());
+
+        return Promise.resolve();
+    }
+
+    async verify(req, res, next) {
+        if (req.query.token) {
+            const tokenObj = await TokensORM.get(req.query.token, 'v')
+                .catch(() => next(new Error('Invalid token')));
+            if (!tokenObj) {
+                return;
+            }
+            const user = await UsersORM.get(tokenObj.getUserId())
+                .catch(err => next(err));
+            await UsersORM.update(user.getNickname(), { verified: true })
+                .catch(err => next(err));
+            await TokensORM.updateStatus(tokenObj.getId(), '0')
+                .catch(err => next(err));
+        } else {
+            next(new Error('Missing token'));
+        }
+        res.send().status(204);
+        next();
     }
 }
 
