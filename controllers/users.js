@@ -2,13 +2,6 @@ const { UsersORM } = require('../orm');
 
 class UsersCtrl {
     /**
-     * Constructor function to UsersCtrl.
-     */
-    constructor() {
-        this.create = this.create.bind(this);
-    }
-
-    /**
      * This function request to the data base all the
      * users stored.
      * @param {Object} req Express request object.
@@ -49,7 +42,6 @@ class UsersCtrl {
      * @param {String} req.body.email User email.
      */
     async create(req, res) {
-        this.setDefaultValues(req);
         await UsersORM.create(req.body)
             .then((usr) => { res.status(200).send({ data: usr }); })
             .catch((err) => { res.status(404).send({ error: err.message }); });
@@ -84,21 +76,6 @@ class UsersCtrl {
         await UsersORM.delete(req.params.nickname)
             .then(() => { res.status(204).send(); })
             .catch((err) => { res.status(404).send({ error: err.message }); });
-    }
-
-    /**
-     * This function set the default valuest to the attribs
-     * admin, score, avatar, lastlogin, deleted and verified
-     * for a user.
-     * @param {Object} req Express request object.
-     */
-    setDefaultValues(req) {
-        req.body.admin = false;
-        req.body.score = 0;
-        req.body.avatar = 'default.png';
-        req.body.lastlogin = new Date().toISOString();
-        req.body.deleted = false;
-        req.body.verified = false;
     }
 }
 
