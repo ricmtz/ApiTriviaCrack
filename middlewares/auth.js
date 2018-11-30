@@ -193,11 +193,8 @@ class Auth {
         if (!token) {
             return;
         }
-        const updated = await this.updateSession(token)
+        await this.updateSession(token)
             .catch(err => next(err));
-        if (typeof (updated) === 'undefined') {
-            return;
-        }
         if (!token.isActive()) {
             next(Codes.resUnauthorized('The session has expired'));
             return;
