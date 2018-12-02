@@ -17,9 +17,11 @@ class Questions {
         this.msgNoUser = 'This user dont exist';
     }
 
-    async getAll(page) {
+    async getAll(page, filters) {
         let result = null;
-        await db.selectPaged(this.name, null, [], page)
+        const filtersObj = await this.getFilters(filters)
+            .catch(err => Promise.reject(err));
+        await db.selectPaged(this.name, filtersObj, [], page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         await this.appendValues(result)
@@ -37,9 +39,9 @@ class Questions {
         return result;
     }
 
-    async getQuestion(question) {
+    async getQuestion(questionText) {
         let result = null;
-        await db.selectNonDel(this.name, { question })
+        await db.selectNonDel(this.name, { question: questionText })
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
         return result;
@@ -122,6 +124,18 @@ class Questions {
             await Promise.all(promises)
                 .catch(err => Promise.reject(err));
         }
+    }
+
+    async getFilters(query) {
+        const result = [];
+        if (query.category) {
+            await CategoriesORM.getByName(query.category)
+                .then((cat) => { result.category = cat.getId(); });
+        }
+        if (typeof (query.approved) !== 'undefined') {
+            result.approved = query.approved;
+        }
+        return result;
     }
 }
 

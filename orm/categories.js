@@ -28,6 +28,14 @@ class Categories {
         return result;
     }
 
+    async getByName(categoryName) {
+        let result = null;
+        await db.selectNonDel(this.name, { name: categoryName })
+            .then((res) => { result = this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoCategory)));
+        return result;
+    }
+
     async create(data) {
         const category = new Category(data);
         await this.existsAttribs(category)

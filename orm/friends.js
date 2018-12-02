@@ -9,16 +9,20 @@ class Friends {
         this.msgNoFriendExist = 'This friendship not exists';
     }
 
-    async getAll(nickname) {
+    async getAll(nickname, filters) {
         const user = await UsersORM.getByNickname(nickname)
             .catch(err => Promise.reject(err));
         let result = null;
-        await db.selectNonDel(this.name, { user1: user.getId() }, [])
+        let filtersObj = await this.getFilters(filters)
+            .catch(err => Promise.reject(err));
+        await db.selectNonDel(this.name, { user1: user.getId(), ...filtersObj }, [])
             .then((res) => { result = res; })
+            .catch(() => {});
+        filtersObj = await this.getInverseFilters(filters)
             .catch(err => Promise.reject(err));
-        await db.selectNonDel(this.name, { user2: user.getId() }, [])
+        await db.selectNonDel(this.name, { user2: user.getId(), ...filtersObj }, [])
             .then((res) => { result.push(...res); })
-            .catch(err => Promise.reject(err));
+            .catch(() => {});
         await this.appendValuesFriends(result)
             .catch(err => Promise.reject(err));
         return result;
@@ -93,6 +97,24 @@ class Friends {
             await Promise.all(promises)
                 .catch(err => Promise.reject(err));
         }
+    }
+
+    async getFilters(query) {
+        const result = [];
+        if (query.user2) {
+            await UsersORM.getByNickname(query.user2)
+                .then((usr) => { result.user2 = usr.getId(); });
+        }
+        return result;
+    }
+
+    async getInverseFilters(query) {
+        const result = [];
+        if (query.user2) {
+            await UsersORM.getByNickname(query.user2)
+                .then((usr) => { result.user1 = usr.getId(); });
+        }
+        return result;
     }
 }
 

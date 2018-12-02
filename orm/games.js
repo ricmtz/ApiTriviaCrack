@@ -1,7 +1,6 @@
 const { db } = require('../db');
 const { Game } = require('../models');
 const UsersORM = require('./users');
-const QuestionsORM = require('./questions');
 
 class Games {
     constructor() {
@@ -20,9 +19,9 @@ class Games {
         return games[pos];
     }
 
-    async getAll(page) {
+    async getAll(page, filters) {
         let result = null;
-        await db.selectPaged(this.name, {}, [], page)
+        await db.selectPaged(this.name, this.getFilters(filters), [], page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         await this.appendValuesGames(result)
@@ -153,6 +152,42 @@ class Games {
             await Promise.all(promises)
                 .catch(err => Promise.reject(err));
         }
+    }
+
+    getFilters(query) {
+        const result = [];
+        if (query.scorePlayer1Min) {
+            result.push({
+                attrib: 'scoreplayer1',
+                opr: '>=',
+                val: Number(query.scorePlayer1Min),
+            });
+        }
+        if (query.scorePlayer1Max) {
+            result.push({
+                attrib: 'scoreplayer1',
+                opr: '<=',
+                val: Number(query.scorePlayer1Max),
+            });
+        }
+        if (query.scorePlayer2Min) {
+            result.push({
+                attrib: 'scoreplayer2',
+                opr: '>=',
+                val: Number(query.scorePlayer2Min),
+            });
+        }
+        if (query.scorePlayer2Max) {
+            result.push({
+                attrib: 'scoreplayer2',
+                opr: '<=',
+                val: Number(query.scorePlayer2Max),
+            });
+        }
+        if (typeof (query.finished) !== 'undefined') {
+            result.finished = query.finished;
+        }
+        return result;
     }
 }
 

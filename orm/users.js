@@ -17,9 +17,9 @@ class Users {
         this.msgNoFriendExist = 'This friendship not exists';
     }
 
-    async getAll(pageNum) {
+    async getAll(pageNum, filters) {
         let result = null;
-        await db.selectPaged(this.name, {}, [], pageNum)
+        await db.selectPaged(this.name, this.getFilters(filters), [], pageNum)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(Codes.resNotFound(err.message)));
         return result;
@@ -109,6 +109,25 @@ class Users {
             return Promise.reject(new Error(this.msgExistEmail));
         }
         return null;
+    }
+
+    getFilters(query) {
+        const result = [];
+        if (query.scoreMin) {
+            result.push({
+                attrib: 'score',
+                opr: '>=',
+                val: Number(query.scoreMin),
+            });
+        }
+        if (query.scoreMax) {
+            result.push({
+                attrib: 'score',
+                opr: '<=',
+                val: Number(query.scoreMax),
+            });
+        }
+        return result;
     }
 
     /**

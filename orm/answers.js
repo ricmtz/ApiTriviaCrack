@@ -17,9 +17,11 @@ class AnswersORM {
         this.msgNoExistAnsware = 'This answare not exist';
     }
 
-    async getAll(gameId, page) {
+    async getAll(gameId, page, filters) {
         let result = null;
-        await db.selectPaged(this.name, { game: gameId }, [], page)
+        const filtersObj = await this.getFilters(filters)
+            .catch(err => Promise.reject(err));
+        await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [], page)
             .then((res) => { result = this.processResultAnsw(res); })
             .catch(err => Promise.reject(err));
         await this.appendValuesAnswers(result)
@@ -180,6 +182,22 @@ class AnswersORM {
             await Promise.all(promises)
                 .catch(err => Promise.reject(err));
         }
+    }
+
+    async getFilters(query) {
+        const result = [];
+        if (query.question) {
+            await QuestionsORM.getQuestion(query.question)
+                .then((que) => { result.question = que.getId(); });
+        }
+        if (query.player) {
+            await UsersORM.getByNickname(query.player)
+                .then((usr) => { result.player = usr.getId(); });
+        }
+        if (typeof (query.correct) !== 'undefined') {
+            result.correct = query.correct;
+        }
+        return result;
     }
 }
 
