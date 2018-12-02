@@ -4,6 +4,7 @@ const { UsersORM, TokensORM } = require('../orm');
 const Authorization = require('../orm/authorizations');
 const { mailer } = require('../mail');
 
+// FIXME Documentar esta clase y sus metodos
 
 class Auth {
     constructor() {
@@ -18,6 +19,7 @@ class Auth {
         this.restore = this.restore.bind(this);
     }
 
+    // FIXME generalmente la parte de registro la hace el ctrl de users, y desde ahi se llaman las necesidad de auth para token
     async register(req, res, next) {
         let user = null;
         let token = null;
@@ -41,7 +43,7 @@ class Auth {
             data: user,
             token: token.getToken(),
         }).status(201);
-        mailer.sendConfirmation(user.getEmail(), token.getToken());
+        mailer.sendConfirmation(user.getEmail(), token.getToken()); // FIXME primero se debe mandar el correo y luego mandar el send y debe ser async
         next();
     }
 
