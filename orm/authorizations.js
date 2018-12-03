@@ -6,7 +6,7 @@ const USERS = 'users';
 const EMAILS = 'emails';
 const FRIENDS = 'friends';
 const CATEGORIES = 'categories';
-const ANSWERS = 'games_questions';
+const ANSWERS = 'answers';
 const GAMES = 'games';
 const QUESTIONS = 'questions';
 // method
@@ -211,8 +211,8 @@ class Authorization {
 
     getPermission(permissions, path, method) {
         for (let i = 0; i < permissions.length; i += 1) {
-            if (permissions[i].path === path &&
-                permissions[i].method === method
+            if (permissions[i].path === path
+                && permissions[i].method === method
             ) {
                 return permissions[i];
             }
@@ -223,7 +223,7 @@ class Authorization {
     getRestrictions(rol, user, req) {
         const url = req.baseUrl.split(PATH_ROOT);
         const urlName = url[url.length - 1];
-        //const { method } = req;
+        // const { method } = req;
         if (rol === USER) {
             if (urlName === USERS || urlName === EMAILS || urlName === FRIENDS) {
                 if (req.params.nickname !== user) {
