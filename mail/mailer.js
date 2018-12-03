@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer');
 
+// FIXME esta clase y sus metodos deben estar documentados
+
 class Mailer {
     constructor() {
         this.transporter = nodemailer.createTransport({
@@ -37,7 +39,7 @@ class Mailer {
         this.sendMail({
             to: email,
             subject: 'Trivia Crack account confirmation',
-            text: token,
+            text: token, // FIXME lo que deberia mandar seria un mensaje en html con un boton que mande a una url para confirmar el token, no el token directamente
         });
     }
 
