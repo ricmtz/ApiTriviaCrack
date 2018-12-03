@@ -160,28 +160,28 @@ class Games {
             result.push({
                 attrib: 'scoreplayer1',
                 opr: '>=',
-                val: Number(query.scorePlayer1Min),
+                val: query.scorePlayer1Min,
             });
         }
         if (query.scorePlayer1Max) {
             result.push({
                 attrib: 'scoreplayer1',
                 opr: '<=',
-                val: Number(query.scorePlayer1Max),
+                val: query.scorePlayer1Max,
             });
         }
         if (query.scorePlayer2Min) {
             result.push({
                 attrib: 'scoreplayer2',
                 opr: '>=',
-                val: Number(query.scorePlayer2Min),
+                val: query.scorePlayer2Min,
             });
         }
         if (query.scorePlayer2Max) {
             result.push({
                 attrib: 'scoreplayer2',
                 opr: '<=',
-                val: Number(query.scorePlayer2Max),
+                val: query.scorePlayer2Max,
             });
         }
         if (typeof (query.finished) !== 'undefined') {

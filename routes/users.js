@@ -12,7 +12,8 @@ router.use(auth.session);
 router.use('/:nickname', rules.paramsUser);
 
 // List all users.
-router.get('/', [rules.getAllElements, auth.havePermissions], usersCtrl.getAll);
+router.get('/', [rules.getAllElements, rules.queryUser,
+    rules.userScoreConv, rules.userScores, auth.havePermissions], usersCtrl.getAll);
 
 // Find users.
 router.get('/:nickname', auth.havePermissions, usersCtrl.get);
