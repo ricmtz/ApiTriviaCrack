@@ -12,9 +12,9 @@ class Categories {
         this.msgExistColor = 'This color already exists';
     }
 
-    async getAll(page) {
+    async getAll(page, filters) {
         let result = null;
-        await db.selectPaged(this.name, {}, [], page)
+        await db.selectPaged(this.name, this.getFilters(filters), [], page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         return result;
@@ -91,6 +91,18 @@ class Categories {
             return Promise.reject(new Error(this.msgExistColor));
         }
         return null;
+    }
+
+    getFilters(query) {
+        const result = [];
+        if (query.name) {
+            result.push({
+                attrib: 'name',
+                opr: ' LIKE ',
+                val: `%${query.name}%`,
+            });
+        }
+        return result;
     }
 }
 

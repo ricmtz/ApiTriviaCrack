@@ -189,7 +189,7 @@ class Auth {
             return;
         }
         const token = await TokensORM.get(req.get('token'))
-            .catch(err => next(Codes.resNotFound(err.message)));
+            .catch(err => next(Codes.resNotFound('Invalid token')));
         if (!token) {
             return;
         }

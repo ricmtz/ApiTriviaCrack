@@ -13,7 +13,7 @@ router.use('/:categoryId', rules.paramsCategories);
 router.post('/', [rules.createCategory, auth.havePermissions], categoriesCtrl.create);
 
 // Get all categories
-router.get('/', [rules.getAllElements, auth.havePermissions], categoriesCtrl.getAll);
+router.get('/', [rules.getAllElements, rules.queryCategory, auth.havePermissions], categoriesCtrl.getAll);
 
 // Get category
 router.get('/:categoryId', auth.havePermissions, categoriesCtrl.get);

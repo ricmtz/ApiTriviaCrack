@@ -113,18 +113,32 @@ class Users {
 
     getFilters(query) {
         const result = [];
+        if (query.nickname) {
+            result.push({
+                attrib: 'nickname',
+                opr: ' LIKE ',
+                val: `%${query.nickname}%`,
+            });
+        }
+        if (query.email) {
+            result.push({
+                attrib: 'email',
+                opr: ' LIKE ',
+                val: `%${query.email}%`,
+            });
+        }
         if (query.scoreMin) {
             result.push({
                 attrib: 'score',
                 opr: '>=',
-                val: Number(query.scoreMin),
+                val: query.scoreMin,
             });
         }
         if (query.scoreMax) {
             result.push({
                 attrib: 'score',
                 opr: '<=',
-                val: Number(query.scoreMax),
+                val: query.scoreMax,
             });
         }
         return result;

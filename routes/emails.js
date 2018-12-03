@@ -7,7 +7,7 @@ const router = express.Router({ mergeParams: true });
 router.use(auth.session);
 
 // Get all emails
-router.get('/', auth.havePermissions, emailsCtrl.getAll);
+router.get('/', [rules.queryEmail, auth.havePermissions], emailsCtrl.getAll);
 
 // Add email
 router.post('/', [rules.checkEmail, auth.havePermissions], emailsCtrl.create);

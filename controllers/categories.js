@@ -16,7 +16,7 @@ class CategoriesCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await CategoriesORM.getAll(req.query.page)
+        await CategoriesORM.getAll(req.query.page, req.query)
             .then((categ) => {
                 res.status(200).send({
                     data: categ,

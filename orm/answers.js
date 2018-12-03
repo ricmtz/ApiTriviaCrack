@@ -186,13 +186,20 @@ class AnswersORM {
 
     async getFilters(query) {
         const result = [];
+        if (query.player) {
+            await UsersORM.getByNickname(query.player)
+                .then((usr) => { result.player = usr.getId(); });
+        }
         if (query.question) {
             await QuestionsORM.getQuestion(query.question)
                 .then((que) => { result.question = que.getId(); });
         }
-        if (query.player) {
-            await UsersORM.getByNickname(query.player)
-                .then((usr) => { result.player = usr.getId(); });
+        if (query.option) {
+            result.push({
+                attrib: 'option',
+                opr: ' LIKE ',
+                val: `%${query.option}%`,
+            });
         }
         if (typeof (query.correct) !== 'undefined') {
             result.correct = query.correct;

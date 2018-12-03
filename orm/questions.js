@@ -128,6 +128,34 @@ class Questions {
 
     async getFilters(query) {
         const result = [];
+        if (query.question) {
+            result.push({
+                attrib: 'question',
+                opr: ' LIKE ',
+                val: `%${query.question}%`,
+            });
+        }
+        if (query.option1) {
+            result.push({
+                attrib: 'option1',
+                opr: ' LIKE ',
+                val: `%${query.option1}%`,
+            });
+        }
+        if (query.option2) {
+            result.push({
+                attrib: 'option2',
+                opr: ' LIKE ',
+                val: `%${query.option2}%`,
+            });
+        }
+        if (query.optionCorrect) {
+            result.push({
+                attrib: 'optioncorrect',
+                opr: ' LIKE ',
+                val: `%${query.optionCorrect}%`,
+            });
+        }
         if (query.category) {
             await CategoriesORM.getByName(query.category)
                 .then((cat) => { result.category = cat.getId(); });

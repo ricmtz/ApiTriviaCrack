@@ -21,7 +21,9 @@ class Games {
 
     async getAll(page, filters) {
         let result = null;
-        await db.selectPaged(this.name, this.getFilters(filters), [], page)
+        const filtersObj = await this.getFilters(filters)
+            .catch(err => Promise.reject(err));
+        await db.selectPaged(this.name, filtersObj, [], page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         await this.appendValuesGames(result)
@@ -154,8 +156,16 @@ class Games {
         }
     }
 
-    getFilters(query) {
+    async getFilters(query) {
         const result = [];
+        if (query.player1) {
+            await UsersORM.getByNickname(query.player1)
+                .then((usr) => { result.player1 = usr.getId(); });
+        }
+        if (query.player2) {
+            await UsersORM.getByNickname(query.player2)
+                .then((usr) => { result.player2 = usr.getId(); });
+        }
         if (query.scorePlayer1Min) {
             result.push({
                 attrib: 'scoreplayer1',

@@ -106,6 +106,8 @@ class Rules {
     static queryUser(req, res, next) {
         validator.validate(req, res, next, {
             query: {
+                nickname: 'text,optional',
+                email: 'text,optional',
                 scoreMin: 'positive,optional',
                 scoreMax: 'positive,optional',
             },
@@ -120,9 +122,19 @@ class Rules {
         });
     }
 
+    static queryEmail(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                email: 'text,optional',
+            },
+        });
+    }
+
     static queryGame(req, res, next) {
         validator.validate(req, res, next, {
             query: {
+                player1: 'nickname,optional',
+                player2: 'nickname,optional',
                 scorePlayer1Min: 'positive,optional',
                 scorePlayer1Max: 'positive,optional',
                 scorePlayer2Min: 'positive,optional',
@@ -134,6 +146,10 @@ class Rules {
     static queryQuestion(req, res, next) {
         validator.validate(req, res, next, {
             query: {
+                question: 'text,optional',
+                option1: 'text,optional',
+                option2: 'text,optional',
+                optioncorrect: 'text,optional',
                 category: 'text,optional',
                 approved: 'boolean,optional',
             },
@@ -143,8 +159,18 @@ class Rules {
     static queryAnswer(req, res, next) {
         validator.validate(req, res, next, {
             query: {
+                player: 'nickname,optional',
                 question: 'text,optional',
+                option: 'text,optional',
                 correct: 'boolean,optional',
+            },
+        });
+    }
+
+    static queryCategory(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                name: 'text,optional',
             },
         });
     }
