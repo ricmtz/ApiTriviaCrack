@@ -214,6 +214,20 @@ class Rules {
         next();
     }
 
+    static answerConv(req, res, next) {
+        if (req.body.question) {
+            req.body.question = Number(req.body.question);
+        }
+        next();
+    }
+
+    static questionConv(req, res, next) {
+        if (req.body.category) {
+            req.body.category = Number(req.body.category);
+        }
+        next();
+    }
+
     static gameScores(req, res, next) {
         if (typeof (req.query.scorePlayer1Min) === 'number'
             && typeof (req.query.scorePlayer1Max) === 'number'
@@ -361,7 +375,6 @@ class Rules {
         validator.validate(req, res, next, {
             body: {
                 question: 'id,required',
-                player: 'text,required',
                 option: 'text,required',
             },
         });
@@ -402,7 +415,6 @@ class Rules {
                 option1: 'text,required',
                 option2: 'text,required',
                 optioncorrect: 'text,required',
-                userid: 'id,required',
             },
         });
     }

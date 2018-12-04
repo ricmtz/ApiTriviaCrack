@@ -16,7 +16,7 @@ router.get('/', [rules.queryQuestion, auth.havePermissions], questionsCtrl.getAl
 router.get('/:question', auth.havePermissions, questionsCtrl.get);
 
 // Create question.
-router.post('/', [rules.createQuestion, auth.havePermissions], questionsCtrl.create);
+router.post('/', [rules.createQuestion, rules.questionConv, auth.havePermissions], questionsCtrl.create);
 
 // Remove question.
 router.delete('/:question', auth.havePermissions, questionsCtrl.delete);

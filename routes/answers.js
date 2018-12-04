@@ -16,7 +16,7 @@ router.get('/', [rules.queryAnswer, auth.havePermissions], AnswersCtrl.getAll);
 router.get('/:answerId', auth.havePermissions, AnswersCtrl.get);
 
 // Create answer
-router.post('/', [rules.createGameQuestion, auth.havePermissions], AnswersCtrl.create);
+router.post('/', [rules.createGameQuestion, rules.answerConv, auth.havePermissions], AnswersCtrl.create);
 
 // Delete answer
 router.delete('/:answerId', auth.havePermissions, AnswersCtrl.delete);

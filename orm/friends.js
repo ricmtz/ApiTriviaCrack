@@ -12,7 +12,7 @@ class Friends {
     async getAll(nickname, filters) {
         const user = await UsersORM.getByNickname(nickname)
             .catch(err => Promise.reject(err));
-        let result = null;
+        let result = [];
         let filtersObj = await this.getFilters(filters)
             .catch(err => Promise.reject(err));
         await db.selectNonDel(this.name, { user1: user.getId(), ...filtersObj }, [])
@@ -86,6 +86,9 @@ class Friends {
     }
 
     async appendValuesFriends(friends) {
+        if (!friends) {
+            return;
+        }
         if (!Array.isArray(friends)) {
             await this.appendValuesFriend(friends)
                 .catch(err => Promise.reject(err));

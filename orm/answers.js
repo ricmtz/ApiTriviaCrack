@@ -42,9 +42,6 @@ class AnswersORM {
 
     async create(data) {
         const answer = new Answer(data);
-        await UsersORM.getByNickname(answer.getPlayer())
-            .then((res) => { answer.setPlayer(res.getId()); })
-            .catch((err) => { Promise.reject(err); });
         await this.existsAttribsAnsw(answer)
             .catch(err => Promise.reject(err));
         await db.selectNonDel(this.questions,
