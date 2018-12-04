@@ -21,35 +21,56 @@ class Mailer {
         this.sendMail = this.sendMail.bind(this);
     }
 
-    sendMail(options) {
+    async sendMail(options) {
         const mailOptions = {
             ...this.mailOptions,
             ...options,
         };
 
-        this.transporter.sendMail(mailOptions, (error, info) => {
+        await this.transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                return console.log(error);
+                return Promise.reject(error);
             }
-            return true;
+            return Promise.resolve(info);
         });
     }
 
-
-    sendVerification(email, token) {
-        this.sendMail({
-            to: email,
-            subject: 'Trivia Crack account verification',
-            text: `${process.env.HOST}/verify?token=${token}`,
-        });
+    async sendVerification(email, token) {
+        try {
+            await this.sendMail({
+                to: email,
+                subject: 'Trivia Crack account verification',
+                text: `Trivia Crack Verification\n${process.env.HOST}/verify?token=${token}`,
+                html: `<h1 style="text-align: center;">Trivia Crack Verification</h1>
+                <div class="" style="width: 20%; margin: auto;">
+                <a href="${process.env.HOST}/verify?token=${token}">
+                <button type="button" name="button" style="width: 100%;">Verify</button>
+                </a>
+                </div>`,
+            });
+        } catch (e) {
+            return Promise.reject(e);
+        }
+        return true;
     }
 
-    sendRestoration(email, token) {
-        this.sendMail({
-            to: email,
-            subject: 'Trivia Crack password restoration',
-            text: `${process.env.HOST}/restore?token=${token}`,
-        });
+    async sendRestoration(email, token) {
+        try {
+            await this.sendMail({
+                to: email,
+                subject: 'Trivia Crack password restoration',
+                text: `Trivia Crack Pass Restoration\n${process.env.HOST}/restore?token=${token}`,
+                html: `<h1 style="text-align: center;">Trivia Crack Pass Restoration</h1>
+                        <div class="" style="width: 20%; margin: auto;">
+                            <a href="${process.env.HOST}/restore?token=${token}">
+                                <button type="button" name="button" style="width: 100%;">Restore</button>
+                            </a>
+                        </div>`,
+            });
+        } catch (e) {
+            return Promise.reject(e);
+        }
+        return true;
     }
 }
 
