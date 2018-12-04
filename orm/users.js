@@ -35,6 +35,7 @@ class Users {
 
     async create(data) {
         const user = new User(data);
+        this.setDefaultValues(user);
         await this.existsAttribs(user)
             .catch(err => Promise.reject(err));
         await db.insert(this.name, user, 'id')
@@ -108,6 +109,21 @@ class Users {
             return Promise.reject(new Error(this.msgExistEmail));
         }
         return null;
+    }
+
+    /**
+     * This function set the default valuest to the attribs
+     * admin, score, avatar, lastlogin, deleted and verified
+     * for a user.
+     * @param {Object} req Express request object.
+     */
+    setDefaultValues(user) {
+        user.setAdmin(false);
+        user.setScore(0);
+        user.setAvatar('default.png');
+        user.setLastLogin(new Date().toISOString());
+        user.setDeleted(false);
+        user.setVerified(false);
     }
 }
 

@@ -16,7 +16,7 @@ class User {
         this.setEmails(emails);
         this.setFriends(friends);
         this.setDeleted(deleted);
-        this.setLastlogin(lastlogin);
+        this.setLastLogin(lastlogin);
         this.setVerified(verified);
     }
 
@@ -108,7 +108,7 @@ class User {
         }
     }
 
-    setLastlogin(lastlogin) {
+    setLastLogin(lastlogin) {
         if (lastlogin !== undefined) {
             this.lastlogin = lastlogin;
         }
