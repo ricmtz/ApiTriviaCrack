@@ -99,7 +99,7 @@ class Auth {
             res.send({ token: sessToken.getToken() }).status(201);
             return next();
         } catch (e) {
-            return Promise.reject(e);
+            return next(e);
         }
     }
 
