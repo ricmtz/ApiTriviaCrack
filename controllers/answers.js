@@ -11,7 +11,7 @@ class AnswersCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await AnswersORM.getAll(req.params.gameId, req.query.page, req.query)
+        await AnswersORM.getAll(req.params.gameId, req.query)
             .then((ans) => {
                 res.status(200).send({
                     data: ans,

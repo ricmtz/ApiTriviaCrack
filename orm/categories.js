@@ -13,9 +13,9 @@ class Categories {
         this.msgExistColor = 'This color already exists';
     }
 
-    async getAll(page, conditions) {
+    async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, this.getFilters(conditions), [], page)
+        await db.selectPaged(this.name, this.getFilters(conditions), [], conditions.page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         return result;

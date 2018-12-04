@@ -18,9 +18,9 @@ class Users {
         this.msgNoFriendExist = 'This friendship not exists';
     }
 
-    async getAll(pageNum, conditions) {
+    async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, this.getFilters(conditions), [], pageNum)
+        await db.selectPaged(this.name, this.getFilters(conditions), [], conditions.page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(Codes.resNotFound(err.message)));
         return result;

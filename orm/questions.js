@@ -18,11 +18,11 @@ class Questions {
         this.msgNoUser = 'This user dont exist';
     }
 
-    async getAll(page, conditions) {
+    async getAll(conditions) {
         let result = null;
         const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
-        await db.selectPaged(this.name, filtersObj, [], page)
+        await db.selectPaged(this.name, filtersObj, [], conditions.page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         await this.appendValues(result)

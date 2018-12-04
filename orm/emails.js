@@ -9,12 +9,12 @@ class Emails {
         this.msgNoExistEmail = 'This email not exists';
     }
 
-    async getAll(nicknameUser, page, conditions) {
+    async getAll(nicknameUser, conditions) {
         const user = await UsersORM.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
         let result = null;
         await db.selectPaged(this.name,
-            { userid: user.getId(), ...this.getFilters(conditions) }, [], page)
+            { userid: user.getId(), ...this.getFilters(conditions) }, [], conditions.page)
             .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
         await this.appendValuesEmails(result)

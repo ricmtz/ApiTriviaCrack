@@ -9,7 +9,7 @@ class UsersCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await UsersORM.getAll(req.query.page, req.query)
+        await UsersORM.getAll(req.query)
             .then((usrs) => {
                 res.status(200).send({
                     data: usrs,

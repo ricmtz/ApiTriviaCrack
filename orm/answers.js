@@ -18,11 +18,11 @@ class AnswersORM {
         this.msgNoExistAnsware = 'This answare not exist';
     }
 
-    async getAll(gameId, page, conditions) {
+    async getAll(gameId, conditions) {
         let result = null;
         const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
-        await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [], page)
+        await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [], conditions.page)
             .then((res) => { result = this.processResultAnsw(res); })
             .catch(err => Promise.reject(err));
         await this.appendValuesAnswers(result)
