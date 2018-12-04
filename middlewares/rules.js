@@ -108,6 +108,7 @@ class Rules {
             query: {
                 nickname: 'text,optional',
                 email: 'text,optional',
+                admin: 'boolean,optional',
                 scoreMin: 'positive,optional',
                 scoreMax: 'positive,optional',
             },
@@ -139,6 +140,7 @@ class Rules {
                 scorePlayer1Max: 'positive,optional',
                 scorePlayer2Min: 'positive,optional',
                 scorePlayer2Max: 'positive,optional',
+                finished: 'boolean,optional',
             },
         });
     }
@@ -146,12 +148,13 @@ class Rules {
     static queryQuestion(req, res, next) {
         validator.validate(req, res, next, {
             query: {
+                category: 'text,optional',
                 question: 'text,optional',
                 option1: 'text,optional',
                 option2: 'text,optional',
                 optioncorrect: 'text,optional',
-                category: 'text,optional',
                 approved: 'boolean,optional',
+                user: 'nickname,optional',
             },
         });
     }

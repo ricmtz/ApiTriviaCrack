@@ -2,6 +2,7 @@ const { db } = require('../db');
 const { Question } = require('../models');
 const CategoriesORM = require('./categories');
 const UsersORM = require('./users');
+const { filters } = require('../filters');
 
 // FIXME En los metodos getAll se debe permitir paginado y filtrado
 
@@ -17,9 +18,9 @@ class Questions {
         this.msgNoUser = 'This user dont exist';
     }
 
-    async getAll(page, filters) {
+    async getAll(page, conditions) {
         let result = null;
-        const filtersObj = await this.getFilters(filters)
+        const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
         await db.selectPaged(this.name, filtersObj, [], page)
             .then((res) => { result = this.processResult(res); })
@@ -126,42 +127,32 @@ class Questions {
         }
     }
 
-    async getFilters(query) {
-        const result = [];
-        if (query.question) {
-            result.push({
-                attrib: 'question',
-                opr: ' LIKE ',
-                val: `%${query.question}%`,
-            });
+    async getFilters(cond) {
+        const result = {};
+        if (cond.category) {
+            await CategoriesORM.getByName(cond.category)
+                .then((cat) => { result.category = cat.getId(); })
+                .catch(err => Promise.reject(err));
         }
-        if (query.option1) {
-            result.push({
-                attrib: 'option1',
-                opr: ' LIKE ',
-                val: `%${query.option1}%`,
-            });
+        if (cond.question) {
+            result.question = filters.strFilter('question', cond.question);
         }
-        if (query.option2) {
-            result.push({
-                attrib: 'option2',
-                opr: ' LIKE ',
-                val: `%${query.option2}%`,
-            });
+        if (cond.option1) {
+            result.option1 = filters.strFilter('option1', cond.option1);
         }
-        if (query.optionCorrect) {
-            result.push({
-                attrib: 'optioncorrect',
-                opr: ' LIKE ',
-                val: `%${query.optionCorrect}%`,
-            });
+        if (cond.option2) {
+            result.option2 = filters.strFilter('option2', cond.option2);
         }
-        if (query.category) {
-            await CategoriesORM.getByName(query.category)
-                .then((cat) => { result.category = cat.getId(); });
+        if (cond.optionCorrect) {
+            result.optionCorrect = filters.strFilter('optioncorrect', cond.optionCorrect);
         }
-        if (typeof (query.approved) !== 'undefined') {
-            result.approved = query.approved;
+        if (typeof (cond.approved) !== 'undefined') {
+            result.approved = cond.approved;
+        }
+        if (cond.user) {
+            await UsersORM.getByNickname(cond.user)
+                .then((usr) => { result.userid = usr.getId(); })
+                .catch(err => Promise.reject(err));
         }
         return result;
     }

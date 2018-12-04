@@ -1,5 +1,6 @@
 const { db } = require('../db');
 const { Category } = require('../models');
+const { filters } = require('../filters');
 
 // FIXME Todos los métodos deben estar documentados
 
@@ -12,9 +13,9 @@ class Categories {
         this.msgExistColor = 'This color already exists';
     }
 
-    async getAll(page, filters) {
+    async getAll(page, conditions) {
         let result = null;
-        await db.selectPaged(this.name, this.getFilters(filters), [], page)
+        await db.selectPaged(this.name, this.getFilters(conditions), [], page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         return result;
@@ -93,14 +94,10 @@ class Categories {
         return null;
     }
 
-    getFilters(query) {
+    getFilters(cond) {
         const result = [];
-        if (query.name) {
-            result.push({
-                attrib: 'name',
-                opr: ' LIKE ',
-                val: `%${query.name}%`,
-            });
+        if (cond.name) {
+            result.name = filters.strFilter('name', cond.name);
         }
         return result;
     }

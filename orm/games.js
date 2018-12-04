@@ -1,6 +1,7 @@
 const { db } = require('../db');
 const { Game } = require('../models');
 const UsersORM = require('./users');
+const { filters } = require('../filters');
 
 class Games {
     constructor() {
@@ -19,9 +20,9 @@ class Games {
         return games[pos];
     }
 
-    async getAll(page, filters) {
+    async getAll(page, conditions) {
         let result = null;
-        const filtersObj = await this.getFilters(filters)
+        const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
         await db.selectPaged(this.name, filtersObj, [], page)
             .then((res) => { result = this.processResult(res); })
@@ -156,46 +157,32 @@ class Games {
         }
     }
 
-    async getFilters(query) {
+    async getFilters(cond) {
         const result = [];
-        if (query.player1) {
-            await UsersORM.getByNickname(query.player1)
-                .then((usr) => { result.player1 = usr.getId(); });
+        if (cond.player1) {
+            await UsersORM.getByNickname(cond.player1)
+                .then((usr) => { result.player1 = usr.getId(); })
+                .catch(err => Promise.reject(err));
         }
-        if (query.player2) {
-            await UsersORM.getByNickname(query.player2)
-                .then((usr) => { result.player2 = usr.getId(); });
+        if (cond.player2) {
+            await UsersORM.getByNickname(cond.player2)
+                .then((usr) => { result.player2 = usr.getId(); })
+                .catch(err => Promise.reject(err));
         }
-        if (query.scorePlayer1Min) {
-            result.push({
-                attrib: 'scoreplayer1',
-                opr: '>=',
-                val: query.scorePlayer1Min,
-            });
+        if (cond.scorePlayer1Min) {
+            result.scorePlayer1Min = filters.minNumber('score', cond.scorePlayer1Min);
         }
-        if (query.scorePlayer1Max) {
-            result.push({
-                attrib: 'scoreplayer1',
-                opr: '<=',
-                val: query.scorePlayer1Max,
-            });
+        if (cond.scorePlayer1Max) {
+            result.scorePlayer1Max = filters.maxNumber('score', cond.scorePlayer1Max);
         }
-        if (query.scorePlayer2Min) {
-            result.push({
-                attrib: 'scoreplayer2',
-                opr: '>=',
-                val: query.scorePlayer2Min,
-            });
+        if (cond.scorePlayer2Min) {
+            result.scorePlayer2Min = filters.minNumber('score', cond.scorePlayer2Min);
         }
-        if (query.scorePlayer2Max) {
-            result.push({
-                attrib: 'scoreplayer2',
-                opr: '<=',
-                val: query.scorePlayer2Max,
-            });
+        if (cond.scorePlayer2Max) {
+            result.scorePlayer2Max = filters.maxNumber('score', cond.scorePlayer2Max);
         }
-        if (typeof (query.finished) !== 'undefined') {
-            result.finished = query.finished;
+        if (typeof (cond.finished) !== 'undefined') {
+            result.finished = cond.finished;
         }
         return result;
     }

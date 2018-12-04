@@ -1,6 +1,7 @@
 const { db } = require('../db');
 const { User } = require('../models');
 const { Codes } = require('../resCodes');
+const { filters } = require('../filters');
 
 class Users {
     constructor() {
@@ -17,9 +18,9 @@ class Users {
         this.msgNoFriendExist = 'This friendship not exists';
     }
 
-    async getAll(pageNum, filters) {
+    async getAll(pageNum, conditions) {
         let result = null;
-        await db.selectPaged(this.name, this.getFilters(filters), [], pageNum)
+        await db.selectPaged(this.name, this.getFilters(conditions), [], pageNum)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(Codes.resNotFound(err.message)));
         return result;
@@ -111,35 +112,22 @@ class Users {
         return null;
     }
 
-    getFilters(query) {
+    getFilters(cond) {
         const result = [];
-        if (query.nickname) {
-            result.push({
-                attrib: 'nickname',
-                opr: ' LIKE ',
-                val: `%${query.nickname}%`,
-            });
+        if (cond.nickname) {
+            result.nickname = filters.strFilter('nickname', cond.nickname);
         }
-        if (query.email) {
-            result.push({
-                attrib: 'email',
-                opr: ' LIKE ',
-                val: `%${query.email}%`,
-            });
+        if (cond.email) {
+            result.email = filters.strFilter('email', cond.email);
         }
-        if (query.scoreMin) {
-            result.push({
-                attrib: 'score',
-                opr: '>=',
-                val: query.scoreMin,
-            });
+        if (typeof (cond.admin) !== 'undefined') {
+            result.admin = cond.admin;
         }
-        if (query.scoreMax) {
-            result.push({
-                attrib: 'score',
-                opr: '<=',
-                val: query.scoreMax,
-            });
+        if (cond.scoreMin) {
+            result.scoreMin = filters.minNumber('score', cond.scoreMin);
+        }
+        if (cond.scoreMax) {
+            result.scoreMax = filters.maxNumber('score', cond.scoreMax);
         }
         return result;
     }

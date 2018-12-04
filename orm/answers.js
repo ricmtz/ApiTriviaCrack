@@ -3,6 +3,7 @@ const { Answer } = require('../models');
 const UsersORM = require('./users');
 const GamesORM = require('./games');
 const QuestionsORM = require('./questions');
+const { filters } = require('../filters');
 
 class AnswersORM {
     constructor() {
@@ -17,9 +18,9 @@ class AnswersORM {
         this.msgNoExistAnsware = 'This answare not exist';
     }
 
-    async getAll(gameId, page, filters) {
+    async getAll(gameId, page, conditions) {
         let result = null;
-        const filtersObj = await this.getFilters(filters)
+        const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
         await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [], page)
             .then((res) => { result = this.processResultAnsw(res); })
@@ -184,25 +185,21 @@ class AnswersORM {
         }
     }
 
-    async getFilters(query) {
+    async getFilters(cond) {
         const result = [];
-        if (query.player) {
-            await UsersORM.getByNickname(query.player)
+        if (cond.player) {
+            await UsersORM.getByNickname(cond.player)
                 .then((usr) => { result.player = usr.getId(); });
         }
-        if (query.question) {
-            await QuestionsORM.getQuestion(query.question)
+        if (cond.question) {
+            await QuestionsORM.getQuestion(cond.question)
                 .then((que) => { result.question = que.getId(); });
         }
-        if (query.option) {
-            result.push({
-                attrib: 'option',
-                opr: ' LIKE ',
-                val: `%${query.option}%`,
-            });
+        if (cond.option) {
+            result.option = filters.strFilter('option', cond.option);
         }
-        if (typeof (query.correct) !== 'undefined') {
-            result.correct = query.correct;
+        if (typeof (cond.correct) !== 'undefined') {
+            result.correct = cond.correct;
         }
         return result;
     }
