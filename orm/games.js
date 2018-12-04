@@ -1,7 +1,7 @@
 const { db } = require('../db');
 const { Game } = require('../models');
 const UsersORM = require('./users');
-const QuestionsORM = require('./questions');
+const { filters } = require('../filters');
 
 class Games {
     constructor() {
@@ -20,9 +20,11 @@ class Games {
         return games[pos];
     }
 
-    async getAll(page) {
+    async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, {}, [], page)
+        const filtersObj = await this.getFilters(conditions)
+            .catch(err => Promise.reject(err));
+        await db.selectPaged(this.name, filtersObj, [], conditions.page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         await this.appendValuesGames(result)
@@ -153,6 +155,36 @@ class Games {
             await Promise.all(promises)
                 .catch(err => Promise.reject(err));
         }
+    }
+
+    async getFilters(cond) {
+        const result = [];
+        if (cond.player1) {
+            await UsersORM.getByNickname(cond.player1)
+                .then((usr) => { result.player1 = usr.getId(); })
+                .catch(err => Promise.reject(err));
+        }
+        if (cond.player2) {
+            await UsersORM.getByNickname(cond.player2)
+                .then((usr) => { result.player2 = usr.getId(); })
+                .catch(err => Promise.reject(err));
+        }
+        if (cond.scorePlayer1Min) {
+            result.scorePlayer1Min = filters.minNumber('score', cond.scorePlayer1Min);
+        }
+        if (cond.scorePlayer1Max) {
+            result.scorePlayer1Max = filters.maxNumber('score', cond.scorePlayer1Max);
+        }
+        if (cond.scorePlayer2Min) {
+            result.scorePlayer2Min = filters.minNumber('score', cond.scorePlayer2Min);
+        }
+        if (cond.scorePlayer2Max) {
+            result.scorePlayer2Max = filters.maxNumber('score', cond.scorePlayer2Max);
+        }
+        if (typeof (cond.finished) !== 'undefined') {
+            result.finished = cond.finished;
+        }
+        return result;
     }
 }
 

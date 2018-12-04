@@ -10,7 +10,7 @@ router.use(auth.session);
 router.use('/:answerId', rules.paramsAnswers);
 
 // Get all answers
-router.get('/', auth.havePermissions, AnswersCtrl.getAll);
+router.get('/', [rules.queryAnswer, auth.havePermissions], AnswersCtrl.getAll);
 
 // Get answer of game
 router.get('/:answerId', auth.havePermissions, AnswersCtrl.get);

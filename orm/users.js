@@ -1,6 +1,7 @@
 const { db } = require('../db');
 const { User } = require('../models');
 const { Codes } = require('../resCodes');
+const { filters } = require('../filters');
 
 class Users {
     constructor() {
@@ -17,9 +18,9 @@ class Users {
         this.msgNoFriendExist = 'This friendship not exists';
     }
 
-    async getAll(pageNum) {
+    async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, {}, [], pageNum)
+        await db.selectPaged(this.name, this.getFilters(conditions), [], conditions.page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(Codes.resNotFound(err.message)));
         return result;
@@ -109,6 +110,26 @@ class Users {
             return Promise.reject(new Error(this.msgExistEmail));
         }
         return null;
+    }
+
+    getFilters(cond) {
+        const result = [];
+        if (cond.nickname) {
+            result.nickname = filters.strFilter('nickname', cond.nickname);
+        }
+        if (cond.email) {
+            result.email = filters.strFilter('email', cond.email);
+        }
+        if (typeof (cond.admin) !== 'undefined') {
+            result.admin = cond.admin;
+        }
+        if (cond.scoreMin) {
+            result.scoreMin = filters.minNumber('score', cond.scoreMin);
+        }
+        if (cond.scoreMax) {
+            result.scoreMax = filters.maxNumber('score', cond.scoreMax);
+        }
+        return result;
     }
 
     /**

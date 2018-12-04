@@ -86,7 +86,26 @@ class DB {
             return '';
         }
 
-        return pgp.helpers.sets(conditions).replace(new RegExp(',', 'g'), logOp);
+        return this.getConditionsStr(conditions, logOp);
+    }
+
+    getConditionsStr(conditions, logOp) {
+        let resultStr = '';
+        let aux;
+        Object.keys(conditions).forEach((key) => {
+            aux = {};
+            if (typeof (conditions[key]) === 'object') {
+                aux[conditions[key].attrib] = conditions[key].val;
+                resultStr += pgp.helpers.sets(aux)
+                    .replace(new RegExp('='), conditions[key].opr)
+                    .replace(new RegExp(','), '');
+            } else {
+                aux[key] = conditions[key];
+                resultStr += pgp.helpers.sets(aux).replace(new RegExp(','), '');
+            }
+            resultStr += logOp;
+        });
+        return resultStr.slice(0, resultStr.length - logOp.length);
     }
 
     getColsQuery(cols) {

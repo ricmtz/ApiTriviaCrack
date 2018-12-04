@@ -103,6 +103,133 @@ class Rules {
         });
     }
 
+    static queryUser(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                nickname: 'text,optional',
+                email: 'text,optional',
+                admin: 'boolean,optional',
+                scoreMin: 'positive,optional',
+                scoreMax: 'positive,optional',
+            },
+        });
+    }
+
+    static queryFriend(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                user2: 'text,optional',
+            },
+        });
+    }
+
+    static queryEmail(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                email: 'text,optional',
+            },
+        });
+    }
+
+    static queryGame(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                player1: 'nickname,optional',
+                player2: 'nickname,optional',
+                scorePlayer1Min: 'positive,optional',
+                scorePlayer1Max: 'positive,optional',
+                scorePlayer2Min: 'positive,optional',
+                scorePlayer2Max: 'positive,optional',
+                finished: 'boolean,optional',
+            },
+        });
+    }
+
+    static queryQuestion(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                category: 'text,optional',
+                question: 'text,optional',
+                option1: 'text,optional',
+                option2: 'text,optional',
+                optioncorrect: 'text,optional',
+                approved: 'boolean,optional',
+                user: 'nickname,optional',
+            },
+        });
+    }
+
+    static queryAnswer(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                player: 'nickname,optional',
+                question: 'text,optional',
+                option: 'text,optional',
+                correct: 'boolean,optional',
+            },
+        });
+    }
+
+    static queryCategory(req, res, next) {
+        validator.validate(req, res, next, {
+            query: {
+                name: 'text,optional',
+            },
+        });
+    }
+
+    static userScoreConv(req, res, next) {
+        if (req.query.scoreMin) {
+            req.query.scoreMin = Number(req.query.scoreMin);
+        }
+        if (req.query.scoreMax) {
+            req.query.scoreMax = Number(req.query.scoreMax);
+        }
+        next();
+    }
+
+    static userScores(req, res, next) {
+        if (typeof (req.query.scoreMin) === 'number'
+            && typeof (req.query.scoreMax) === 'number'
+            && req.query.scoreMax < req.query.scoreMin) {
+            next(new Error('Validation error'));
+            return;
+        }
+        next();
+    }
+
+    static gameScoreConv(req, res, next) {
+        if (req.query.scorePlayer1Min) {
+            req.query.scorePlayer1Min = Number(req.query.scorePlayer1Min);
+        }
+        if (req.query.scorePlayer1Max) {
+            req.query.scorePlayer1Max = Number(req.query.scorePlayer1Max);
+        }
+        if (req.query.scorePlayer2Min) {
+            req.query.scorePlayer2Min = Number(req.query.scorePlayer2Min);
+        }
+        if (req.query.scorePlayer2Max) {
+            req.query.scorePlayer2Max = Number(req.query.scorePlayer2Max);
+        }
+        next();
+    }
+
+    static gameScores(req, res, next) {
+        if (typeof (req.query.scorePlayer1Min) === 'number'
+            && typeof (req.query.scorePlayer1Max) === 'number'
+            && req.query.scorePlayer1Max < req.query.scorePlayer1Min) {
+            next(new Error('Validation error'));
+            return;
+        }
+        if (typeof (req.query.scorePlayer2Min) === 'number'
+            && typeof (req.query.scorePlayer2Max) === 'number'
+            && req.query.scorePlayer2Max < req.query.scorePlayer2Min) {
+            next(new Error('Validation error'));
+            return;
+        }
+        next();
+    }
+
     /**
      * Validator middleware that add the rules to validate
      * the nickname, password and email values from the request

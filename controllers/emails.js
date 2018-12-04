@@ -10,7 +10,7 @@ class EmailsCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await EmailsORM.getAll(req.params.nickname, req.query.page)
+        await EmailsORM.getAll(req.params.nickname, req.query)
             .then((email) => {
                 res.status(200).send({
                     data: email,

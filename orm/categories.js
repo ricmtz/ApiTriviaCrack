@@ -1,5 +1,6 @@
 const { db } = require('../db');
 const { Category } = require('../models');
+const { filters } = require('../filters');
 
 // FIXME Todos los métodos deben estar documentados
 
@@ -12,9 +13,9 @@ class Categories {
         this.msgExistColor = 'This color already exists';
     }
 
-    async getAll(page) {
+    async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, {}, [], page)
+        await db.selectPaged(this.name, this.getFilters(conditions), [], conditions.page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         return result;
@@ -23,6 +24,14 @@ class Categories {
     async get(categoryId) {
         let result = null;
         await db.selectNonDel(this.name, { id: categoryId })
+            .then((res) => { result = this.processResult(res); })
+            .catch(() => Promise.reject(new Error(this.msgNoCategory)));
+        return result;
+    }
+
+    async getByName(categoryName) {
+        let result = null;
+        await db.selectNonDel(this.name, { name: categoryName })
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoCategory)));
         return result;
@@ -83,6 +92,14 @@ class Categories {
             return Promise.reject(new Error(this.msgExistColor));
         }
         return null;
+    }
+
+    getFilters(cond) {
+        const result = [];
+        if (cond.name) {
+            result.name = filters.strFilter('name', cond.name);
+        }
+        return result;
     }
 }
 

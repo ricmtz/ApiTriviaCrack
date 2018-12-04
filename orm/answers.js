@@ -3,6 +3,7 @@ const { Answer } = require('../models');
 const UsersORM = require('./users');
 const GamesORM = require('./games');
 const QuestionsORM = require('./questions');
+const { filters } = require('../filters');
 
 class AnswersORM {
     constructor() {
@@ -17,9 +18,11 @@ class AnswersORM {
         this.msgNoExistAnsware = 'This answare not exist';
     }
 
-    async getAll(gameId, page) {
+    async getAll(gameId, conditions) {
         let result = null;
-        await db.selectPaged(this.name, { game: gameId }, [], page)
+        const filtersObj = await this.getFilters(conditions)
+            .catch(err => Promise.reject(err));
+        await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [], conditions.page)
             .then((res) => { result = this.processResultAnsw(res); })
             .catch(err => Promise.reject(err));
         await this.appendValuesAnswers(result)
@@ -180,6 +183,25 @@ class AnswersORM {
             await Promise.all(promises)
                 .catch(err => Promise.reject(err));
         }
+    }
+
+    async getFilters(cond) {
+        const result = [];
+        if (cond.player) {
+            await UsersORM.getByNickname(cond.player)
+                .then((usr) => { result.player = usr.getId(); });
+        }
+        if (cond.question) {
+            await QuestionsORM.getQuestion(cond.question)
+                .then((que) => { result.question = que.getId(); });
+        }
+        if (cond.option) {
+            result.option = filters.strFilter('option', cond.option);
+        }
+        if (typeof (cond.correct) !== 'undefined') {
+            result.correct = cond.correct;
+        }
+        return result;
     }
 }
 

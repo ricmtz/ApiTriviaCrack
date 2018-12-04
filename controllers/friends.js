@@ -10,7 +10,7 @@ class FriendsCtrl {
      * @param {String} req.params.nickname User nickname.
      */
     async getAll(req, res) {
-        await FriendsORM.getAll(req.params.nickname)
+        await FriendsORM.getAll(req.params.nickname, req.query)
             .then((friend) => {
                 res.status(200).send({
                     data: friend,

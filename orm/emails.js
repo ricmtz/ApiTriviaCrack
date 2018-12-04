@@ -1,5 +1,6 @@
 const { db } = require('../db');
 const UsersORM = require('./users');
+const { filters } = require('../filters');
 
 class Emails {
     constructor() {
@@ -8,11 +9,12 @@ class Emails {
         this.msgNoExistEmail = 'This email not exists';
     }
 
-    async getAll(nicknameUser, page) {
+    async getAll(nicknameUser, conditions) {
         const user = await UsersORM.getByNickname(nicknameUser)
             .catch(err => Promise.reject(err));
         let result = null;
-        await db.selectPaged(this.name, { userid: user.getId() }, [], page)
+        await db.selectPaged(this.name,
+            { userid: user.getId(), ...this.getFilters(conditions) }, [], conditions.page)
             .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
         await this.appendValuesEmails(result)
@@ -85,6 +87,13 @@ class Emails {
         }
     }
 
+    getFilters(cond) {
+        const result = [];
+        if (cond.email) {
+            result.email = filters.strFilter('email', cond.email);
+        }
+        return result;
+    }
 }
 
 module.exports = new Emails();

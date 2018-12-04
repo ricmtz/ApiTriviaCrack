@@ -2,6 +2,7 @@ const { db } = require('../db');
 const { Question } = require('../models');
 const CategoriesORM = require('./categories');
 const UsersORM = require('./users');
+const { filters } = require('../filters');
 
 // FIXME En los metodos getAll se debe permitir paginado y filtrado
 
@@ -17,9 +18,11 @@ class Questions {
         this.msgNoUser = 'This user dont exist';
     }
 
-    async getAll(page) {
+    async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, null, [], page)
+        const filtersObj = await this.getFilters(conditions)
+            .catch(err => Promise.reject(err));
+        await db.selectPaged(this.name, filtersObj, [], conditions.page)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         await this.appendValues(result)
@@ -37,9 +40,9 @@ class Questions {
         return result;
     }
 
-    async getQuestion(question) {
+    async getQuestion(questionText) {
         let result = null;
-        await db.selectNonDel(this.name, { question })
+        await db.selectNonDel(this.name, { question: questionText })
             .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoQuestion)));
         return result;
@@ -122,6 +125,36 @@ class Questions {
             await Promise.all(promises)
                 .catch(err => Promise.reject(err));
         }
+    }
+
+    async getFilters(cond) {
+        const result = {};
+        if (cond.category) {
+            await CategoriesORM.getByName(cond.category)
+                .then((cat) => { result.category = cat.getId(); })
+                .catch(err => Promise.reject(err));
+        }
+        if (cond.question) {
+            result.question = filters.strFilter('question', cond.question);
+        }
+        if (cond.option1) {
+            result.option1 = filters.strFilter('option1', cond.option1);
+        }
+        if (cond.option2) {
+            result.option2 = filters.strFilter('option2', cond.option2);
+        }
+        if (cond.optionCorrect) {
+            result.optionCorrect = filters.strFilter('optioncorrect', cond.optionCorrect);
+        }
+        if (typeof (cond.approved) !== 'undefined') {
+            result.approved = cond.approved;
+        }
+        if (cond.user) {
+            await UsersORM.getByNickname(cond.user)
+                .then((usr) => { result.userid = usr.getId(); })
+                .catch(err => Promise.reject(err));
+        }
+        return result;
     }
 }
 
