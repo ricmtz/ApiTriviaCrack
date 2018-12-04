@@ -170,16 +170,16 @@ class Games {
                 .catch(err => Promise.reject(err));
         }
         if (cond.scorePlayer1Min) {
-            result.scorePlayer1Min = filters.minNumber('score', cond.scorePlayer1Min);
+            result.scorePlayer1Min = filters.minNumber('scoreplayer1', cond.scorePlayer1Min);
         }
         if (cond.scorePlayer1Max) {
-            result.scorePlayer1Max = filters.maxNumber('score', cond.scorePlayer1Max);
+            result.scorePlayer1Max = filters.maxNumber('scoreplayer1', cond.scorePlayer1Max);
         }
         if (cond.scorePlayer2Min) {
-            result.scorePlayer2Min = filters.minNumber('score', cond.scorePlayer2Min);
+            result.scorePlayer2Min = filters.minNumber('scoreplayer2', cond.scorePlayer2Min);
         }
         if (cond.scorePlayer2Max) {
-            result.scorePlayer2Max = filters.maxNumber('score', cond.scorePlayer2Max);
+            result.scorePlayer2Max = filters.maxNumber('scoreplayer2', cond.scorePlayer2Max);
         }
         if (typeof (cond.finished) !== 'undefined') {
             result.finished = cond.finished;
