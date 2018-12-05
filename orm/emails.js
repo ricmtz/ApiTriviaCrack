@@ -14,7 +14,8 @@ class Emails {
             .catch(err => Promise.reject(err));
         let result = null;
         await db.selectPaged(this.name,
-            { userid: user.getId(), ...this.getFilters(conditions) }, [], conditions.page)
+            { userid: user.getId(), ...this.getFilters(conditions) }, [],
+            conditions.page, conditions.random)
             .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
         await this.appendValuesEmails(result)

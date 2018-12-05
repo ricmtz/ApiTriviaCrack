@@ -10,7 +10,10 @@ router.use(auth.session);
 router.use('/:question', rules.paramsQuestions);
 
 // Get all question.
-router.get('/', [rules.queryQuestion, auth.havePermissions], questionsCtrl.getAll);
+router.get('/',
+    [rules.getAllElements, rules.getAllConv,
+        rules.queryQuestion, rules.questionConv,
+        auth.havePermissions], questionsCtrl.getAll);
 
 // Get question.
 router.get('/:question', auth.havePermissions, questionsCtrl.get);

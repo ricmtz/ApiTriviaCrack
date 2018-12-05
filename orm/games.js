@@ -13,18 +13,12 @@ class Games {
         this.msgNoCreateGame = 'Dont create answer';
     }
 
-    async getOponent() {
-        const games = await db.select(this.users, [], { deleted: false });
-        const max = games.length - 1;
-        const pos = Math.round(Math.random() * max);
-        return games[pos];
-    }
-
     async getAll(conditions) {
         let result = null;
         const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
-        await db.selectPaged(this.name, filtersObj, [], conditions.page)
+        await db.selectPaged(this.name, filtersObj, [],
+            conditions.page, conditions.random)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         await this.appendValuesGames(result)

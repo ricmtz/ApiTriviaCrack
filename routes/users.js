@@ -12,8 +12,11 @@ const upload = multer({ dest: 'temp/' });
 router.use('/:nickname', auth.session, rules.paramsUser);
 
 // List all users.
-router.get('/', [auth.session, rules.getAllElements, rules.queryUser,
-    rules.userScoreConv, rules.userScores, auth.havePermissions], usersCtrl.getAll);
+router.get('/',
+    [rules.getAllElements, rules.getAllConv,
+        rules.queryUser, rules.userConv,
+        rules.userScores, auth.session,
+        auth.havePermissions], usersCtrl.getAll);
 
 // Find users.
 router.get('/:nickname', [auth.session, auth.havePermissions], usersCtrl.get);

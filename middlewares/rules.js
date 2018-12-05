@@ -9,8 +9,19 @@ class Rules {
         validator.validate(req, res, next, {
             query: {
                 page: 'positive,optional',
+                random: 'boolean,optional',
             },
         });
+    }
+
+    static getAllConv(req, res, next) {
+        if (req.query.page) {
+            req.query.page = Number(req.query.page);
+        }
+        if (req.query.random) {
+            req.query.random = (req.query.random === 'true');
+        }
+        next();
     }
 
     /**
@@ -174,12 +185,11 @@ class Rules {
         validator.validate(req, res, next, {
             query: {
                 name: 'text,optional',
-                random: 'boolean,optional',
             },
         });
     }
 
-    static userScoreConv(req, res, next) {
+    static userConv(req, res, next) {
         if (req.query.scoreMin) {
             req.query.scoreMin = Number(req.query.scoreMin);
         }
@@ -199,7 +209,7 @@ class Rules {
         next();
     }
 
-    static gameScoreConv(req, res, next) {
+    static gameConv(req, res, next) {
         if (req.query.scorePlayer1Min) {
             req.query.scorePlayer1Min = Number(req.query.scorePlayer1Min);
         }
@@ -225,13 +235,6 @@ class Rules {
     static questionConv(req, res, next) {
         if (req.body.category) {
             req.body.category = Number(req.body.category);
-        }
-        next();
-    }
-
-    static categoryConv(req, res, next) {
-        if (req.query.random) {
-            req.query.random = (req.query.random === 'true');
         }
         next();
     }

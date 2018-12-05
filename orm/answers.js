@@ -22,7 +22,8 @@ class AnswersORM {
         let result = null;
         const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
-        await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [], conditions.page)
+        await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [],
+            conditions.page, conditions.random)
             .then((res) => { result = this.processResultAnsw(res); })
             .catch(err => Promise.reject(err));
         await this.appendValuesAnswers(result)
