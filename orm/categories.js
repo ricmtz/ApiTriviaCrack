@@ -15,7 +15,8 @@ class Categories {
 
     async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, this.getFilters(conditions), [], conditions.page)
+        await db.selectPaged(this.name, this.getFilters(conditions), [],
+            conditions.page, conditions.random)
             .then((res) => { result = this.processResult(res); })
             .catch(err => Promise.reject(err));
         return result;

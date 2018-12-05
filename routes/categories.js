@@ -18,7 +18,10 @@ router.post('/',
     categoriesCtrl.create);
 
 // Get all categories
-router.get('/', [rules.getAllElements, rules.queryCategory, auth.havePermissions], categoriesCtrl.getAll);
+router.get('/',
+    [rules.getAllElements, rules.queryCategory,
+        rules.categoryConv, auth.havePermissions],
+    categoriesCtrl.getAll);
 
 // Get category
 router.get('/:categoryId', auth.havePermissions, categoriesCtrl.get);

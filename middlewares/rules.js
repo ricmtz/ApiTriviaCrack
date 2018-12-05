@@ -174,6 +174,7 @@ class Rules {
         validator.validate(req, res, next, {
             query: {
                 name: 'text,optional',
+                random: 'boolean,optional',
             },
         });
     }
@@ -224,6 +225,13 @@ class Rules {
     static questionConv(req, res, next) {
         if (req.body.category) {
             req.body.category = Number(req.body.category);
+        }
+        next();
+    }
+
+    static categoryConv(req, res, next) {
+        if (req.query.random) {
+            req.query.random = (req.query.random === 'true');
         }
         next();
     }

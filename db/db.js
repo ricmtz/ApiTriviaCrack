@@ -192,15 +192,21 @@ class DB {
         });
     }
 
-    async selectPaged(tab, cond, col, page = DEFAULT_PAGE) {
-        await this.validatePage(tab, page, cond).catch(err => Promise.reject(err));
-
+    async selectPaged(tab, cond, col, page = DEFAULT_PAGE, random = false) {
         let conds = cond;
         if (!conds) {
             conds = { deleted: false };
         } else {
             conds.deleted = false;
         }
+
+        if (random) {
+            const ranReg = await this.randomReg(tab, conds, page)
+                .catch(err => Promise.reject(err));
+            return ranReg;
+        }
+
+        await this.validatePage(tab, page, conds).catch(err => Promise.reject(err));
 
         return new Promise((resolve, reject) => {
             this.db.any(this.selectQuery({
@@ -210,6 +216,29 @@ class DB {
                 orderBy: DEFAULT_ORDER_BY_COLUMN,
                 limit: REG_PER_PAGE,
                 offset: (page - 1) * REG_PER_PAGE,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async randomReg(tab, conds, page = DEFAULT_PAGE) {
+        if (page > 1) {
+            return Promise.reject(new Error('Page out of range'));
+        }
+
+        let off;
+        await this.countRegs(tab, conds)
+            .then((res) => { off = Math.floor(Math.random() * Math.floor(res)); })
+            .catch(err => Promise.reject(err));
+
+        return new Promise((resolve, reject) => {
+            this.db.any(this.selectQuery({
+                table: tab,
+                conditions: conds,
+                orderBy: DEFAULT_ORDER_BY_COLUMN,
+                limit: 1,
+                offset: off,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));
