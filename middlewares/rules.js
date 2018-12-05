@@ -253,15 +253,11 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static createUser(req, res, next) {
-        if (req.file !== undefined) {
-            req.body.avatar = req.file.originalname;
-        }
         validator.validate(req, res, next, {
             body: {
                 nickname: 'nickname,required',
                 password: 'password,required',
                 email: 'email,required',
-                avatar: 'file, optional',
             },
         });
     }

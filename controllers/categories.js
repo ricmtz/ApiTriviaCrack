@@ -1,5 +1,5 @@
-const { CategoriesORM } = require('../orm');
 const fs = require('fs');
+const { CategoriesORM } = require('../orm');
 
 class CategoriesCtrl {
     /**
@@ -15,6 +15,7 @@ class CategoriesCtrl {
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
      * @param {Number} req.query.page Page number.
+     * @param {File} req.file File of icon
      */
     async getAll(req, res) {
         await CategoriesORM.getAll(req.query)

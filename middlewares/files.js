@@ -1,15 +1,22 @@
 const fs = require('fs');
 
 class File {
-    changeFolder(req, res, next){
+    changeFolder(req, res, next) {
         if (req.file !== undefined) {
-            fs.rename(req.file.path, `uploads/${req.file.filename}`, (err) => {
+            const newPath = `uploads/${req.file.filename}.${req.file.mimetype.split('/')[1]}`;
+            let error;
+            fs.rename(req.file.path, newPath, (err) => {
                 if (err) {
-                    console.log(err);
+                    error = err;
                 }
             });
+            if (error) {
+                return next(new Error('Failed file upload'));
+            }
+            req.body.avatar = `${process.env.HOST}/${newPath}`;
+            req.file.path = newPath;
         }
-        next();
+        return next();
     }
 
     createFolder(folder) {

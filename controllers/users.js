@@ -44,19 +44,9 @@ class UsersCtrl {
      * @param {File} req.file File of avatar
      */
     async create(req, res) {
-        if (req.file !== undefined) {
-            req.body.avatar = req.file.filename;
-        }
         await UsersORM.create(req.body)
             .then((usr) => { res.status(200).send({ data: usr }); })
-            .catch((err) => {
-                if (req.file !== undefined) {
-                    fs.unlink(`uploads/${req.file.filename}`, (error) => {
-                        if (error) throw error;
-                    });
-                }
-                res.status(404).send({ error: err.message });
-            });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -73,16 +63,11 @@ class UsersCtrl {
      * @param {File} req.file File of avatar
      */
     async update(req, res) {
-        if (req.file !== undefined) {
-            req.body.avatar = req.file.filename;
-        }
         await UsersORM.update(req.params.nickname, req.body)
             .then(() => { res.status(204).send(); })
             .catch((err) => {
                 if (req.file !== undefined) {
-                    fs.unlink(`uploads/${req.file.filename}`, (error) => {
-                        if (error) throw error;
-                    });
+                    fs.unlink(req.body.avatar);
                 }
                 res.status(404).send({ error: err.message });
             });
