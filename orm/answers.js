@@ -62,6 +62,7 @@ class AnswersORM {
             { game: answer.getGame(), player: answer.getPlayer() })
             .then((res) => { num = res; })
             .catch(err => Promise.reject(err));
+        answer.ansNumber = num;
         if (num >= 10) {
             const numCorrect = await db.countRegs(this.name,
                 {
