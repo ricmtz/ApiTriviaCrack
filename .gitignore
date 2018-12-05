@@ -1,3 +1,5 @@
+/temp
+/uploads
 package-lock.json
 .env
 .vscode/
