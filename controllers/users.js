@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { UsersORM } = require('../orm');
+const { auth } = require('../middlewares');
 
 class UsersCtrl {
     /**
@@ -64,6 +65,10 @@ class UsersCtrl {
      * @param {File} req.file File of avatar
      */
     async update(req, res) {
+        if (req.body.password) {
+            req.body.password = await auth.hash(req.body.password)
+                .catch(err => res.status(500).send({ error: err.message }));
+        }
         await UsersORM.update(req.params.nickname, req.body)
             .then(() => { res.status(204).send(); })
             .catch((err) => {
