@@ -253,11 +253,15 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static createUser(req, res, next) {
+        if (req.file !== undefined) {
+            req.body.avatar = req.file.originalname;
+        }
         validator.validate(req, res, next, {
             body: {
                 nickname: 'nickname,required',
                 password: 'password,required',
                 email: 'email,required',
+                avatar: 'file, optional',
             },
         });
     }
@@ -271,6 +275,9 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static updateUser(req, res, next) {
+        if (req.file !== undefined) {
+            req.body.avatar = req.file.originalname;
+        }
         validator.validate(req, res, next, {
             body: {
                 nickname: 'nickname,optional',
@@ -448,10 +455,14 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static createCategory(req, res, next) {
+        if (req.file !== undefined) {
+            req.body.icon = req.file.originalname;
+        }
         validator.validate(req, res, next, {
             body: {
-                name: 'text,required',
                 color: 'text,required',
+                name: 'text,required',
+                icon: 'file,optional',
             },
         });
     }
@@ -464,6 +475,9 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static updateCategory(req, res, next) {
+        if (req.file !== undefined) {
+            req.body.icon = req.file.originalname;
+        }
         validator.validate(req, res, next, {
             body: {
                 name: 'text,optional',
