@@ -59,7 +59,7 @@ class Friends {
     }
 
     async notExistFriendship(user1, user2) {
-        const exist = await db.exists(this.name, { user1, user2 })
+        const exist = await db.selectNonDel(this.name, { user1, user2 })
             .catch(() => { });
         if (exist) {
             return Promise.reject(new Error(this.msgFriendExist));
