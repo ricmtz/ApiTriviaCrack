@@ -18,7 +18,7 @@ class Emails {
             conditions.page, conditions.random)
             .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
-        await this.appendValuesEmails(result)
+        await this.appendValuesEmails(result.result)
             .catch(err => Promise.reject(err));
         return result;
     }

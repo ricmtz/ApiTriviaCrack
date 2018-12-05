@@ -24,9 +24,10 @@ class AnswersORM {
             .catch(err => Promise.reject(err));
         await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [],
             conditions.page, conditions.random)
-            .then((res) => { result = this.processResultAnsw(res); })
+            .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
-        await this.appendValuesAnswers(result)
+        result.result = this.processResult(result.result);
+        await this.appendValuesAnswers(result.result)
             .catch(err => Promise.reject(err));
         return result;
     }
@@ -120,7 +121,7 @@ class AnswersORM {
         return null;
     }
 
-    processResultAnsw(rows) {
+    processResult(rows) {
         if (!rows) {
             return null;
         }

@@ -19,9 +19,10 @@ class Games {
             .catch(err => Promise.reject(err));
         await db.selectPaged(this.name, filtersObj, [],
             conditions.page, conditions.random)
-            .then((res) => { result = this.processResult(res); })
+            .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
-        await this.appendValuesGames(result)
+        result.result = this.processResult(result.result);
+        await this.appendValuesGames(result.result)
             .catch(err => Promise.reject(err));
         return result;
     }

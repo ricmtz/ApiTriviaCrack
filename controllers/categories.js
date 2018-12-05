@@ -21,8 +21,9 @@ class CategoriesCtrl {
         await CategoriesORM.getAll(req.query)
             .then((categ) => {
                 res.status(200).send({
-                    data: categ,
-                    total: categ.length,
+                    data: categ.result,
+                    total: categ.result.length,
+                    pages: categ.pages,
                 });
             })
             .catch((err) => { res.status(404).send({ data: err.message }); });

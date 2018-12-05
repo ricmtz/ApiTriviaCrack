@@ -13,8 +13,9 @@ class UsersCtrl {
         await UsersORM.getAll(req.query)
             .then((usrs) => {
                 res.status(200).send({
-                    data: usrs,
-                    total: usrs.length,
+                    data: usrs.result,
+                    total: usrs.result.length,
+                    pages: usrs.pages,
                 });
             })
             .catch((err) => { res.status(err.code).send({ error: err.message }); });

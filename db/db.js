@@ -200,18 +200,30 @@ class DB {
             conds.deleted = false;
         }
 
+        const result = {};
+        let regs;
         if (random) {
-            const ranReg = await this.randomReg(tab, conds, page)
+            result.result = await this.randomReg(tab, conds, page)
                 .catch(err => Promise.reject(err));
-            return ranReg;
+            regs = 1;
+        } else {
+            result.result = await this.selectPage(tab, conds, col, page)
+                .catch(err => Promise.reject(err));
+            regs = await this.countRegs(tab, conds)
+                .catch(err => Promise.reject(err));
         }
 
-        await this.validatePage(tab, page, conds).catch(err => Promise.reject(err));
+        result.pages = Math.ceil(regs / REG_PER_PAGE);
+        return result;
+    }
+
+    async selectPage(tab, cond, col, page = DEFAULT_PAGE) {
+        await this.validatePage(tab, page, cond).catch(err => Promise.reject(err));
 
         return new Promise((resolve, reject) => {
             this.db.any(this.selectQuery({
                 table: tab,
-                conditions: conds,
+                conditions: cond,
                 columns: col,
                 orderBy: DEFAULT_ORDER_BY_COLUMN,
                 limit: REG_PER_PAGE,

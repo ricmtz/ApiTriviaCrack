@@ -14,8 +14,9 @@ class AnswersCtrl {
         await AnswersORM.getAll(req.params.gameId, req.query)
             .then((ans) => {
                 res.status(200).send({
-                    data: ans,
-                    total: ans.length,
+                    data: ans.result,
+                    total: ans.result.length,
+                    pages: ans.pages,
                 });
             })
             .catch((err) => { res.status(404).send({ error: err.message }); });

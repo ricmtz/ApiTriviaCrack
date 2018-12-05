@@ -20,8 +20,9 @@ class GamesCtrl {
         await GamesORM.getAll(req.query)
             .then((game) => {
                 res.status(200).send({
-                    data: game,
-                    total: game.length,
+                    data: game.result,
+                    total: game.result.length,
+                    pages: game.pages,
                 });
             })
             .catch((err) => { res.status(404).send({ error: err.message }); });

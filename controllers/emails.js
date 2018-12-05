@@ -13,8 +13,9 @@ class EmailsCtrl {
         await EmailsORM.getAll(req.params.nickname, req.query)
             .then((email) => {
                 res.status(200).send({
-                    data: email,
-                    total: email.length,
+                    data: email.result,
+                    total: email.result.length,
+                    pages: email.pages,
                 });
             })
             .catch((err) => { res.status(404).send({ error: err.message }); });

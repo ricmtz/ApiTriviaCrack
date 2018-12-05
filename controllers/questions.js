@@ -19,8 +19,9 @@ class QuestionsCtrl {
         await QuestionsORM.getAll(req.query)
             .then((quest) => {
                 res.status(200).send({
-                    data: quest,
-                    total: quest.length,
+                    data: quest.result,
+                    total: quest.result.length,
+                    pages: quest.pages,
                 });
             })
             .catch((err) => { res.status(404).send({ error: err.message }); });
