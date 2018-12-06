@@ -210,7 +210,7 @@ class Auth {
             res.send({ token: resToken.getToken() }).status(201);
             return next();
         } catch (e) {
-            return next(e);
+            return next(Codes.resNotFound(e.message));
         }
     }
 
