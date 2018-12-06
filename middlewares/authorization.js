@@ -86,7 +86,7 @@ class Authorization {
                 },
                 answers: {
                     GET: this.answerGet,
-                    POST: this.answerPost,
+                    POST: this.gameGet,
                     PATCH: this.notAllowed,
                     DELETE: this.notAllowed,
                 },

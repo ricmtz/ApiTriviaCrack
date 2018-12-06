@@ -55,6 +55,8 @@ class AnswersORM {
             .catch(err => Promise.reject(err));
         await this.finishGame(answer)
             .catch(err => Promise.reject(err));
+        await this.appendValuesAnswer(answer)
+            .catch(err => Promise.reject(err));
         return answer;
     }
 
