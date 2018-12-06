@@ -67,7 +67,7 @@ class Authorization {
                     DELETE: this.sameNick,
                 },
                 categories: {
-                    GET: this.notAllowed,
+                    GET: this.allowed,
                     POST: this.notAllowed,
                     PATCH: this.notAllowed,
                     DELETE: this.notAllowed,
