@@ -61,34 +61,38 @@ class AnswersORM {
     }
 
     async finishGame(answer) {
-        let num = null;
-        await db.countRegs(this.name,
-            { game: answer.getGame(), player: answer.getPlayer() })
-            .then((res) => { num = res; })
-            .catch(err => Promise.reject(err));
-        answer.ansNumber = num;
-        if (num >= 10) {
-            const numCorrect = await db.countRegs(this.name,
-                {
-                    game: answer.getGame(),
-                    player: answer.getPlayer(),
-                    correct: true,
-                })
-                .catch(err => Promise.reject(err));
-            const posUsr = await this.getPosPlayer(answer.getGame(), answer.getPlayer());
-            const result = {};
-            if (posUsr) {
-                result[posUsr] = numCorrect;
-                await GamesORM.update(answer.getGame(), result)
-                    .catch((err) => { Promise.reject(err); });
-            }
+        try {
+            const num = await db.countRegs(this.name,
+                { game: answer.getGame(), player: answer.getPlayer() });
+            answer.ansNumber = num;
+            if (num >= 10) {
+                const numCorrect = await db.countRegs(this.name,
+                    {
+                        game: answer.getGame(),
+                        player: answer.getPlayer(),
+                        correct: true,
+                    });
+                const posUsr = await this.getPosPlayer(answer.getGame(),
+                    answer.getPlayer());
+                const result = {};
+                if (posUsr) {
+                    result[posUsr] = numCorrect;
+                    await GamesORM.update(answer.getGame(), result)
+                        .catch((err) => { Promise.reject(err); });
+                }
+                const user = await UsersORM.get(answer.getPlayer());
+                await UsersORM.update(user.getNickname(),
+                    { score: user.getScore() + numCorrect });
 
-            const game = await GamesORM.get(answer.getGame())
-                .catch(err => Promise.reject(err));
-            if (game.getScoreplayer1() !== -1 && game.getScoreplayer2() !== -1) {
-                await GamesORM.update(game.getId(), { finished: true })
+                const game = await GamesORM.get(answer.getGame())
                     .catch(err => Promise.reject(err));
+                if (game.getScoreplayer1() !== -1 && game.getScoreplayer2() !== -1) {
+                    await GamesORM.update(game.getId(), { finished: true })
+                        .catch(err => Promise.reject(err));
+                }
             }
+        } catch (e) {
+            return Promise.reject(e);
         }
     }
 
