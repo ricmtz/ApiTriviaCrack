@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { UsersORM, TokensORM } = require('../orm');
-const Authorization = require('../orm/authorizations');
+const Authorization = require('./authorization');
 const { mailer } = require('../mail');
 const { Codes } = require('../resCodes');
 
@@ -168,6 +168,7 @@ class Auth {
             if (!token.isActive()) {
                 return next(Codes.resUnauthorized('The session has expired'));
             }
+            req.user = await UsersORM.get(token.getUserId());
             return next();
         } catch (e) {
             return next(e);
@@ -180,6 +181,7 @@ class Auth {
                 token.setStatus('0');
                 await TokensORM.updateStatus(token.getId(), '0');
             }
+            return Promise.resolve();
         } catch (e) {
             return Promise.reject(e);
         }
@@ -262,16 +264,9 @@ class Auth {
 
     async havePermissions(req, res, next) {
         try {
-            const tokenObj = await TokensORM.get(req.get('token'));
-            const user = await UsersORM.get(tokenObj.getUserId());
-            let rol = 'user';
-            if (user.getAdmin()) {
-                rol = 'admin';
-            }
-            if (Authorization.canDo(rol, user.getNickname(), req)) {
-                return next();
-            }
-            return next(Codes.resUnauthorized('Dont have Authorization'));
+            const perm = await Authorization.canDo(req.method, req.originalUrl,
+                req.user, req.params, req.query);
+            return perm ? next() : next(Codes.resUnauthorized('Unauthorized access'));
         } catch (e) {
             return next(e);
         }

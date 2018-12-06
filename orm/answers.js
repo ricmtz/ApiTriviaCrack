@@ -35,7 +35,7 @@ class AnswersORM {
     async get(gameId, questionId) {
         let result = null;
         await db.select(this.name, { game: gameId, id: questionId }, [])
-            .then((res) => { result = this.processResultAnsw(res); })
+            .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
         await this.appendValuesAnswer(result)
             .catch(err => Promise.reject(err));
