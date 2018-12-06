@@ -1,4 +1,6 @@
+const fs = require('fs');
 const { UsersORM } = require('../orm');
+const { auth } = require('../middlewares');
 
 class UsersCtrl {
     /**
@@ -12,8 +14,9 @@ class UsersCtrl {
         await UsersORM.getAll(req.query)
             .then((usrs) => {
                 res.status(200).send({
-                    data: usrs,
-                    total: usrs.length,
+                    data: usrs.result,
+                    total: usrs.result.length,
+                    pages: usrs.pages,
                 });
             })
             .catch((err) => { res.status(err.code).send({ error: err.message }); });
@@ -40,6 +43,7 @@ class UsersCtrl {
      * @param {String} req.body.nickname User nickname.
      * @param {String} req.body.password User password.
      * @param {String} req.body.email User email.
+     * @param {File} req.file File of avatar
      */
     async create(req, res) {
         await UsersORM.create(req.body)
@@ -58,11 +62,21 @@ class UsersCtrl {
      * @param {String} req.body.email User email.
      * @param {String} req.body.avatar File name of the avatar.
      * @param {Boolean} req.body.admin Admin privileges.
+     * @param {File} req.file File of avatar
      */
     async update(req, res) {
+        if (req.body.password) {
+            req.body.password = await auth.hash(req.body.password)
+                .catch(err => res.status(500).send({ error: err.message }));
+        }
         await UsersORM.update(req.params.nickname, req.body)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ error: err.message }); });
+            .catch((err) => {
+                if (req.file !== undefined) {
+                    fs.unlink(req.body.avatar);
+                }
+                res.status(404).send({ error: err.message });
+            });
     }
 
     /**

@@ -10,13 +10,16 @@ router.use(auth.session);
 router.use('/:question', rules.paramsQuestions);
 
 // Get all question.
-router.get('/', [rules.queryQuestion, auth.havePermissions], questionsCtrl.getAll);
+router.get('/',
+    [rules.getAllElements, rules.getAllConv,
+        rules.queryQuestion, rules.questionConv,
+        auth.havePermissions], questionsCtrl.getAll);
 
 // Get question.
 router.get('/:question', auth.havePermissions, questionsCtrl.get);
 
 // Create question.
-router.post('/', [rules.createQuestion, auth.havePermissions], questionsCtrl.create);
+router.post('/', [rules.createQuestion, rules.questionConv, auth.havePermissions], questionsCtrl.create);
 
 // Remove question.
 router.delete('/:question', auth.havePermissions, questionsCtrl.delete);

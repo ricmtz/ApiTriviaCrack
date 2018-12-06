@@ -1,8 +1,10 @@
 const { Router } = require('express');
+const multer = require('multer');
 const { categoriesCtrl } = require('../controllers');
-const { rules, auth } = require('../middlewares');
+const { rules, auth, file } = require('../middlewares');
 
 const router = Router();
+const upload = multer({ dest: 'temp/' });
 
 router.use(auth.session);
 
@@ -10,16 +12,24 @@ router.use(auth.session);
 router.use('/:categoryId', rules.paramsCategories);
 
 // Create category
-router.post('/', [rules.createCategory, auth.havePermissions], categoriesCtrl.create);
+router.post('/',
+    [upload.single('icon'), rules.createCategory,
+        auth.havePermissions, file.changeFolder],
+    categoriesCtrl.create);
 
 // Get all categories
-router.get('/', [rules.getAllElements, rules.queryCategory, auth.havePermissions], categoriesCtrl.getAll);
+router.get('/',
+    [rules.getAllElements, rules.getAllConv,
+        rules.queryCategory, auth.havePermissions], categoriesCtrl.getAll);
 
 // Get category
 router.get('/:categoryId', auth.havePermissions, categoriesCtrl.get);
 
 // Put category
-router.patch('/:categoryId', [rules.updateCategory, auth.havePermissions], categoriesCtrl.update);
+router.patch('/:categoryId',
+    [upload.single('icon'), rules.updateCategory,
+        auth.havePermissions, file.changeFolder],
+    categoriesCtrl.update);
 
 // Delete category
 router.delete('/:categoryId', auth.havePermissions, categoriesCtrl.delete);

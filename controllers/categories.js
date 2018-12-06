@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { CategoriesORM } = require('../orm');
 
 class CategoriesCtrl {
@@ -14,13 +15,15 @@ class CategoriesCtrl {
      * @param {Object} req Express request object.
      * @param {Object} res Express response object.
      * @param {Number} req.query.page Page number.
+     * @param {File} req.file File of icon
      */
     async getAll(req, res) {
         await CategoriesORM.getAll(req.query)
             .then((categ) => {
                 res.status(200).send({
-                    data: categ,
-                    total: categ.length,
+                    data: categ.result,
+                    total: categ.result.length,
+                    pages: categ.pages,
                 });
             })
             .catch((err) => { res.status(404).send({ data: err.message }); });
@@ -47,12 +50,23 @@ class CategoriesCtrl {
      * @param {Object} req.body Data to created the category.
      * @param {String} req.body.name Name category.
      * @param {String} req.body.color Color category.
+     * @param {File} req.file File of icon
      */
     async create(req, res) {
         this.setDefaultValues(req);
+        if (req.file !== undefined) {
+            req.body.icon = req.file.filename;
+        }
         await CategoriesORM.create(req.body)
             .then((categ) => { res.status(200).send({ data: categ }); })
-            .catch((err) => { res.status(404).send({ error: err.message }); });
+            .catch((err) => {
+                if (req.file !== undefined) {
+                    fs.unlink(`uploads/${req.file.filename}`, (error) => {
+                        if (error) throw error;
+                    });
+                }
+                res.status(404).send({ error: err.message });
+            });
     }
 
     /**
@@ -66,11 +80,22 @@ class CategoriesCtrl {
      * @param {String} req.body.color Color category.
      * @param {String} req.body.icon Category icon.
      * @param {Boolean} req.body.deleted Category deleted property.
+     * @param {File} req.file File of icon
      */
     async update(req, res) {
+        if (req.file !== undefined) {
+            req.body.icon = req.file.filename;
+        }
         await CategoriesORM.update(req.params.categoryId, req.body)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ error: err.message }); });
+            .catch((err) => {
+                if (req.file !== undefined) {
+                    fs.unlink(`uploads/${req.file.filename}`, (error) => {
+                        if (error) throw error;
+                    });
+                }
+                res.status(404).send({ error: err.message });
+            });
     }
 
     /**

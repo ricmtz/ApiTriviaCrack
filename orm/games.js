@@ -13,21 +13,16 @@ class Games {
         this.msgNoCreateGame = 'Dont create answer';
     }
 
-    async getOponent() {
-        const games = await db.select(this.users, [], { deleted: false });
-        const max = games.length - 1;
-        const pos = Math.round(Math.random() * max);
-        return games[pos];
-    }
-
     async getAll(conditions) {
         let result = null;
         const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
-        await db.selectPaged(this.name, filtersObj, [], conditions.page)
-            .then((res) => { result = this.processResult(res); })
+        await db.selectPaged(this.name, filtersObj, [],
+            conditions.page, conditions.random)
+            .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
-        await this.appendValuesGames(result)
+        result.result = this.processResult(result.result);
+        await this.appendValuesGames(result.result)
             .catch(err => Promise.reject(err));
         return result;
     }
@@ -46,11 +41,6 @@ class Games {
         const game = new Game(data);
         await this.existsAttribs(game)
             .catch(err => Promise.reject(err));
-        let idP1 = null;
-        await UsersORM.getByNickname(game.getPlayer1())
-            .then((usr) => { idP1 = usr.getId(); })
-            .catch((err) => { Promise.reject(err); });
-        game.setPlayer1(idP1);
         let idP2 = null;
         await UsersORM.getByNickname(game.getPlayer2())
             .then((usr) => { idP2 = usr.getId(); })
@@ -58,6 +48,8 @@ class Games {
         game.setPlayer2(idP2);
         await db.insert(this.name, game, 'id')
             .then((res) => { game.setId(res); })
+            .catch((err) => { Promise.reject(err); });
+        await this.appendValuesGame(game)
             .catch((err) => { Promise.reject(err); });
         return game;
     }
@@ -107,14 +99,14 @@ class Games {
     async existsAttribs(game) {
         let exist = null;
         if (game.getPlayer1()) {
-            exist = await db.exists(this.users, { nickname: game.getPlayer1() })
+            exist = await db.selectNonDel(this.users, { id: game.getPlayer1() })
                 .catch(() => { });
             if (!exist) {
                 return Promise.reject(new Error(this.msgNoUser));
             }
         }
         if (game.getPlayer2()) {
-            exist = await db.exists(this.users, { nickname: game.getPlayer2() })
+            exist = await db.selectNonDel(this.users, { nickname: game.getPlayer2() })
                 .catch(() => { });
             if (!exist) {
                 return Promise.reject(new Error(this.msgNoUser));
@@ -170,16 +162,16 @@ class Games {
                 .catch(err => Promise.reject(err));
         }
         if (cond.scorePlayer1Min) {
-            result.scorePlayer1Min = filters.minNumber('score', cond.scorePlayer1Min);
+            result.scorePlayer1Min = filters.minNumber('scoreplayer1', cond.scorePlayer1Min);
         }
         if (cond.scorePlayer1Max) {
-            result.scorePlayer1Max = filters.maxNumber('score', cond.scorePlayer1Max);
+            result.scorePlayer1Max = filters.maxNumber('scoreplayer1', cond.scorePlayer1Max);
         }
         if (cond.scorePlayer2Min) {
-            result.scorePlayer2Min = filters.minNumber('score', cond.scorePlayer2Min);
+            result.scorePlayer2Min = filters.minNumber('scoreplayer2', cond.scorePlayer2Min);
         }
         if (cond.scorePlayer2Max) {
-            result.scorePlayer2Max = filters.maxNumber('score', cond.scorePlayer2Max);
+            result.scorePlayer2Max = filters.maxNumber('scoreplayer2', cond.scorePlayer2Max);
         }
         if (typeof (cond.finished) !== 'undefined') {
             result.finished = cond.finished;

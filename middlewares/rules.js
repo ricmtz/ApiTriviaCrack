@@ -9,8 +9,19 @@ class Rules {
         validator.validate(req, res, next, {
             query: {
                 page: 'positive,optional',
+                random: 'boolean,optional',
             },
         });
+    }
+
+    static getAllConv(req, res, next) {
+        if (req.query.page) {
+            req.query.page = Number(req.query.page);
+        }
+        if (req.query.random) {
+            req.query.random = (req.query.random === 'true');
+        }
+        next();
     }
 
     /**
@@ -178,7 +189,7 @@ class Rules {
         });
     }
 
-    static userScoreConv(req, res, next) {
+    static userConv(req, res, next) {
         if (req.query.scoreMin) {
             req.query.scoreMin = Number(req.query.scoreMin);
         }
@@ -198,7 +209,7 @@ class Rules {
         next();
     }
 
-    static gameScoreConv(req, res, next) {
+    static gameConv(req, res, next) {
         if (req.query.scorePlayer1Min) {
             req.query.scorePlayer1Min = Number(req.query.scorePlayer1Min);
         }
@@ -210,6 +221,20 @@ class Rules {
         }
         if (req.query.scorePlayer2Max) {
             req.query.scorePlayer2Max = Number(req.query.scorePlayer2Max);
+        }
+        next();
+    }
+
+    static answerConv(req, res, next) {
+        if (req.body.question) {
+            req.body.question = Number(req.body.question);
+        }
+        next();
+    }
+
+    static questionConv(req, res, next) {
+        if (req.body.category) {
+            req.body.category = Number(req.body.category);
         }
         next();
     }
@@ -257,6 +282,9 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static updateUser(req, res, next) {
+        if (req.file !== undefined) {
+            req.body.avatar = req.file.originalname;
+        }
         validator.validate(req, res, next, {
             body: {
                 nickname: 'nickname,optional',
@@ -326,8 +354,7 @@ class Rules {
     static createGame(req, res, next) {
         validator.validate(req, res, next, {
             body: {
-                player1: 'nickname,required',
-                player2: 'nickname,optional',
+                player2: 'nickname,required',
             },
         });
     }
@@ -361,7 +388,6 @@ class Rules {
         validator.validate(req, res, next, {
             body: {
                 question: 'id,required',
-                player: 'text,required',
                 option: 'text,required',
             },
         });
@@ -402,7 +428,6 @@ class Rules {
                 option1: 'text,required',
                 option2: 'text,required',
                 optioncorrect: 'text,required',
-                userid: 'id,required',
             },
         });
     }
@@ -436,10 +461,14 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static createCategory(req, res, next) {
+        if (req.file !== undefined) {
+            req.body.icon = req.file.originalname;
+        }
         validator.validate(req, res, next, {
             body: {
-                name: 'text,required',
                 color: 'text,required',
+                name: 'text,required',
+                icon: 'file,optional',
             },
         });
     }
@@ -452,6 +481,9 @@ class Rules {
      * @param {Function} next Express next middleware function
      */
     static updateCategory(req, res, next) {
+        if (req.file !== undefined) {
+            req.body.icon = req.file.originalname;
+        }
         validator.validate(req, res, next, {
             body: {
                 name: 'text,optional',

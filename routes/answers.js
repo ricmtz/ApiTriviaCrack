@@ -10,13 +10,15 @@ router.use(auth.session);
 router.use('/:answerId', rules.paramsAnswers);
 
 // Get all answers
-router.get('/', [rules.queryAnswer, auth.havePermissions], AnswersCtrl.getAll);
+router.get('/',
+    [rules.getAllElements, rules.getAllConv,
+        rules.queryAnswer, auth.havePermissions], AnswersCtrl.getAll);
 
 // Get answer of game
 router.get('/:answerId', auth.havePermissions, AnswersCtrl.get);
 
 // Create answer
-router.post('/', [rules.createGameQuestion, auth.havePermissions], AnswersCtrl.create);
+router.post('/', [rules.createGameQuestion, rules.answerConv, auth.havePermissions], AnswersCtrl.create);
 
 // Delete answer
 router.delete('/:answerId', auth.havePermissions, AnswersCtrl.delete);

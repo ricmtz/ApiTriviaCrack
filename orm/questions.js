@@ -22,10 +22,11 @@ class Questions {
         let result = null;
         const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
-        await db.selectPaged(this.name, filtersObj, [], conditions.page)
-            .then((res) => { result = this.processResult(res); })
+        await db.selectPaged(this.name, filtersObj, [], conditions.page, conditions.random)
+            .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
-        await this.appendValues(result)
+        result.result = this.processResult(result.result);
+        await this.appendValues(result.result)
             .catch(err => Promise.reject(err));
         return result;
     }

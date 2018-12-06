@@ -20,9 +20,11 @@ class Users {
 
     async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, this.getFilters(conditions), [], conditions.page)
-            .then((res) => { result = this.processResult(res); })
+        await db.selectPaged(this.name, this.getFilters(conditions), [],
+            conditions.page, conditions.random)
+            .then((res) => { result = res; })
             .catch(err => Promise.reject(Codes.resNotFound(err.message)));
+        result.result = this.processResult(result.result);
         return result;
     }
 

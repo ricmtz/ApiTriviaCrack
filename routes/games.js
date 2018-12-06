@@ -14,7 +14,10 @@ router.use('/:gameId', rules.paramsGames);
 router.post('/', [rules.createGame, auth.havePermissions], gamesCtrl.create);
 
 // Get all games
-router.get('/', [rules.queryGame, rules.gameScoreConv, rules.gameScores, auth.havePermissions], gamesCtrl.getAll);
+router.get('/',
+    [rules.getAllElements, rules.getAllConv,
+        rules.queryGame, rules.gameConv,
+        rules.gameScores, auth.havePermissions], gamesCtrl.getAll);
 
 // Get game by Id
 router.get('/:gameId', auth.havePermissions, gamesCtrl.get);

@@ -1,4 +1,4 @@
-const { QuestionsORM } = require('../orm');
+const { QuestionsORM, TokensORM } = require('../orm');
 
 class QuestionsCtrl {
     /**
@@ -19,8 +19,9 @@ class QuestionsCtrl {
         await QuestionsORM.getAll(req.query)
             .then((quest) => {
                 res.status(200).send({
-                    data: quest,
-                    total: quest.length,
+                    data: quest.result,
+                    total: quest.result.length,
+                    pages: quest.pages,
                 });
             })
             .catch((err) => { res.status(404).send({ error: err.message }); });
@@ -52,6 +53,12 @@ class QuestionsCtrl {
      * @param {Number} req.body.userid User id.
      */
     async create(req, res) {
+        try {
+            const token = await TokensORM.get(req.get('token'));
+            req.body.userid = token.getUserId();
+        } catch (e) {
+            return Promise.reject(e);
+        }
         this.setDefaultValues(req);
         await QuestionsORM.create(req.body)
             .then((quest) => { res.status(200).send({ data: quest }); })

@@ -1,4 +1,4 @@
-const { AnswersORM } = require('../orm');
+const { AnswersORM, TokensORM } = require('../orm');
 
 class AnswersCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
@@ -14,8 +14,9 @@ class AnswersCtrl {
         await AnswersORM.getAll(req.params.gameId, req.query)
             .then((ans) => {
                 res.status(200).send({
-                    data: ans,
-                    total: ans.length,
+                    data: ans.result,
+                    total: ans.result.length,
+                    pages: ans.pages,
                 });
             })
             .catch((err) => { res.status(404).send({ error: err.message }); });
@@ -47,13 +48,19 @@ class AnswersCtrl {
      * @param {Boolean} req.body.correct Evaluation answer.
      */
     async create(req, res) {
-        const data = {
-            game: req.params.gameId,
-            question: req.params.answerId,
-            player: req.body.player,
-            option: req.body.option,
-            correct: req.body.correct,
-        };
+        let data;
+        try {
+            const token = await TokensORM.get(req.get('token'));
+            data = {
+                game: req.params.gameId,
+                question: req.body.question,
+                player: token.getUserId(),
+                option: req.body.option,
+            };
+        } catch (e) {
+            res.status(404).send({ error: e.message });
+            return;
+        }
         await AnswersORM.create(data)
             .then((ans) => { res.status(200).send({ data: ans }); })
             .catch((err) => { res.status(404).send({ error: err.message }); });

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const { UsersORM, TokensORM } = require('../orm');
-const Authorization = require('../orm/authorizations');
+const Authorization = require('./authorization');
 const { mailer } = require('../mail');
 const { Codes } = require('../resCodes');
 
@@ -20,54 +20,46 @@ class Auth {
     }
 
     async register(req, res, next) {
-        // Encrypt password
-        req.body.password = await this.hash(req.body.password)
-            .catch(err => next(err));
-        if (!req.body.password) {
-            return;
+        try {
+            // Encrypt password
+            req.body.password = await this.hash(req.body.password);
+            // Create user
+            const user = await UsersORM.create(req.body);
+            // Create new session token
+            const sessToken = await this.createSessionToken(user);
+            // Create verification token
+            this.createVerificationToken(user);
+            res.send({ data: user, token: sessToken.getToken() }).status(201);
+            return next();
+        } catch (e) {
+            return next(e);
         }
-        // Create user
-        const user = await UsersORM.create(req.body)
-            .catch(err => next(err));
-        if (!user) {
-            return;
-        }
-        // Create session token
-        const sessToken = await this.createSessionToken(user)
-            .catch(err => next(err));
-        if (!sessToken) {
-            return;
-        }
-        // Create verification token
-        const verToken = this.createVerificationToken(user)
-            .catch(err => next(err));
-        if (!verToken) {
-            return;
-        }
-        res.send({
-            data: user,
-            token: sessToken.getToken(),
-        }).status(201);
-        next();
     }
 
     async createSessionToken(user) {
-        const token = await this.createToken(user, 's')
-            .catch(err => Promise.reject(err));
-        return token;
+        try {
+            return await this.createToken(user, 's');
+        } catch (e) {
+            return Promise.reject(e);
+        }
     }
 
     async createVerificationToken(user) {
-        const token = await this.createToken(user, 'v')
-            .catch(err => Promise.reject(err));
-        mailer.sendVerification(user.getEmail(), token.getToken());
-        return token;
+        try {
+            const token = await this.createToken(user, 'v');
+            await mailer.sendVerification(user.getEmail(), token.getToken());
+            return token;
+        } catch (e) {
+            return Promise.reject(e);
+        }
     }
 
     async hash(str) {
-        const hashedStr = await this.hashString(this.secureString(str))
-            .catch(err => Promise.reject(err));
-        return hashedStr;
+        try {
+            return await this.hashString(this.secureString(str));
+        } catch (e) {
+            return Promise.reject(e);
+        }
     }
 
     secureString(str) {
@@ -75,62 +67,50 @@ class Auth {
     }
 
     async hashString(str) {
-        const hashedStr = await bcrypt.hash(str, Number(process.env.SALT_ROUNDS))
-            .catch(err => Promise.reject(Codes.resServerErr(err.message)));
-        return hashedStr;
+        try {
+            return await bcrypt.hash(str, Number(process.env.SALT_ROUNDS));
+        } catch (e) {
+            return Promise.reject(Codes.resServerErr(e.message));
+        }
     }
 
     async login(req, res, next) {
-        // Check if user exists
-        const user = await UsersORM.getByNickname(req.body.nickname)
-            .catch(err => next(err));
-        if (!user) {
-            return;
+        try {
+            // Check if user exists
+            const user = await UsersORM.getByNickname(req.body.nickname);
+            // Check user password
+            const correctPass = await bcrypt.compare(this.secureString(req.body.password),
+                user.getPassword());
+            // Check if password is correct
+            if (correctPass === false) {
+                return next(Codes.resUnauthorized('User/password combination is not valid'));
+            }
+            // Get last active token associated to the user
+            const tokenObj = await TokensORM.getLastByUserId(user.getId());
+            // Update session
+            await this.updateSession(tokenObj);
+            // Check if te token is still active
+            if (tokenObj.isActive()) {
+                res.send({ token: tokenObj.getToken() }).status(200);
+                return next();
+            }
+            // Generate new session token
+            const sessToken = await this.createSessionToken(user);
+            res.send({ token: sessToken.getToken() }).status(201);
+            return next();
+        } catch (e) {
+            return next(e);
         }
-        // Check user password
-        const correctPass = await bcrypt.compare(this.secureString(req.body.password),
-            user.getPassword())
-            .catch(err => next(err));
-        // Finish if compare() failed
-        if (typeof (correctPass) === 'undefined') {
-            return;
-        }
-        // Check if password is correct
-        if (correctPass === false) {
-            next(Codes.resUnauthorized('User/password combination is not valid'));
-            return;
-        }
-        // Get last active token associated to the user
-        const tokenObj = await TokensORM.getLastByUserId(user.getId())
-            .catch(err => next(err));
-        if (!tokenObj) {
-            return;
-        }
-        // Check if te token is still active
-        await this.updateSession(tokenObj)
-            .catch(err => next(err));
-
-        if (tokenObj.isActive()) {
-            res.send({ token: tokenObj.getToken() }).status(200);
-            next();
-            return;
-        }
-        // Generate new session token
-        const sessToken = await this.createSessionToken(user)
-            .catch(err => next(err));
-        if (!sessToken) {
-            return;
-        }
-        res.send({ token: sessToken.getToken() }).status(201);
-        next();
     }
 
     async createToken(user, type = 's') {
-        const tokenData = await this.genTokenData(user, type)
-            .catch(err => Promise.reject(err));
-        const resToken = await TokensORM.create(tokenData)
-            .catch(err => Promise.reject(err));
-        return resToken;
+        try {
+            const tokenData = await this.genTokenData(user, type);
+            const resToken = await TokensORM.create(tokenData);
+            return resToken;
+        } catch (e) {
+            return Promise.reject(e);
+        }
     }
 
     async genTokenData(user, tokenType = 's') {
@@ -165,158 +145,130 @@ class Auth {
     }
 
     async logout(req, res, next) {
-        if (!req.get('token')) {
-            next(Codes.resUnauthorized('Missing token'));
-            return;
+        try {
+            if (!req.get('token')) {
+                return next(Codes.resUnauthorized('Missing token'));
+            }
+            const token = await TokensORM.get(req.get('token'));
+            await TokensORM.updateStatus(token.getId(), '0');
+            res.send().status(204);
+            return next();
+        } catch (e) {
+            return next(e);
         }
-        const token = await TokensORM.get(req.get('token'))
-            .catch(() => next(Codes.resNotFound('Invalid token')));
-        if (!token) {
-            return;
-        }
-        const updated = await TokensORM.updateStatus(token.getId(), '0')
-            .catch(err => next(err));
-        if (!updated) {
-            return;
-        }
-        res.send().status(204);
-        next();
     }
 
     async session(req, res, next) {
-        if (!req.get('token')) {
-            next(Codes.resUnauthorized('Missing token'));
-            return;
+        try {
+            if (!req.get('token')) {
+                return next(Codes.resUnauthorized('Missing token'));
+            }
+            const token = await TokensORM.get(req.get('token'));
+            await this.updateSession(token);
+            if (!token.isActive()) {
+                return next(Codes.resUnauthorized('The session has expired'));
+            }
+            req.user = await UsersORM.get(token.getUserId());
+            return next();
+        } catch (e) {
+            return next(e);
         }
-        const token = await TokensORM.get(req.get('token'))
-            .catch(err => next(Codes.resNotFound('Invalid token')));
-        if (!token) {
-            return;
-        }
-        await this.updateSession(token)
-            .catch(err => next(err));
-        if (!token.isActive()) {
-            next(Codes.resUnauthorized('The session has expired'));
-            return;
-        }
-        next();
     }
 
     async updateSession(token) {
-        if (!token.isActive()) {
-            token.setStatus('0');
-            await TokensORM.updateStatus(token.getId(), '0')
-                .catch(err => Promise.reject(err));
+        try {
+            if (!token.isActive()) {
+                token.setStatus('0');
+                await TokensORM.updateStatus(token.getId(), '0');
+            }
+            return Promise.resolve();
+        } catch (e) {
+            return Promise.reject(e);
         }
     }
 
     async restore(req, res, next) {
-        if (!req.query.token) {
-            await this.restoreToken(req, res, next);
-        } else {
-            await this.restorePass(req, res, next);
+        try {
+            if (!req.query.token) {
+                await this.restoreToken(req, res, next);
+            } else {
+                await this.restorePass(req, res, next);
+            }
+            return next();
+        } catch (e) {
+            return next(e);
         }
     }
 
     async restoreToken(req, res, next) {
-        if (!req.body.nickname) {
-            next(Codes.resBadRequest('Missing user nickname'));
-            return;
+        try {
+            if (!req.body.nickname) {
+                return next(Codes.resBadRequest('Missing user nickname'));
+            }
+            const user = await UsersORM.getByNickname(req.body.nickname);
+            const resToken = await this.createRestorationToken(user);
+            res.send({ token: resToken.getToken() }).status(201);
+            return next();
+        } catch (e) {
+            return next(Codes.resNotFound(e.message));
         }
-        const user = await UsersORM.getByNickname(req.body.nickname)
-            .catch(err => next(Codes.resNotFound(err.message)));
-        if (!user) {
-            return;
-        }
-        const resToken = await this.createRestorationToken(user)
-            .catch(err => next(err));
-        if (!resToken) {
-            return;
-        }
-        res.send({
-            token: resToken.getToken(),
-        }).status(201);
     }
 
     async createRestorationToken(user) {
-        const token = await this.createToken(user, 'r')
-            .catch(err => Promise.reject(err));
-        mailer.sendRestoration(user.getEmail(), token.getToken());
-        return token;
+        try {
+            const token = await this.createToken(user, 'r');
+            await mailer.sendRestoration(user.getEmail(), token.getToken());
+            return token;
+        } catch (e) {
+            return Promise.reject(e);
+        }
     }
 
     async restorePass(req, res, next) {
-        if (!req.body.password) {
-            next(Codes.resBadRequest('Missing user password'));
-            return;
+        try {
+            if (!req.body.password) {
+                return next(Codes.resBadRequest('Missing user password'));
+            }
+            const token = await TokensORM.get(req.query.token, 'r');
+            await this.updateSession(token);
+            if (!token.isActive()) {
+                return next(Codes.resUnauthorized('The token has expired'));
+            }
+            const user = await UsersORM.get(token.getUserId());
+            const hashedPass = await this.hash(req.body.password);
+            await UsersORM.update(user.getNickname(), { password: hashedPass });
+            await TokensORM.updateStatus(token.getId(), '0');
+            res.status(204).send();
+            return next();
+        } catch (e) {
+            return next(e);
         }
-        const token = await TokensORM.get(req.query.token, 'r')
-            .catch(() => next(Codes.resUnauthorized('Invalid token')));
-        if (!token) {
-            return;
-        }
-        await this.updateSession(token)
-            .catch(err => next(err));
-        if (!token.isActive()) {
-            next(Codes.resUnauthorized('The token has expired'));
-            return;
-        }
-        const user = await UsersORM.get(token.getUserId())
-            .catch(err => next(err));
-        if (!user) {
-            return;
-        }
-        const hashedPass = await this.hash(req.body.password)
-            .catch(err => next(err));
-        if (!hashedPass) {
-            return;
-        }
-        await UsersORM.update(user.getNickname(), { password: hashedPass })
-            .catch(err => next(err));
-        await TokensORM.updateStatus(token.getId(), '0')
-            .catch(err => next(err));
-        res.status(204).send();
     }
 
     async verify(req, res, next) {
-        if (req.query.token) {
-            const token = await TokensORM.get(req.query.token, 'v')
-                .catch(() => next(Codes.resUnauthorized('Invalid token')));
-            if (!token) {
-                return;
+        try {
+            if (req.query.token) {
+                const token = await TokensORM.get(req.query.token, 'v');
+                const user = await UsersORM.get(token.getUserId());
+                await UsersORM.update(user.getNickname(), { verified: true });
+                await TokensORM.updateStatus(token.getId(), '0');
+            } else {
+                return next(Codes.resUnauthorized('Missing token'));
             }
-            const user = await UsersORM.get(token.getUserId())
-                .catch(err => next(err));
-            if (!user) {
-                return;
-            }
-            await UsersORM.update(user.getNickname(), { verified: true })
-                .catch(err => next(err));
-            await TokensORM.updateStatus(token.getId(), '0')
-                .catch(err => next(err));
-        } else {
-            next(Codes.resUnauthorized('Missing token'));
+            res.send().status(204);
+            return next();
+        } catch (e) {
+            return next(e);
         }
-        res.send().status(204);
-        next();
     }
 
     async havePermissions(req, res, next) {
-        const tokenObj = await TokensORM.get(req.get('token'))
-            .catch(() => next(Codes.resUnauthorized('Not valid token')));
-        if (!tokenObj) {
-            return;
-        }
-        const user = await UsersORM.get(tokenObj.getUserId())
-            .catch(err => next(err));
-        let rol = 'user';
-        if (user.getAdmin()) {
-            rol = 'admin';
-        }
-        if (Authorization.canDo(rol, user.getNickname(), req)) {
-            next();
-        } else {
-            next(Codes.resUnauthorized('Dont have Authorization'));
+        try {
+            const perm = await Authorization.canDo(req.method, req.originalUrl,
+                req.user, req.params, req.query);
+            return perm ? next() : next(Codes.resUnauthorized('Unauthorized access'));
+        } catch (e) {
+            return next(e);
         }
     }
 }

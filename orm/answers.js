@@ -22,10 +22,12 @@ class AnswersORM {
         let result = null;
         const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
-        await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [], conditions.page)
-            .then((res) => { result = this.processResultAnsw(res); })
+        await db.selectPaged(this.name, { game: gameId, ...filtersObj }, [],
+            conditions.page, conditions.random)
+            .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
-        await this.appendValuesAnswers(result)
+        result.result = this.processResult(result.result);
+        await this.appendValuesAnswers(result.result)
             .catch(err => Promise.reject(err));
         return result;
     }
@@ -33,7 +35,7 @@ class AnswersORM {
     async get(gameId, questionId) {
         let result = null;
         await db.select(this.name, { game: gameId, id: questionId }, [])
-            .then((res) => { result = this.processResultAnsw(res); })
+            .then((res) => { result = this.processResult(res); })
             .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
         await this.appendValuesAnswer(result)
             .catch(err => Promise.reject(err));
@@ -42,9 +44,6 @@ class AnswersORM {
 
     async create(data) {
         const answer = new Answer(data);
-        await UsersORM.getByNickname(answer.getPlayer())
-            .then((res) => { answer.setPlayer(res.getId()); })
-            .catch((err) => { Promise.reject(err); });
         await this.existsAttribsAnsw(answer)
             .catch(err => Promise.reject(err));
         await db.selectNonDel(this.questions,
@@ -56,37 +55,44 @@ class AnswersORM {
             .catch(err => Promise.reject(err));
         await this.finishGame(answer)
             .catch(err => Promise.reject(err));
+        await this.appendValuesAnswer(answer)
+            .catch(err => Promise.reject(err));
         return answer;
     }
 
     async finishGame(answer) {
-        let num = null;
-        await db.countRegs(this.name,
-            { game: answer.getGame(), player: answer.getPlayer() })
-            .then((res) => { num = res; })
-            .catch(err => Promise.reject(err));
-        if (num >= 10) {
-            const numCorrect = await db.countRegs(this.name,
-                {
-                    game: answer.getGame(),
-                    player: answer.getPlayer(),
-                    correct: true,
-                })
-                .catch(err => Promise.reject(err));
-            const posUsr = await this.getPosPlayer(answer.getGame(), answer.getPlayer());
-            const result = {};
-            if (posUsr) {
-                result[posUsr] = numCorrect;
-                await GamesORM.update(answer.getGame(), result)
-                    .catch((err) => { Promise.reject(err); });
-            }
+        try {
+            const num = await db.countRegs(this.name,
+                { game: answer.getGame(), player: answer.getPlayer() });
+            answer.ansNumber = num;
+            if (num >= 10) {
+                const numCorrect = await db.countRegs(this.name,
+                    {
+                        game: answer.getGame(),
+                        player: answer.getPlayer(),
+                        correct: true,
+                    });
+                const posUsr = await this.getPosPlayer(answer.getGame(),
+                    answer.getPlayer());
+                const result = {};
+                if (posUsr) {
+                    result[posUsr] = numCorrect;
+                    await GamesORM.update(answer.getGame(), result)
+                        .catch((err) => { Promise.reject(err); });
+                }
+                const user = await UsersORM.get(answer.getPlayer());
+                await UsersORM.update(user.getNickname(),
+                    { score: user.getScore() + numCorrect });
 
-            const game = await GamesORM.get(answer.getGame())
-                .catch(err => Promise.reject(err));
-            if (game.getScoreplayer1() !== -1 && game.getScoreplayer2() !== -1) {
-                await GamesORM.update(game.getId(), { finished: true })
+                const game = await GamesORM.get(answer.getGame())
                     .catch(err => Promise.reject(err));
+                if (game.getScoreplayer1() !== -1 && game.getScoreplayer2() !== -1) {
+                    await GamesORM.update(game.getId(), { finished: true })
+                        .catch(err => Promise.reject(err));
+                }
             }
+        } catch (e) {
+            return Promise.reject(e);
         }
     }
 
@@ -121,7 +127,7 @@ class AnswersORM {
         return null;
     }
 
-    processResultAnsw(rows) {
+    processResult(rows) {
         if (!rows) {
             return null;
         }

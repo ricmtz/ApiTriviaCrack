@@ -14,10 +14,11 @@ class Emails {
             .catch(err => Promise.reject(err));
         let result = null;
         await db.selectPaged(this.name,
-            { userid: user.getId(), ...this.getFilters(conditions) }, [], conditions.page)
+            { userid: user.getId(), ...this.getFilters(conditions) }, [],
+            conditions.page, conditions.random)
             .then((res) => { result = res; })
             .catch(err => Promise.reject(err));
-        await this.appendValuesEmails(result)
+        await this.appendValuesEmails(result.result)
             .catch(err => Promise.reject(err));
         return result;
     }
@@ -42,6 +43,8 @@ class Emails {
         await this.existsAttribsEmail(newEmail)
             .catch(err => Promise.reject(err));
         const conditions = { userid: user.getId(), email: oldEmail };
+        await db.exists(this.name, conditions)
+            .catch(() => Promise.reject(new Error(this.msgNoExistEmail)));
         await db.update(this.name, { email: newEmail }, conditions)
             .catch(err => Promise.reject(err));
     }
@@ -55,11 +58,11 @@ class Emails {
             .catch(err => Promise.reject(err));
     }
 
-    async existsAttribsEmail(email) {
-        const duplicateMail = await db.exists(this.name, { email })
-            .catch(() => { });
-        const duplicateMailUsr = await db.exists(this.name, { email })
-            .catch(() => { });
+    async existsAttribsEmail(newEmail) {
+        const duplicateMail = await db.exists(this.name, { email: newEmail })
+            .catch(() => {});
+        const duplicateMailUsr = await db.exists(UsersORM.name, { email: newEmail })
+            .catch(() => {});
         if (duplicateMail || duplicateMailUsr) {
             return Promise.reject(new Error(this.msgExistEmail));
         }

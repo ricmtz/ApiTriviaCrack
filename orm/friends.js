@@ -12,7 +12,7 @@ class Friends {
     async getAll(nickname, filters) {
         const user = await UsersORM.getByNickname(nickname)
             .catch(err => Promise.reject(err));
-        let result = null;
+        let result = [];
         let filtersObj = await this.getFilters(filters)
             .catch(err => Promise.reject(err));
         await db.selectNonDel(this.name, { user1: user.getId(), ...filtersObj }, [])
@@ -23,7 +23,7 @@ class Friends {
         await db.selectNonDel(this.name, { user2: user.getId(), ...filtersObj }, [])
             .then((res) => { result.push(...res); })
             .catch(() => {});
-        await this.appendValuesFriends(result)
+        await this.appendValuesFriends(result, user.getId())
             .catch(err => Promise.reject(err));
         return result;
     }
@@ -59,7 +59,7 @@ class Friends {
     }
 
     async notExistFriendship(user1, user2) {
-        const exist = await db.exists(this.name, { user1, user2 })
+        const exist = await db.selectNonDel(this.name, { user1, user2 })
             .catch(() => { });
         if (exist) {
             return Promise.reject(new Error(this.msgFriendExist));
@@ -76,23 +76,32 @@ class Friends {
         return null;
     }
 
-    async appendValuesFriend(friend) {
+    async appendValuesFriend(friend, userId) {
         await UsersORM.get(friend.user1)
-            .then((res) => { friend.user1 = res.getNickname(); })
+            .then((res) => {
+                friend.user1 = res.getNickname();
+                friend.avatar = friend.user1 !== userId ? res.getAvatar() : null;
+            })
             .catch(err => Promise.reject(err));
         await UsersORM.get(friend.user2)
-            .then((res) => { friend.user2 = res.getNickname(); })
+            .then((res) => {
+                friend.user2 = res.getNickname();
+                friend.avatar = friend.user2 !== userId ? res.getAvatar() : friend.avatar;
+            })
             .catch(err => Promise.reject(err));
     }
 
-    async appendValuesFriends(friends) {
+    async appendValuesFriends(friends, userId) {
+        if (!friends) {
+            return;
+        }
         if (!Array.isArray(friends)) {
-            await this.appendValuesFriend(friends)
+            await this.appendValuesFriend(friends, userId)
                 .catch(err => Promise.reject(err));
         } else {
             const promises = [];
             for (let i = 0; i < friends.length; i += 1) {
-                promises.push(this.appendValuesFriend(friends[i]));
+                promises.push(this.appendValuesFriend(friends[i], userId));
             }
             await Promise.all(promises)
                 .catch(err => Promise.reject(err));
