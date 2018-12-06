@@ -1,13 +1,8 @@
+const fs = require('fs');
 const { UsersORM } = require('../orm');
+const { auth } = require('../middlewares');
 
 class UsersCtrl {
-    /**
-     * Constructor function to UsersCtrl.
-     */
-    constructor() {
-        this.create = this.create.bind(this);
-    }
-
     /**
      * This function request to the data base all the
      * users stored.
@@ -16,14 +11,15 @@ class UsersCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await UsersORM.getAll(req.query.page)
+        await UsersORM.getAll(req.query)
             .then((usrs) => {
                 res.status(200).send({
-                    data: usrs,
-                    total: usrs.length,
+                    data: usrs.result,
+                    total: usrs.result.length,
+                    pages: usrs.pages,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(err.code).send({ error: err.message }); });
     }
 
     /**
@@ -36,7 +32,7 @@ class UsersCtrl {
     async get(req, res) {
         await UsersORM.getByNickname(req.params.nickname)
             .then((usr) => { res.status(200).send({ data: usr }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -47,12 +43,12 @@ class UsersCtrl {
      * @param {String} req.body.nickname User nickname.
      * @param {String} req.body.password User password.
      * @param {String} req.body.email User email.
+     * @param {File} req.file File of avatar
      */
     async create(req, res) {
-        this.setDefaultValues(req);
         await UsersORM.create(req.body)
             .then((usr) => { res.status(200).send({ data: usr }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -66,11 +62,21 @@ class UsersCtrl {
      * @param {String} req.body.email User email.
      * @param {String} req.body.avatar File name of the avatar.
      * @param {Boolean} req.body.admin Admin privileges.
+     * @param {File} req.file File of avatar
      */
     async update(req, res) {
+        if (req.body.password) {
+            req.body.password = await auth.hash(req.body.password)
+                .catch(err => res.status(500).send({ error: err.message }));
+        }
         await UsersORM.update(req.params.nickname, req.body)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => {
+                if (req.file !== undefined) {
+                    fs.unlink(req.body.avatar);
+                }
+                res.status(404).send({ error: err.message });
+            });
     }
 
     /**
@@ -83,22 +89,7 @@ class UsersCtrl {
     async delete(req, res) {
         await UsersORM.delete(req.params.nickname)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
-    }
-
-    /**
-     * This function set the default valuest to the attribs
-     * admin, score, avatar, lastlogin, deleted and verified
-     * for a user.
-     * @param {Object} req Express request object.
-     */
-    setDefaultValues(req) {
-        req.body.admin = false;
-        req.body.score = 0;
-        req.body.avatar = 'default.png';
-        req.body.lastlogin = new Date().toISOString();
-        req.body.deleted = false;
-        req.body.verified = false;
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 }
 

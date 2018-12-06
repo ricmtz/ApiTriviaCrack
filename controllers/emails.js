@@ -1,4 +1,4 @@
-const { UsersORM } = require('../orm');
+const { EmailsORM } = require('../orm');
 
 class EmailsCtrl {
     /**
@@ -10,14 +10,15 @@ class EmailsCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await UsersORM.getEmails(req.params.nickname, req.query.page)
+        await EmailsORM.getAll(req.params.nickname, req.query)
             .then((email) => {
                 res.status(200).send({
-                    data: email,
-                    total: email.length,
+                    data: email.result,
+                    total: email.result.length,
+                    pages: email.pages,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -29,9 +30,9 @@ class EmailsCtrl {
      * @param {String} req.body.email Email that would be added.
      */
     async create(req, res) {
-        await UsersORM.addEmail(req.params.nickname, req.body.email)
+        await EmailsORM.create(req.params.nickname, req.body.email)
             .then((email) => { res.status(200).send({ data: email }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -44,9 +45,9 @@ class EmailsCtrl {
      * @param {String} req.body.newEmail New user email.
      */
     async update(req, res) {
-        await UsersORM.updateEmail(req.params.nickname, req.body.oldEmail, req.body.newEmail)
+        await EmailsORM.update(req.params.nickname, req.body.oldEmail, req.body.newEmail)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -58,9 +59,9 @@ class EmailsCtrl {
      * @param {String} req.body.email User email that would be deleted.
      */
     async delete(req, res) {
-        await UsersORM.deleteEmail(req.params.nickname, req.body.email)
+        await EmailsORM.delete(req.params.nickname, req.body.email)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 }
 

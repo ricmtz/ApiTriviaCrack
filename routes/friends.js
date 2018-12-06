@@ -10,7 +10,7 @@ router.use(auth.session);
 router.use('/:friendNickname', rules.paramsFriends);
 
 // Get all friends.
-router.get('/', [rules.paramsUser, auth.havePermissions], friendsCtrl.getAll);
+router.get('/', [rules.paramsUser, rules.queryFriend, auth.havePermissions], friendsCtrl.getAll);
 
 // Add friend
 router.post('/', [rules.createFriend, auth.havePermissions], friendsCtrl.create);

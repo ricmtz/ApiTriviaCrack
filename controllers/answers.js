@@ -1,4 +1,4 @@
-const { GamesORM } = require('../orm');
+const { AnswersORM, TokensORM } = require('../orm');
 
 class AnswersCtrl {
     // FIXME En los metodos getAll se debe permitir paginado y filtrado
@@ -11,14 +11,15 @@ class AnswersCtrl {
      * @param {Number} req.query.page Page number.
      */
     async getAll(req, res) {
-        await GamesORM.getAllGamesQuestions(req.params.gameId, req.query.page)
+        await AnswersORM.getAll(req.params.gameId, req.query)
             .then((ans) => {
                 res.status(200).send({
-                    data: ans,
-                    total: ans.length,
+                    data: ans.result,
+                    total: ans.result.length,
+                    pages: ans.pages,
                 });
             })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -30,9 +31,9 @@ class AnswersCtrl {
      * @param {Number} req.params.answerId Question id.
      */
     async get(req, res) {
-        await GamesORM.getGameQuestion(req.params.gameId, req.params.answerId)
+        await AnswersORM.get(req.params.gameId, req.params.answerId)
             .then((ans) => { res.status(200).send({ data: ans }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -47,16 +48,22 @@ class AnswersCtrl {
      * @param {Boolean} req.body.correct Evaluation answer.
      */
     async create(req, res) {
-        const data = {
-            game: req.params.gameId,
-            question: req.params.answerId,
-            player: req.body.player,
-            option: req.body.option,
-            correct: req.body.correct,
-        };
-        await GamesORM.addAnswer(data)
+        let data;
+        try {
+            const token = await TokensORM.get(req.get('token'));
+            data = {
+                game: req.params.gameId,
+                question: req.body.question,
+                player: token.getUserId(),
+                option: req.body.option,
+            };
+        } catch (e) {
+            res.status(404).send({ error: e.message });
+            return;
+        }
+        await AnswersORM.create(data)
             .then((ans) => { res.status(200).send({ data: ans }); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -77,9 +84,9 @@ class AnswersCtrl {
             player: req.body.player,
             option: req.body.selectedoption,
         };
-        await GamesORM.updateGameQuestion(req.params.gameId, req.params.answerId, data)
+        await AnswersORM.update(req.params.gameId, req.params.answerId, data)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 
     /**
@@ -92,9 +99,9 @@ class AnswersCtrl {
      * @param {Number} req.params.answerId Question id
      */
     async delete(req, res) {
-        await GamesORM.deleteGameQuestion(req.params.gameId, req.params.answerId)
+        await AnswersORM.delete(req.params.gameId, req.params.answerId)
             .then(() => { res.status(204).send(); })
-            .catch((err) => { res.status(404).send({ data: err.message }); });
+            .catch((err) => { res.status(404).send({ error: err.message }); });
     }
 }
 

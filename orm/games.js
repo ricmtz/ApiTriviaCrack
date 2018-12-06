@@ -1,38 +1,28 @@
 const { db } = require('../db');
-const { Game, Answer } = require('../models');
+const { Game } = require('../models');
 const UsersORM = require('./users');
-const QuestionsORM = require('./questions');
+const { filters } = require('../filters');
 
 class Games {
     constructor() {
         this.name = 'games';
         this.users = 'users';
-        this.answers = 'answers';
-        this.questions = 'questions';
         this.msgNoUser = 'This user not exist';
         this.msgNoCreateGame = 'Dont create game';
         this.msgNoExistGame = 'This game not exist';
-        this.msgNoExistQuestion = 'This question not exist';
         this.msgNoCreateGame = 'Dont create answer';
-        this.msgNoUpdate = 'Dont update this data';
-        this.msgMaxQuestions = 'You answered your 10 questions';
-        this.msgNoExistOption = 'Option does not exist';
-        this.msgNoExistAnsware = 'This answare not exist';
     }
 
-    async getOponent() {
-        const games = await db.select(this.users, [], { deleted: false });
-        const max = games.length - 1;
-        const pos = Math.round(Math.random() * max);
-        return games[pos];
-    }
-
-    async getAll(page) {
+    async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, {}, [], page)
-            .then((res) => { result = this.processResult(res); })
+        const filtersObj = await this.getFilters(conditions)
             .catch(err => Promise.reject(err));
-        await this.appendValuesGames(result)
+        await db.selectPaged(this.name, filtersObj, [],
+            conditions.page, conditions.random)
+            .then((res) => { result = res; })
+            .catch(err => Promise.reject(err));
+        result.result = this.processResult(result.result);
+        await this.appendValuesGames(result.result)
             .catch(err => Promise.reject(err));
         return result;
     }
@@ -51,11 +41,6 @@ class Games {
         const game = new Game(data);
         await this.existsAttribs(game)
             .catch(err => Promise.reject(err));
-        let idP1 = null;
-        await UsersORM.getByNickname(game.getPlayer1())
-            .then((usr) => { idP1 = usr.getId(); })
-            .catch((err) => { Promise.reject(err); });
-        game.setPlayer1(idP1);
         let idP2 = null;
         await UsersORM.getByNickname(game.getPlayer2())
             .then((usr) => { idP2 = usr.getId(); })
@@ -63,6 +48,8 @@ class Games {
         game.setPlayer2(idP2);
         await db.insert(this.name, game, 'id')
             .then((res) => { game.setId(res); })
+            .catch((err) => { Promise.reject(err); });
+        await this.appendValuesGame(game)
             .catch((err) => { Promise.reject(err); });
         return game;
     }
@@ -94,93 +81,6 @@ class Games {
             .catch(err => Promise.reject(err));
     }
 
-    async getAllGamesQuestions(gameId, page) {
-        let result = null;
-        await db.selectPaged(this.answers, { game: gameId }, [], page)
-            .then((res) => { result = this.processResultAnsw(res); })
-            .catch(err => Promise.reject(err));
-        await this.appendValuesAnswers(result)
-            .catch(err => Promise.reject(err));
-        return result;
-    }
-
-    async getGameQuestion(gameId, questionId) {
-        let result = null;
-        await db.select(this.answers, { game: gameId, id: questionId }, [])
-            .then((res) => { result = this.processResultAnsw(res); })
-            .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
-        await this.appendValuesAnswer(result)
-            .catch(err => Promise.reject(err));
-        return result;
-    }
-
-    async addAnswer(data) {
-        const answer = new Answer(data);
-        await UsersORM.getByNickname(answer.getPlayer())
-            .then((res) => { answer.setPlayer(res.getId()); })
-            .catch((err) => { Promise.reject(err); });
-        await this.existsAttribsAnsw(answer)
-            .catch(err => Promise.reject(err));
-        await db.selectNonDel(this.questions,
-            { id: answer.getQuestion(), optioncorrect: answer.getOption() })
-            .then(() => { answer.setCorrect(true); })
-            .catch(() => { answer.setCorrect(false); });
-        await db.insert(this.answers, answer, 'id')
-            .then((res) => { answer.setId(res); })
-            .catch(err => Promise.reject(err));
-        await this.finishGame(answer)
-            .catch(err => Promise.reject(err));
-        return answer;
-    }
-
-    async finishGame(answer) {
-        let num = null;
-        await db.countRegs(this.answers,
-            { game: answer.getGame(), player: answer.getPlayer() })
-            .then((res) => { num = res; })
-            .catch(err => Promise.reject(err));
-        if (num >= 10) {
-            const numCorrect = await db.countRegs(this.answers,
-                {
-                    game: answer.getGame(),
-                    player: answer.getPlayer(),
-                    correct: true,
-                })
-                .catch(err => Promise.reject(err));
-            const posUsr = await this.getPosPlayer(answer.getGame(), answer.getPlayer());
-            const result = {};
-            if (posUsr) {
-                result[posUsr] = numCorrect;
-                await this.update(answer.getGame(), result)
-                    .catch((err) => { Promise.reject(err); });
-            }
-
-            const game = await this.get(answer.getGame())
-                .catch(err => Promise.reject(err));
-            if (game.getScoreplayer1() !== -1 && game.getScoreplayer2() !== -1) {
-                await this.update(game.getId(), { finished: true })
-                    .catch(err => Promise.reject(err));
-            }
-        }
-    }
-
-    async updateGameQuestion(gameId, questionId, data) {
-        await db.exists(this.answers, { game: gameId, question: questionId })
-            .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
-        const answer = new Answer(data);
-        await this.existsAttribsAnsw(answer)
-            .catch(err => Promise.reject(err));
-        await db.update(this.answers, answer, { game: gameId, question: questionId })
-            .catch(err => Promise.reject(err));
-    }
-
-    async deleteGameQuestion(gameId, questionId) {
-        await db.exists(this.answers, { game: gameId, question: questionId })
-            .catch(() => Promise.reject(new Error(this.msgNoExistAnsware)));
-        await db.delete(this.answers, { game: gameId, question: questionId })
-            .catch(err => Promise.reject(err));
-    }
-
     processResult(rows) {
         if (!rows) {
             return null;
@@ -196,58 +96,17 @@ class Games {
         return categoriesList;
     }
 
-    processResultAnsw(rows) {
-        if (!rows) {
-            return null;
-        }
-        if (!Array.isArray(rows)) {
-            return new Answer(rows);
-        }
-        if (rows.length === 1) {
-            return new Answer(rows[0]);
-        }
-        const categoriesList = [];
-        rows.forEach((row) => { categoriesList.push(new Answer(row)); });
-        return categoriesList;
-    }
-
     async existsAttribs(game) {
         let exist = null;
         if (game.getPlayer1()) {
-            exist = await db.exists(this.users, { nickname: game.getPlayer1() })
+            exist = await db.selectNonDel(this.users, { id: game.getPlayer1() })
                 .catch(() => { });
             if (!exist) {
                 return Promise.reject(new Error(this.msgNoUser));
             }
         }
         if (game.getPlayer2()) {
-            exist = await db.exists(this.users, { nickname: game.getPlayer2() })
-                .catch(() => { });
-            if (!exist) {
-                return Promise.reject(new Error(this.msgNoUser));
-            }
-        }
-        return null;
-    }
-
-    async existsAttribsAnsw(answer) {
-        let exist = null;
-        if (answer.getGame()) {
-            exist = await db.exists(this.name, { id: answer.getGame() })
-                .catch(() => { });
-            if (!exist) {
-                return Promise.reject(new Error(this.msgNoCreateGame));
-            }
-        }
-        if (answer.getQuestion()) {
-            exist = await db.exists(this.questions, { id: answer.getQuestion() })
-                .catch(() => { });
-            if (!exist) {
-                return Promise.reject(new Error(this.msgNoExistQuestion));
-            }
-        }
-        if (answer.getPlayer()) {
-            exist = await db.exists(this.users, { id: answer.getPlayer() })
+            exist = await db.selectNonDel(this.users, { nickname: game.getPlayer2() })
                 .catch(() => { });
             if (!exist) {
                 return Promise.reject(new Error(this.msgNoUser));
@@ -263,20 +122,6 @@ class Games {
             .catch(() => { });
         if (!p1 || !p2) {
             return Promise.reject(new Error(this.msgNoUser));
-        }
-        return null;
-    }
-
-    async getPosPlayer(gameId, userId) {
-        const p1 = await db.exists(this.name, { id: gameId, player1: userId })
-            .catch(() => { });
-        const p2 = await db.exists(this.name, { id: gameId, player2: userId })
-            .catch(() => { });
-        if (p1) {
-            return 'scoreplayer1';
-        }
-        if (p2) {
-            return 'scoreplayer2';
         }
         return null;
     }
@@ -304,27 +149,34 @@ class Games {
         }
     }
 
-    async appendValuesAnswer(answer) {
-        await UsersORM.get(answer.getPlayer())
-            .then((res) => { answer.setPlayer(res.getNickname()); })
-            .catch(err => Promise.reject(err));
-        await QuestionsORM.get(answer.getQuestion())
-            .then((res) => { answer.setQuestion(res.getQuestion()); })
-            .catch(() => { answer.setQuestion('Question deleted'); });
-    }
-
-    async appendValuesAnswers(answers) {
-        if (!Array.isArray(answers)) {
-            await this.appendValuesAnswer(answers)
-                .catch(err => Promise.reject(err));
-        } else {
-            const promises = [];
-            for (let i = 0; i < answers.length; i += 1) {
-                promises.push(this.appendValuesAnswer(answers[i]));
-            }
-            await Promise.all(promises)
+    async getFilters(cond) {
+        const result = [];
+        if (cond.player1) {
+            await UsersORM.getByNickname(cond.player1)
+                .then((usr) => { result.player1 = usr.getId(); })
                 .catch(err => Promise.reject(err));
         }
+        if (cond.player2) {
+            await UsersORM.getByNickname(cond.player2)
+                .then((usr) => { result.player2 = usr.getId(); })
+                .catch(err => Promise.reject(err));
+        }
+        if (cond.scorePlayer1Min) {
+            result.scorePlayer1Min = filters.minNumber('scoreplayer1', cond.scorePlayer1Min);
+        }
+        if (cond.scorePlayer1Max) {
+            result.scorePlayer1Max = filters.maxNumber('scoreplayer1', cond.scorePlayer1Max);
+        }
+        if (cond.scorePlayer2Min) {
+            result.scorePlayer2Min = filters.minNumber('scoreplayer2', cond.scorePlayer2Min);
+        }
+        if (cond.scorePlayer2Max) {
+            result.scorePlayer2Max = filters.maxNumber('scoreplayer2', cond.scorePlayer2Max);
+        }
+        if (typeof (cond.finished) !== 'undefined') {
+            result.finished = cond.finished;
+        }
+        return result;
     }
 }
 

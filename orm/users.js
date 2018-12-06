@@ -1,5 +1,7 @@
 const { db } = require('../db');
 const { User } = require('../models');
+const { Codes } = require('../resCodes');
+const { filters } = require('../filters');
 
 class Users {
     constructor() {
@@ -16,11 +18,13 @@ class Users {
         this.msgNoFriendExist = 'This friendship not exists';
     }
 
-    async getAll(pageNum) {
+    async getAll(conditions) {
         let result = null;
-        await db.selectPaged(this.name, {}, [], pageNum)
-            .then((res) => { result = this.processResult(res); })
-            .catch(err => Promise.reject(err));
+        await db.selectPaged(this.name, this.getFilters(conditions), [],
+            conditions.page, conditions.random)
+            .then((res) => { result = res; })
+            .catch(err => Promise.reject(Codes.resNotFound(err.message)));
+        result.result = this.processResult(result.result);
         return result;
     }
 
@@ -28,12 +32,13 @@ class Users {
         let result = null;
         await db.selectNonDel(this.name, { id: idUser })
             .then((res) => { result = this.processResult(res); })
-            .catch(() => Promise.reject(new Error(this.msgNoUser)));
+            .catch(() => Promise.reject(Codes.resNotFound(this.msgNoUser)));
         return result;
     }
 
     async create(data) {
         const user = new User(data);
+        this.setDefaultValues(user);
         await this.existsAttribs(user)
             .catch(err => Promise.reject(err));
         await db.insert(this.name, user, 'id')
@@ -109,167 +114,39 @@ class Users {
         return null;
     }
 
-    async getEmails(nicknameUser, page) {
-        const user = await this.getByNickname(nicknameUser)
-            .catch(err => Promise.reject(err));
-        let result = null;
-        await db.selectPaged(this.emails, { userid: user.getId() }, [], page)
-            .then((res) => { result = res; })
-            .catch(err => Promise.reject(err));
-        await this.appendValuesEmails(result)
-            .catch(err => Promise.reject(err));
+    getFilters(cond) {
+        const result = [];
+        if (cond.nickname) {
+            result.nickname = filters.strFilter('nickname', cond.nickname);
+        }
+        if (cond.email) {
+            result.email = filters.strFilter('email', cond.email);
+        }
+        if (typeof (cond.admin) !== 'undefined') {
+            result.admin = cond.admin;
+        }
+        if (cond.scoreMin) {
+            result.scoreMin = filters.minNumber('score', cond.scoreMin);
+        }
+        if (cond.scoreMax) {
+            result.scoreMax = filters.maxNumber('score', cond.scoreMax);
+        }
         return result;
     }
 
-    async addEmail(nickname, email) {
-        const user = await this.getByNickname(nickname)
-            .catch(err => Promise.reject(err));
-        await this.existsAttribsEmail(email)
-            .catch(err => Promise.reject(err));
-        const newEmail = { userid: user.getId(), email };
-        await db.insert(this.emails, newEmail, 'id')
-            .then((res) => { newEmail.id = res; })
-            .catch(err => Promise.reject(err));
-        await this.appendValuesEmail(newEmail)
-            .catch(err => Promise.reject(err));
-        return newEmail;
-    }
-
-    async updateEmail(nickname, oldEmail, newEmail) {
-        const user = await this.getByNickname(nickname)
-            .catch(err => Promise.reject(err));
-        await this.existsAttribsEmail(newEmail)
-            .catch(err => Promise.reject(err));
-        const conditions = { userid: user.getId(), email: oldEmail };
-        await db.update(this.emails, { email: newEmail }, conditions)
-            .catch(err => Promise.reject(err));
-    }
-
-    async deleteEmail(nickname, email) {
-        const user = await this.getByNickname(nickname)
-            .catch(err => Promise.reject(err));
-        await db.exists(this.emails, { email })
-            .catch(() => Promise.reject(new Error(this.msgNoExistEmail)));
-        await db.delete(this.emails, { userid: user.getId(), email })
-            .catch(err => Promise.reject(err));
-    }
-
-    async existsAttribsEmail(email) {
-        const duplicateMail = await db.exists(this.emails, { email })
-            .catch(() => { });
-        const duplicateMailUsr = await db.exists(this.name, { email })
-            .catch(() => { });
-        if (duplicateMail || duplicateMailUsr) {
-            return Promise.reject(new Error(this.msgExistEmail));
-        }
-        return null;
-    }
-
-    async appendValuesEmail(email) {
-        await this.get(email.userid)
-            .then((res) => { email.user = res.getNickname(); })
-            .catch(err => Promise.reject(err));
-        delete email.userid;
-    }
-
-    async appendValuesEmails(emails) {
-        if (!Array.isArray(emails)) {
-            await this.appendValuesEmail(emails)
-                .catch(err => Promise.reject(err));
-        } else {
-            const promises = [];
-            for (let i = 0; i < emails.length; i += 1) {
-                promises.push(this.appendValuesEmail(emails[i]));
-            }
-            await Promise.all(promises)
-                .catch(err => Promise.reject(err));
-        }
-    }
-
-    async getFriends(nickname) {
-        const user = await this.getByNickname(nickname)
-            .catch(err => Promise.reject(err));
-        let result = null;
-        await db.selectNonDel(this.friends, { user1: user.getId() }, [])
-            .then((res) => { result = res; })
-            .catch(err => Promise.reject(err));
-        await db.selectNonDel(this.friends, { user2: user.getId() }, [])
-            .then((res) => { result.push(...res); })
-            .catch(err => Promise.reject(err));
-        await this.appendValuesFriends(result)
-            .catch(err => Promise.reject(err));
-        await this.appendValuesFriend(result)
-            .catch(err => Promise.reject(err));
-        return result;
-    }
-
-    async addFriend(nicknameUser, nicknameFriend, date) {
-        const user1 = await this.getByNickname(nicknameUser)
-            .catch(err => Promise.reject(err));
-        const user2 = await this.getByNickname(nicknameFriend)
-            .catch(err => Promise.reject(err));
-        if (user1.getId() === user2.getId()) {
-            return Promise.reject(new Error(this.msgSameUser));
-        }
-        await this.notExistFriendship(user1.getId(), user2.getId())
-            .catch(err => Promise.reject(err));
-        const friendship = { user1: user1.getId(), user2: user2.getId(), friendshipdate: date };
-        await db.insert(this.friends, friendship, 'id')
-            .then((res) => { friendship.id = res; })
-            .catch(err => Promise.reject(err));
-        return friendship;
-    }
-
-    async deleteFriend(nicknameUser, nicknameFriend) {
-        const user1 = await this.getByNickname(nicknameUser)
-            .catch(err => Promise.reject(err));
-        const user2 = await this.getByNickname(nicknameFriend)
-            .catch(err => Promise.reject(err));
-        await this.existFriendship(user1.getId(), user2.getId())
-            .catch(err => Promise.reject(err));
-        await db.delete(this.friends, { user1: user1.getId(), user2: user2.getId() })
-            .catch(err => Promise.reject(err));
-    }
-
-    async notExistFriendship(user1, user2) {
-        const exist = await db.exists(this.friends, { user1, user2 })
-            .catch(() => { });
-        if (exist) {
-            return Promise.reject(new Error(this.msgFriendExist));
-        }
-        return null;
-    }
-
-    async existFriendship(user1, user2) {
-        const exist = await db.exists(this.friends, { user1, user2, deleted: false })
-            .catch(() => { });
-        if (!exist) {
-            return Promise.reject(new Error(this.msgNoFriendExist));
-        }
-        return null;
-    }
-
-    async appendValuesFriend(friend) {
-        await this.get(friend.user1)
-            .then((res) => { friend.user1 = res.getNickname(); })
-            .catch(err => Promise.reject(err));
-        await this.get(friend.user2)
-            .then((res) => { friend.user2 = res.getNickname(); })
-            .catch(err => Promise.reject(err));
-    }
-
-    async appendValuesFriends(friends) {
-        if (!Array.isArray(friends)) {
-            await this.appendValuesFriend(friends)
-                .catch(err => Promise.reject(err));
-        } else {
-            const promises = [];
-            for (let i = 0; i < friends.length; i += 1) {
-                promises.push(this.appendValuesFriend(friends[i]));
-            }
-            await Promise.all(promises)
-                .catch(err => Promise.reject(err));
-        }
+    /**
+     * This function set the default valuest to the attribs
+     * admin, score, avatar, lastlogin, deleted and verified
+     * for a user.
+     * @param {Object} req Express request object.
+     */
+    setDefaultValues(user) {
+        user.setAdmin(false);
+        user.setScore(0);
+        user.setAvatar('default.png');
+        user.setLastLogin(new Date().toISOString());
+        user.setDeleted(false);
+        user.setVerified(false);
     }
 }
 

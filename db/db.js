@@ -86,7 +86,26 @@ class DB {
             return '';
         }
 
-        return pgp.helpers.sets(conditions).replace(new RegExp(',', 'g'), logOp);
+        return this.getConditionsStr(conditions, logOp);
+    }
+
+    getConditionsStr(conditions, logOp) {
+        let resultStr = '';
+        let aux;
+        Object.keys(conditions).forEach((key) => {
+            aux = {};
+            if (typeof (conditions[key]) === 'object') {
+                aux[conditions[key].attrib] = conditions[key].val;
+                resultStr += pgp.helpers.sets(aux)
+                    .replace(new RegExp('='), conditions[key].opr)
+                    .replace(new RegExp(','), '');
+            } else {
+                aux[key] = conditions[key];
+                resultStr += pgp.helpers.sets(aux).replace(new RegExp(','), '');
+            }
+            resultStr += logOp;
+        });
+        return resultStr.slice(0, resultStr.length - logOp.length);
     }
 
     getColsQuery(cols) {
@@ -173,9 +192,7 @@ class DB {
         });
     }
 
-    async selectPaged(tab, cond, col, page = DEFAULT_PAGE) {
-        await this.validatePage(tab, page, cond).catch(err => Promise.reject(err));
-
+    async selectPaged(tab, cond, col, page = DEFAULT_PAGE, random = false) {
         let conds = cond;
         if (!conds) {
             conds = { deleted: false };
@@ -183,14 +200,57 @@ class DB {
             conds.deleted = false;
         }
 
+        const result = {};
+        let regs;
+        if (random) {
+            result.result = await this.randomReg(tab, conds, page)
+                .catch(err => Promise.reject(err));
+            regs = 1;
+        } else {
+            result.result = await this.selectPage(tab, conds, col, page)
+                .catch(err => Promise.reject(err));
+            regs = await this.countRegs(tab, conds)
+                .catch(err => Promise.reject(err));
+        }
+
+        result.pages = Math.ceil(regs / REG_PER_PAGE);
+        return result;
+    }
+
+    async selectPage(tab, cond, col, page = DEFAULT_PAGE) {
+        await this.validatePage(tab, page, cond).catch(err => Promise.reject(err));
+
         return new Promise((resolve, reject) => {
             this.db.any(this.selectQuery({
                 table: tab,
-                conditions: conds,
+                conditions: cond,
                 columns: col,
                 orderBy: DEFAULT_ORDER_BY_COLUMN,
                 limit: REG_PER_PAGE,
                 offset: (page - 1) * REG_PER_PAGE,
+            }))
+                .then(res => resolve(res))
+                .catch(err => reject(err));
+        });
+    }
+
+    async randomReg(tab, conds, page = DEFAULT_PAGE) {
+        if (page > 1) {
+            return Promise.reject(new Error('Page out of range'));
+        }
+
+        let off;
+        await this.countRegs(tab, conds)
+            .then((res) => { off = Math.floor(Math.random() * Math.floor(res)); })
+            .catch(err => Promise.reject(err));
+
+        return new Promise((resolve, reject) => {
+            this.db.any(this.selectQuery({
+                table: tab,
+                conditions: conds,
+                orderBy: DEFAULT_ORDER_BY_COLUMN,
+                limit: 1,
+                offset: off,
             }))
                 .then(res => resolve(res))
                 .catch(err => reject(err));

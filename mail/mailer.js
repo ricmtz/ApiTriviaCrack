@@ -5,50 +5,76 @@ const nodemailer = require('nodemailer');
 class Mailer {
     constructor() {
         this.transporter = nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
-            port: process.env.MAIL_PORT,
+            service: 'gmail',
             auth: {
+                type: 'OAuth2',
                 user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASS,
+                clientId: process.env.MAIL_CLIENT_ID,
+                clientSecret: process.env.MAIL_CLIENT_SECRET,
+                refreshToken: process.env.MAIL_REFRESH_TOKEN,
+            },
+            tls: {
+                rejectUnauthorized: false,
             },
         });
 
         this.mailOptions = {
-            from: '"Trivia Crack App" <triviacrack@example.com>',
+            from: `"Trivia Crack App" <${process.env.MAIL_USER}>`,
         };
 
         this.sendMail = this.sendMail.bind(this);
     }
 
-    sendMail(options) {
+    async sendMail(options) {
         const mailOptions = {
             ...this.mailOptions,
             ...options,
         };
 
-        this.transporter.sendMail(mailOptions, (error, info) => {
+        await this.transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                return console.log(error);
+                return Promise.reject(error);
             }
-            return true;
+            return Promise.resolve(info);
         });
     }
 
-
-    sendConfirmation(email, token) {
-        this.sendMail({
-            to: email,
-            subject: 'Trivia Crack account confirmation',
-            text: token, // FIXME lo que deberia mandar seria un mensaje en html con un boton que mande a una url para confirmar el token, no el token directamente
-        });
+    async sendVerification(email, token) {
+        try {
+            await this.sendMail({
+                to: email,
+                subject: 'Trivia Crack account verification',
+                text: `Trivia Crack Verification\n${process.env.HOST}/verify?token=${token}`,
+                html: `<h1 style="text-align: center;">Trivia Crack Verification</h1>
+                <div class="" style="width: 20%; margin: auto;">
+                <a href="${process.env.HOST}/verify?token=${token}">
+                <button type="button" name="button" style="width: 100%;">Verify</button>
+                </a>
+                </div>`,
+            });
+        } catch (e) {
+            return Promise.reject(e);
+        }
+        return true;
     }
 
-    sendRestoration(email, token) {
-        this.sendMail({
-            to: email,
-            subject: 'Trivia Crack password restoration',
-            text: token,
-        });
+    async sendRestoration(email, token) {
+        try {
+            await this.sendMail({
+                to: email,
+                subject: 'Trivia Crack password restoration',
+                text: `Trivia Crack Pass Restoration\n${process.env.HOST}/restore?token=${token}`,
+                html: `<h1 style="text-align: center;">Trivia Crack Pass Restoration</h1>
+                        <div class="" style="width: 20%; margin: auto;">
+                            <a href="${process.env.HOST}/restore?token=${token}">
+                                <button type="button" name="button" style="width: 100%;">Restore</button>
+                            </a>
+                        </div>`,
+            });
+        } catch (e) {
+            return Promise.reject(e);
+        }
+        return true;
     }
 }
 

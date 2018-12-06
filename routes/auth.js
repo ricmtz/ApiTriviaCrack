@@ -7,5 +7,6 @@ router.post('/register', rules.createUser, auth.register);
 router.post('/login', auth.login);
 router.get('/logout', auth.logout);
 router.post('/restore', auth.restore);
+router.get('/verify', auth.verify);
 
 module.exports = router;
