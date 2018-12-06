@@ -354,8 +354,7 @@ class Rules {
     static createGame(req, res, next) {
         validator.validate(req, res, next, {
             body: {
-                player1: 'nickname,required',
-                player2: 'nickname,optional',
+                player2: 'nickname,required',
             },
         });
     }

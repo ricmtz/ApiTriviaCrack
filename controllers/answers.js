@@ -58,7 +58,8 @@ class AnswersCtrl {
                 option: req.body.option,
             };
         } catch (e) {
-            return Promise.reject(e);
+            res.status(404).send({ error: e.message });
+            return;
         }
         await AnswersORM.create(data)
             .then((ans) => { res.status(200).send({ data: ans }); })

@@ -41,11 +41,6 @@ class Games {
         const game = new Game(data);
         await this.existsAttribs(game)
             .catch(err => Promise.reject(err));
-        let idP1 = null;
-        await UsersORM.getByNickname(game.getPlayer1())
-            .then((usr) => { idP1 = usr.getId(); })
-            .catch((err) => { Promise.reject(err); });
-        game.setPlayer1(idP1);
         let idP2 = null;
         await UsersORM.getByNickname(game.getPlayer2())
             .then((usr) => { idP2 = usr.getId(); })
@@ -53,6 +48,8 @@ class Games {
         game.setPlayer2(idP2);
         await db.insert(this.name, game, 'id')
             .then((res) => { game.setId(res); })
+            .catch((err) => { Promise.reject(err); });
+        await this.appendValuesGame(game)
             .catch((err) => { Promise.reject(err); });
         return game;
     }
@@ -102,14 +99,14 @@ class Games {
     async existsAttribs(game) {
         let exist = null;
         if (game.getPlayer1()) {
-            exist = await db.exists(this.users, { nickname: game.getPlayer1() })
+            exist = await db.selectNonDel(this.users, { id: game.getPlayer1() })
                 .catch(() => { });
             if (!exist) {
                 return Promise.reject(new Error(this.msgNoUser));
             }
         }
         if (game.getPlayer2()) {
-            exist = await db.exists(this.users, { nickname: game.getPlayer2() })
+            exist = await db.selectNonDel(this.users, { nickname: game.getPlayer2() })
                 .catch(() => { });
             if (!exist) {
                 return Promise.reject(new Error(this.msgNoUser));

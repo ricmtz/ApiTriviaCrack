@@ -1,4 +1,4 @@
-const { GamesORM } = require('../orm');
+const { GamesORM, TokensORM } = require('../orm');
 
 class GamesCtrl {
     /**
@@ -50,6 +50,13 @@ class GamesCtrl {
      * @param {String} req.params.player2 User nickname of the player 2.
      */
     async create(req, res) {
+        try {
+            const token = await TokensORM.get(req.get('token'));
+            req.body.player1 = token.getUserId();
+        } catch (e) {
+            res.status(404).send({ error: e.message });
+            return;
+        }
         this.setDefaultValues(req);
         await GamesORM.create(req.body)
             .then((game) => { res.status(200).send({ data: game }); })
