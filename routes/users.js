@@ -22,10 +22,7 @@ router.get('/',
 router.get('/:nickname', [auth.session, auth.havePermissions], usersCtrl.get);
 
 // Create users.
-router.post('/',
-    [upload.single('avatar'), rules.createUser,
-        auth.havePermissions, file.changeFolder],
-    usersCtrl.create);
+router.post('/', rules.createUser, usersCtrl.create);
 
 // Delete users.
 router.delete('/:nickname', [auth.session, auth.havePermissions], usersCtrl.delete);
