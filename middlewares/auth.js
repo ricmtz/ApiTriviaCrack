@@ -4,6 +4,7 @@ const Authorization = require('./authorization');
 const { mailer } = require('../mail');
 const { Codes } = require('../resCodes');
 
+// FIXME Documentar esta clase y sus metodos
 
 class Auth {
     constructor() {
@@ -19,6 +20,7 @@ class Auth {
         this.verify = this.verify.bind(this);
     }
 
+    // FIXME generalmente la parte de registro la hace el ctrl de users, y desde ahi se llaman las necesidad de auth para token
     async register(req, res, next) {
         try {
             // Encrypt password

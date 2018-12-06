@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer');
 
+// FIXME esta clase y sus metodos deben estar documentados
+
 class Mailer {
     constructor() {
         this.transporter = nodemailer.createTransport({
