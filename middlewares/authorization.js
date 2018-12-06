@@ -117,6 +117,9 @@ class Authorization {
     }
 
     async questionGet(user, params, filters) {
+        if (filters.random) {
+            return true;
+        }
         if (!params.question && filters.user !== user.getNickname()) {
             return false;
         }
